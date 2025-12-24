@@ -22,7 +22,7 @@ plugins {
 description = "Graphite Maven Plugin - Maven plugin for GraphQL code generation"
 
 val mavenVersion = "3.9.12"
-val mavenPluginToolsVersion = "3.11.0"
+val mavenPluginToolsVersion = "3.15.2"
 
 dependencies {
     // Codegen module
