@@ -36,4 +36,7 @@ dependencies {
     // Testing
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
+    testImplementation("org.apache.maven:maven-plugin-api:$mavenVersion")
+    testImplementation("org.apache.maven:maven-core:$mavenVersion")
+    testImplementation("org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenPluginToolsVersion")
 }
