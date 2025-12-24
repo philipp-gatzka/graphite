@@ -139,7 +139,9 @@ public final class TypeMapper {
 
     // Check if it's an input type
     if (schema.isInputType(typeName)) {
-      return ClassName.get(configuration.packageName() + ".input", typeName + "Input");
+      // Only add Input suffix if not already present
+      String inputClassName = typeName.endsWith("Input") ? typeName : typeName + "Input";
+      return ClassName.get(configuration.packageName() + ".input", inputClassName);
     }
 
     // Check if it's an interface
