@@ -33,6 +33,9 @@ dependencies {
     implementation(libs.jackson.core)
     implementation(libs.jackson.annotations)
 
+    // Code generation
+    api(libs.javapoet)
+
     // Testing
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
