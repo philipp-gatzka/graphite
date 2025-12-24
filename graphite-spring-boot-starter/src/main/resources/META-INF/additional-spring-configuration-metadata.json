@@ -1,0 +1,179 @@
+{
+  "groups": [
+    {
+      "name": "graphite",
+      "type": "io.github.graphite.spring.autoconfigure.GraphiteProperties",
+      "description": "Graphite GraphQL client configuration."
+    },
+    {
+      "name": "graphite.timeout",
+      "type": "io.github.graphite.spring.autoconfigure.GraphiteProperties$Timeout",
+      "description": "Timeout configuration for HTTP requests."
+    },
+    {
+      "name": "graphite.retry",
+      "type": "io.github.graphite.spring.autoconfigure.GraphiteProperties$Retry",
+      "description": "Retry configuration for failed requests."
+    },
+    {
+      "name": "graphite.rate-limit",
+      "type": "io.github.graphite.spring.autoconfigure.GraphiteProperties$RateLimit",
+      "description": "Rate limiting configuration."
+    },
+    {
+      "name": "graphite.connection-pool",
+      "type": "io.github.graphite.spring.autoconfigure.GraphiteProperties$ConnectionPool",
+      "description": "Connection pool configuration."
+    }
+  ],
+  "properties": [
+    {
+      "name": "graphite.url",
+      "type": "java.lang.String",
+      "description": "GraphQL endpoint URL."
+    },
+    {
+      "name": "graphite.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether the Graphite client is enabled.",
+      "defaultValue": true
+    },
+    {
+      "name": "graphite.timeout.connect",
+      "type": "java.time.Duration",
+      "description": "Connection timeout for establishing connections.",
+      "defaultValue": "10s"
+    },
+    {
+      "name": "graphite.timeout.read",
+      "type": "java.time.Duration",
+      "description": "Read timeout for reading data from the connection.",
+      "defaultValue": "30s"
+    },
+    {
+      "name": "graphite.timeout.request",
+      "type": "java.time.Duration",
+      "description": "Overall request timeout for the entire request.",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "graphite.retry.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether retry is enabled for failed requests.",
+      "defaultValue": true
+    },
+    {
+      "name": "graphite.retry.max-attempts",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retry attempts.",
+      "defaultValue": 3
+    },
+    {
+      "name": "graphite.retry.initial-delay",
+      "type": "java.time.Duration",
+      "description": "Initial delay between retries.",
+      "defaultValue": "100ms"
+    },
+    {
+      "name": "graphite.retry.multiplier",
+      "type": "java.lang.Double",
+      "description": "Multiplier for exponential backoff.",
+      "defaultValue": 2.0
+    },
+    {
+      "name": "graphite.retry.max-delay",
+      "type": "java.time.Duration",
+      "description": "Maximum delay between retries.",
+      "defaultValue": "5s"
+    },
+    {
+      "name": "graphite.rate-limit.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether rate limiting is enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "graphite.rate-limit.requests-per-second",
+      "type": "java.lang.Double",
+      "description": "Maximum requests per second.",
+      "defaultValue": 100.0
+    },
+    {
+      "name": "graphite.rate-limit.burst-capacity",
+      "type": "java.lang.Integer",
+      "description": "Burst capacity for rate limiter.",
+      "defaultValue": 150
+    },
+    {
+      "name": "graphite.connection-pool.max-connections",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of connections in the pool.",
+      "defaultValue": 50
+    },
+    {
+      "name": "graphite.connection-pool.idle-timeout",
+      "type": "java.time.Duration",
+      "description": "Idle timeout for pooled connections.",
+      "defaultValue": "30s"
+    }
+  ],
+  "hints": [
+    {
+      "name": "graphite.timeout.connect",
+      "values": [
+        {"value": "5s", "description": "Fast connection (local/nearby servers)"},
+        {"value": "10s", "description": "Default connection timeout"},
+        {"value": "30s", "description": "Slow network/distant servers"}
+      ]
+    },
+    {
+      "name": "graphite.timeout.read",
+      "values": [
+        {"value": "10s", "description": "Fast reads"},
+        {"value": "30s", "description": "Default read timeout"},
+        {"value": "60s", "description": "Long-running queries"}
+      ]
+    },
+    {
+      "name": "graphite.timeout.request",
+      "values": [
+        {"value": "30s", "description": "Fast requests"},
+        {"value": "60s", "description": "Default request timeout"},
+        {"value": "120s", "description": "Long-running operations"}
+      ]
+    },
+    {
+      "name": "graphite.retry.max-attempts",
+      "values": [
+        {"value": 1, "description": "No retries"},
+        {"value": 3, "description": "Default retries"},
+        {"value": 5, "description": "More retries for unstable networks"}
+      ]
+    },
+    {
+      "name": "graphite.retry.initial-delay",
+      "values": [
+        {"value": "50ms", "description": "Fast retry"},
+        {"value": "100ms", "description": "Default initial delay"},
+        {"value": "500ms", "description": "Slower initial delay"}
+      ]
+    },
+    {
+      "name": "graphite.rate-limit.requests-per-second",
+      "values": [
+        {"value": 10.0, "description": "Conservative rate limit"},
+        {"value": 50.0, "description": "Moderate rate limit"},
+        {"value": 100.0, "description": "Default rate limit"},
+        {"value": 500.0, "description": "High throughput"}
+      ]
+    },
+    {
+      "name": "graphite.connection-pool.max-connections",
+      "values": [
+        {"value": 10, "description": "Small pool"},
+        {"value": 50, "description": "Default pool size"},
+        {"value": 100, "description": "Large pool for high traffic"}
+      ]
+    }
+  ]
+}
