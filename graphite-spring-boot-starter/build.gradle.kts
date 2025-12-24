@@ -45,4 +45,6 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.micrometer.core)
     testImplementation(libs.micrometer.tracing)
+    testImplementation(libs.spring.boot.actuator)
+    testImplementation(libs.spring.boot.actuator.autoconfigure)
 }
