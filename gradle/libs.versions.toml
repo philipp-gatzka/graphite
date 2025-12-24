@@ -1,0 +1,71 @@
+# Version catalog for Graphite project
+# https://docs.gradle.org/current/userguide/version_catalogs.html
+
+[versions]
+# Core
+java = "21"
+
+# Jackson
+jackson = "2.18.2"
+
+# Annotations
+jetbrains-annotations = "26.0.1"
+
+# Spring Boot
+spring-boot = "3.4.1"
+
+# Micrometer
+micrometer = "1.14.2"
+micrometer-tracing = "1.4.1"
+
+# Testing
+junit = "5.11.4"
+assertj = "3.27.0"
+mockito = "5.15.2"
+wiremock = "3.10.0"
+
+# Build plugins
+spotless = "7.0.2"
+checkstyle = "10.21.1"
+
+[libraries]
+# Jackson
+jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+
+# Annotations
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+
+# Spring Boot
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure" }
+spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
+spring-boot-actuator = { module = "org.springframework.boot:spring-boot-actuator" }
+spring-boot-actuator-autoconfigure = { module = "org.springframework.boot:spring-boot-actuator-autoconfigure" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+# Micrometer
+micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer" }
+micrometer-observation = { module = "io.micrometer:micrometer-observation", version.ref = "micrometer" }
+micrometer-tracing = { module = "io.micrometer:micrometer-tracing", version.ref = "micrometer-tracing" }
+
+# Testing
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
+
+[bundles]
+jackson = ["jackson-core", "jackson-databind", "jackson-annotations", "jackson-datatype-jsr310"]
+testing = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter"]
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
