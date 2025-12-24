@@ -145,9 +145,12 @@ A `commit-msg` git hook validates:
 
 ## 4. Pull Request Workflow
 
-### 4.1 PR Requirements
+### 4.1 PR Requirements (Non-Negotiable)
 
-- Title: `#<issue-id> <description>`
+- **Title Format**: `#<issue-id> <issue-title>`
+  - This exact format is **mandatory** and must always be followed
+  - Example: Issue #42 "Add login button" → PR title: `#42 Add login button`
+  - The title should match the issue title exactly
 - Description must include:
   - Link to issue (`Closes #<id>`)
   - Summary of changes
@@ -233,6 +236,7 @@ Configured on `main`:
 - Bulk commits (multiple unrelated changes in one commit)
 - Multi-file commits when separate commits are possible
 - Leaving failed CI unaddressed
+- PR titles not matching the format `#<issue-id> <issue-title>`
 
 ---
 
