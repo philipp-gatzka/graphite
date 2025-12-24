@@ -1,0 +1,83 @@
+name: Chore
+description: Maintenance task, dependency update, or housekeeping
+labels: ["type/chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Chore / Maintenance Task
+        Please fill out all required fields. Issues missing required information will be rejected.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Describe the task from a maintenance perspective
+      placeholder: "As a [role], I want [task], so that [benefit]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the maintenance task
+      placeholder: "What needs to be done and why..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List all conditions that must be met. The first two are mandatory and pre-filled.
+      value: |
+        - [ ] Implemented code is covered with automated tests
+        - [ ] Documentation has been updated
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Estimated size of the task
+      options:
+        - size/xs
+        - size/s
+        - size/m
+        - size/l
+        - size/xl
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      description: Technical complexity of the task
+      options:
+        - complexity/trivial
+        - complexity/simple
+        - complexity/moderate
+        - complexity/complex
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area (Optional)
+      description: Which area of the codebase does this affect?
+      multiple: true
+      options:
+        - area/ui
+        - area/backend
+        - area/api
+        - area/database
+        - area/infra
+        - area/docs
+        - area/testing
+    validations:
+      required: false
