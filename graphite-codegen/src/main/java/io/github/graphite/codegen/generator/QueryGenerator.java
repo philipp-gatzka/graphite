@@ -447,31 +447,25 @@ public final class QueryGenerator {
     return setter.build();
   }
 
-  private String getBaseTypeName(TypeReference typeRef) {
-    return switch (typeRef) {
-      case TypeReference.Named named -> named.name();
-      case TypeReference.NonNull nonNull -> getBaseTypeName(nonNull.inner());
-      case TypeReference.ListType listType -> getBaseTypeName(listType.inner());
-    };
+  private String getBaseTypeName(TypeReference type) {
+    return type.getBaseName();
   }
 
-  private boolean isList(TypeReference typeRef) {
-    return switch (typeRef) {
-      case TypeReference.Named named -> false;
-      case TypeReference.NonNull nonNull -> isList(nonNull.inner());
-      case TypeReference.ListType listType -> true;
-    };
+  private boolean isList(TypeReference type) {
+    return type.isList();
   }
 
-  private boolean isRequired(TypeReference typeRef) {
-    return typeRef instanceof TypeReference.NonNull;
+  private boolean isRequired(TypeReference type) {
+    return type.isNonNull();
   }
 
   private boolean isScalarType(String typeName) {
-    return switch (typeName) {
-      case "String", "Int", "Float", "Boolean", "ID" -> true;
-      default -> schema.scalars().containsKey(typeName);
-    };
+    return "String".equals(typeName)
+        || "Int".equals(typeName)
+        || "Float".equals(typeName)
+        || "Boolean".equals(typeName)
+        || "ID".equals(typeName)
+        || schema.scalars().containsKey(typeName);
   }
 
   private ClassName getScalarClassName(String typeName) {
@@ -484,19 +478,12 @@ public final class QueryGenerator {
     };
   }
 
-  private String formatGraphQLType(TypeReference typeRef) {
-    return switch (typeRef) {
-      case TypeReference.Named named -> named.name();
-      case TypeReference.NonNull nonNull -> formatGraphQLType(nonNull.inner()) + "!";
-      case TypeReference.ListType listType -> "[" + formatGraphQLType(listType.inner()) + "]";
-    };
+  private String formatGraphQLType(TypeReference type) {
+    return type.toGraphQL();
   }
 
-  private String capitalize(String str) {
-    if (str == null || str.isEmpty()) {
-      return str;
-    }
-    return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+  private String capitalize(String s) {
+    return s == null || s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
 
   private String escapeJavadoc(String text) {
