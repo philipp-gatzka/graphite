@@ -44,4 +44,5 @@ dependencies {
     testImplementation(libs.bundles.testing)
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.micrometer.core)
+    testImplementation(libs.micrometer.tracing)
 }
