@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating an error that occurred on the client side before or during
- * a GraphQL request.
+ * Exception indicating an error that occurred on the client side before or during a GraphQL
+ * request.
  *
- * <p>Client exceptions represent errors that occur in the Graphite client itself,
- * such as network failures, timeouts, or configuration issues. These are distinct
- * from server exceptions, which represent errors returned by the GraphQL server.
+ * <p>Client exceptions represent errors that occur in the Graphite client itself, such as network
+ * failures, timeouts, or configuration issues. These are distinct from server exceptions, which
+ * represent errors returned by the GraphQL server.
  *
  * <p>Common subclasses include:
+ *
  * <ul>
- *   <li>{@link GraphiteConnectionException} - Connection establishment failures</li>
- *   <li>{@link GraphiteTimeoutException} - Request or connection timeouts</li>
- *   <li>{@link GraphiteRateLimitException} - Client-side rate limit exceeded</li>
+ *   <li>{@link GraphiteConnectionException} - Connection establishment failures
+ *   <li>{@link GraphiteTimeoutException} - Request or connection timeouts
+ *   <li>{@link GraphiteRateLimitException} - Client-side rate limit exceeded
  * </ul>
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try {
  *     client.execute(query);
@@ -53,48 +54,46 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GraphiteClientException extends GraphiteException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructs a new client exception with the specified message.
-     *
-     * @param message the detail message describing the error
-     */
-    public GraphiteClientException(String message) {
-        super(message);
-    }
+  /**
+   * Constructs a new client exception with the specified message.
+   *
+   * @param message the detail message describing the error
+   */
+  public GraphiteClientException(String message) {
+    super(message);
+  }
 
-    /**
-     * Constructs a new client exception with the specified message and cause.
-     *
-     * @param message the detail message describing the error
-     * @param cause the underlying cause of this exception, may be {@code null}
-     */
-    public GraphiteClientException(String message, @Nullable Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * Constructs a new client exception with the specified message and cause.
+   *
+   * @param message the detail message describing the error
+   * @param cause the underlying cause of this exception, may be {@code null}
+   */
+  public GraphiteClientException(String message, @Nullable Throwable cause) {
+    super(message, cause);
+  }
 
-    /**
-     * Constructs a new client exception with the specified message and error code.
-     *
-     * @param message the detail message describing the error
-     * @param errorCode an optional error code for programmatic error handling,
-     *                  may be {@code null}
-     */
-    public GraphiteClientException(String message, @Nullable String errorCode) {
-        super(message, errorCode);
-    }
+  /**
+   * Constructs a new client exception with the specified message and error code.
+   *
+   * @param message the detail message describing the error
+   * @param errorCode an optional error code for programmatic error handling, may be {@code null}
+   */
+  public GraphiteClientException(String message, @Nullable String errorCode) {
+    super(message, errorCode);
+  }
 
-    /**
-     * Constructs a new client exception with the specified message, cause, and error code.
-     *
-     * @param message the detail message describing the error
-     * @param cause the underlying cause of this exception, may be {@code null}
-     * @param errorCode an optional error code for programmatic error handling,
-     *                  may be {@code null}
-     */
-    public GraphiteClientException(
-            String message, @Nullable Throwable cause, @Nullable String errorCode) {
-        super(message, cause, errorCode);
-    }
+  /**
+   * Constructs a new client exception with the specified message, cause, and error code.
+   *
+   * @param message the detail message describing the error
+   * @param cause the underlying cause of this exception, may be {@code null}
+   * @param errorCode an optional error code for programmatic error handling, may be {@code null}
+   */
+  public GraphiteClientException(
+      String message, @Nullable Throwable cause, @Nullable String errorCode) {
+    super(message, cause, errorCode);
+  }
 }

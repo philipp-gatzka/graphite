@@ -233,6 +233,104 @@ public class GraphiteMockServer implements AutoCloseable {
   }
 
   /**
+   * Stubs a GraphQL operation using a custom request matcher.
+   *
+   * <p>This method provides more control over request matching than the simple operation name-based
+   * methods. Use {@link GraphiteRequestMatcher} to build complex matching rules including variable
+   * matching, query content matching, and header matching.
+   *
+   * <p>Example:
+   *
+   * <pre>{@code
+   * GraphiteRequestMatcher matcher = GraphiteRequestMatcher.forOperation("GetUser")
+   *     .withVariable("id", "123")
+   *     .withBearerToken("secret-token");
+   *
+   * server.stub(matcher, Map.of("id", "123", "name", "John"));
+   * }</pre>
+   *
+   * @param matcher the request matcher
+   * @param data the response data
+   */
+  public void stub(@NotNull GraphiteRequestMatcher matcher, @Nullable Object data) {
+    stub(matcher, data, null);
+  }
+
+  /**
+   * Stubs a GraphQL operation using a custom request matcher with errors.
+   *
+   * @param matcher the request matcher
+   * @param data the response data (may be null)
+   * @param errors the errors (may be null or empty)
+   */
+  public void stub(
+      @NotNull GraphiteRequestMatcher matcher,
+      @Nullable Object data,
+      @Nullable List<GraphQLError> errors) {
+    try {
+      String responseBody = buildResponseBody(data, errors);
+
+      wireMockServer.stubFor(
+          matcher
+              .toMappingBuilder()
+              .willReturn(
+                  aResponse()
+                      .withStatus(200)
+                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withBody(responseBody)));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to serialize response", e);
+    }
+  }
+
+  /**
+   * Stubs a GraphQL operation using a custom request matcher to return errors.
+   *
+   * @param matcher the request matcher
+   * @param errors the errors to return
+   */
+  public void stubError(@NotNull GraphiteRequestMatcher matcher, @NotNull GraphQLError... errors) {
+    stub(matcher, null, List.of(errors));
+  }
+
+  /**
+   * Stubs a GraphQL operation using a custom request matcher with delay.
+   *
+   * @param matcher the request matcher
+   * @param delayMillis the delay in milliseconds
+   * @param data the response data
+   */
+  public void stubWithDelay(
+      @NotNull GraphiteRequestMatcher matcher, int delayMillis, @Nullable Object data) {
+    try {
+      String responseBody = buildResponseBody(data, null);
+
+      wireMockServer.stubFor(
+          matcher
+              .toMappingBuilder()
+              .willReturn(
+                  aResponse()
+                      .withStatus(200)
+                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withBody(responseBody)
+                      .withFixedDelay(delayMillis)));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to serialize response", e);
+    }
+  }
+
+  /**
+   * Stubs a GraphQL operation using a custom request matcher to return an HTTP error.
+   *
+   * @param matcher the request matcher
+   * @param statusCode the HTTP status code
+   */
+  public void stubHttpError(@NotNull GraphiteRequestMatcher matcher, int statusCode) {
+    wireMockServer.stubFor(
+        matcher.toMappingBuilder().willReturn(aResponse().withStatus(statusCode)));
+  }
+
+  /**
    * Verifies that the specified operation was called the expected number of times.
    *
    * @param operationName the name of the operation
