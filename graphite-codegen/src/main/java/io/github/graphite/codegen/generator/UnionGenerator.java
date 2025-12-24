@@ -69,8 +69,7 @@ public final class UnionGenerator {
    * @param configuration the codegen configuration
    * @param schema the parsed schema model
    */
-  public UnionGenerator(
-      @NotNull CodegenConfiguration configuration, @NotNull SchemaModel schema) {
+  public UnionGenerator(@NotNull CodegenConfiguration configuration, @NotNull SchemaModel schema) {
     this.configuration = configuration;
     this.schema = schema;
   }

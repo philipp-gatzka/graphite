@@ -16,7 +16,6 @@
 package io.github.graphite.codegen.generator;
 
 import com.palantir.javapoet.ClassName;
-import com.palantir.javapoet.CodeBlock;
 import com.palantir.javapoet.FieldSpec;
 import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.MethodSpec;
@@ -145,8 +144,7 @@ public final class MutationGenerator {
 
     TypeName actualResponseType;
     if (isList) {
-      actualResponseType =
-          ParameterizedTypeName.get(ClassName.get(List.class), responseClass);
+      actualResponseType = ParameterizedTypeName.get(ClassName.get(List.class), responseClass);
     } else {
       actualResponseType = responseClass;
     }
@@ -165,9 +163,7 @@ public final class MutationGenerator {
     // Add JavaDoc
     if (field.description() != null && !field.description().isBlank()) {
       classBuilder.addJavadoc(
-          "Mutation for $N.\n\n<p>$L\n",
-          field.name(),
-          escapeJavadoc(field.description()));
+          "Mutation for $N.\n\n<p>$L\n", field.name(), escapeJavadoc(field.description()));
     } else {
       classBuilder.addJavadoc("Mutation for $N.\n", field.name());
     }
@@ -223,7 +219,8 @@ public final class MutationGenerator {
 
     // Add Builder class
     classBuilder.addType(
-        generateBuilder(field, mutationClassName, builderClassName, projectionClass, !isScalarReturn));
+        generateBuilder(
+            field, mutationClassName, builderClassName, projectionClass, !isScalarReturn));
 
     TypeSpec classSpec = classBuilder.build();
 
@@ -316,8 +313,7 @@ public final class MutationGenerator {
     if (field.arguments().isEmpty()) {
       method.addStatement("return $T.emptyMap()", Collections.class);
     } else {
-      method.addStatement(
-          "$T<String, Object> vars = new $T<>()", Map.class, HashMap.class);
+      method.addStatement("$T<String, Object> vars = new $T<>()", Map.class, HashMap.class);
       for (ArgumentDefinition arg : field.arguments()) {
         method.beginControlFlow("if ($N != null)", arg.name());
         method.addStatement("vars.put($S, $N)", arg.name(), arg.name());
@@ -340,8 +336,7 @@ public final class MutationGenerator {
 
     if (isList) {
       // For List types, we need to return a Class<List<T>> which requires casting
-      method.returns(
-          ParameterizedTypeName.get(ClassName.get(Class.class), actualResponseType));
+      method.returns(ParameterizedTypeName.get(ClassName.get(Class.class), actualResponseType));
       method.addStatement(
           "@SuppressWarnings(\"unchecked\") Class<$T> clazz = (Class<$T>) (Class<?>) $T.class",
           actualResponseType,
@@ -349,8 +344,7 @@ public final class MutationGenerator {
           List.class);
       method.addStatement("return clazz");
     } else {
-      method.returns(
-          ParameterizedTypeName.get(ClassName.get(Class.class), actualResponseType));
+      method.returns(ParameterizedTypeName.get(ClassName.get(Class.class), actualResponseType));
       method.addStatement("return $T.class", responseClass);
     }
 
@@ -377,8 +371,7 @@ public final class MutationGenerator {
 
     // Add projection field
     if (hasProjection) {
-      builder.addField(
-          FieldSpec.builder(projectionClass, "projection", Modifier.PRIVATE).build());
+      builder.addField(FieldSpec.builder(projectionClass, "projection", Modifier.PRIVATE).build());
     }
 
     // Add setter methods for arguments
@@ -397,7 +390,8 @@ public final class MutationGenerator {
               .addModifiers(Modifier.PUBLIC)
               .addParameter(consumerType, "config")
               .returns(builderClassName)
-              .addStatement("$T projBuilder = $T.builder()", projectionBuilderClass, projectionClass)
+              .addStatement(
+                  "$T projBuilder = $T.builder()", projectionBuilderClass, projectionClass)
               .addStatement("config.accept(projBuilder)")
               .addStatement("this.projection = projBuilder.build()")
               .addStatement("return this")
@@ -435,7 +429,8 @@ public final class MutationGenerator {
 
     if (arg.description() != null && !arg.description().isBlank()) {
       setter.addJavadoc(
-          escapeJavadoc(arg.description()) + "\n\n@param $N the value to set\n@return this builder\n",
+          escapeJavadoc(arg.description())
+              + "\n\n@param $N the value to set\n@return this builder\n",
           arg.name());
     } else {
       setter.addJavadoc(
