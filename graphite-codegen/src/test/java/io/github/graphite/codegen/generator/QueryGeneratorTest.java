@@ -267,7 +267,8 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public Builder selecting(Consumer<UserProjection.Builder> config)");
+      assertThat(source)
+          .contains("public Builder selecting(Consumer<UserProjection.Builder> config)");
     }
 
     @Test

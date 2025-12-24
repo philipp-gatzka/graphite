@@ -70,7 +70,8 @@ class MutationGeneratorTest {
       assertThat(files).hasSizeGreaterThanOrEqualTo(3);
 
       List<String> typeNames = files.stream().map(f -> f.typeSpec().name()).toList();
-      assertThat(typeNames).contains("CreateUserMutation", "UpdateUserMutation", "DeleteUserMutation");
+      assertThat(typeNames)
+          .contains("CreateUserMutation", "UpdateUserMutation", "DeleteUserMutation");
     }
 
     @Test
@@ -252,7 +253,8 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public Builder selecting(Consumer<UserProjection.Builder> config)");
+      assertThat(source)
+          .contains("public Builder selecting(Consumer<UserProjection.Builder> config)");
     }
 
     @Test

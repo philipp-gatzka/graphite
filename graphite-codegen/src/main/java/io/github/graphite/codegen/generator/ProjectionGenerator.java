@@ -143,8 +143,7 @@ public final class ProjectionGenerator {
     // Add JavaDoc
     if (type.description() != null && !type.description().isBlank()) {
       classBuilder.addJavadoc(
-          "Projection for selecting fields from {@code $L}.\n\n"
-              + "<p>$L\n",
+          "Projection for selecting fields from {@code $L}.\n\n" + "<p>$L\n",
           type.name(),
           escapeJavadoc(type.description()));
     } else {
@@ -257,8 +256,7 @@ public final class ProjectionGenerator {
       String fieldProjectionType = getProjectionTypeName(field);
       if (fieldProjectionType != null) {
         ClassName fieldProjectionClass = ClassName.get(packageName, fieldProjectionType);
-        builder.addMethod(
-            generateObjectFieldMethod(field, builderClassName, fieldProjectionClass));
+        builder.addMethod(generateObjectFieldMethod(field, builderClassName, fieldProjectionClass));
       }
     }
 
@@ -285,8 +283,7 @@ public final class ProjectionGenerator {
             .addStatement("return this");
 
     if (field.description() != null && !field.description().isBlank()) {
-      method.addJavadoc(
-          escapeJavadoc(field.description()) + "\n\n@return this builder\n");
+      method.addJavadoc(escapeJavadoc(field.description()) + "\n\n@return this builder\n");
     } else {
       method.addJavadoc("Selects the $N field.\n\n@return this builder\n", field.name());
     }
