@@ -18,6 +18,9 @@ spring-boot = "3.4.1"
 micrometer = "1.14.2"
 micrometer-tracing = "1.4.1"
 
+# Code Generation
+javapoet = "0.6.0"
+
 # Testing
 junit = "5.11.4"
 assertj = "3.27.0"
@@ -48,6 +51,9 @@ spring-boot-configuration-processor = { module = "org.springframework.boot:sprin
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-actuator" }
 spring-boot-actuator-autoconfigure = { module = "org.springframework.boot:spring-boot-actuator-autoconfigure" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+# Code Generation
+javapoet = { module = "com.palantir.javapoet:javapoet", version.ref = "javapoet" }
 
 # Micrometer
 micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer" }
