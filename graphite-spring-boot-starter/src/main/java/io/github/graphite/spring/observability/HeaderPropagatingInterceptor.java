@@ -47,7 +47,7 @@ import org.jetbrains.annotations.NotNull;
  *     .build();
  * }</pre>
  *
- * @see GraphiteTracingAutoConfiguration
+ * @see io.github.graphite.spring.autoconfigure.GraphiteTracingAutoConfiguration
  */
 public class HeaderPropagatingInterceptor {
 

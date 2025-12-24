@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
  * }</pre>
  *
  * @see GraphiteMetrics
- * @see GraphiteMetricsAutoConfiguration
+ * @see io.github.graphite.spring.autoconfigure.GraphiteMetricsAutoConfiguration
  */
 public class GraphiteMetricsInterceptor {
 

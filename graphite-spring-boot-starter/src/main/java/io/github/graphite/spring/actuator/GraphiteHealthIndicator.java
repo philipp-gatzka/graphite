@@ -50,7 +50,7 @@ import org.springframework.boot.actuate.health.Health;
  * }
  * }</pre>
  *
- * @see GraphiteHealthIndicatorAutoConfiguration
+ * @see io.github.graphite.spring.autoconfigure.GraphiteHealthIndicatorAutoConfiguration
  */
 public class GraphiteHealthIndicator extends AbstractHealthIndicator {
 
