@@ -1,0 +1,25 @@
+{
+  "__schema": {
+    "queryType": { "name": "Query" },
+    "mutationType": null,
+    "subscriptionType": null,
+    "types": [
+      {
+        "kind": "OBJECT",
+        "name": "Query",
+        "description": "Root query type",
+        "fields": [
+          {
+            "name": "hello",
+            "description": "Returns a greeting",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": []
+      }
+    ]
+  }
+}
