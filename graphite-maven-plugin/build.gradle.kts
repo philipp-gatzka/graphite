@@ -21,7 +21,7 @@ plugins {
 
 description = "Graphite Maven Plugin - Maven plugin for GraphQL code generation"
 
-val mavenVersion = "3.8.8"
+val mavenVersion = "3.9.12"
 val mavenPluginToolsVersion = "3.11.0"
 
 dependencies {
