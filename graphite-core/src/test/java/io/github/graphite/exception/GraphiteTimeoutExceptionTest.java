@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,119 +28,113 @@ import org.junit.jupiter.params.provider.EnumSource;
 @DisplayName("GraphiteTimeoutException")
 class GraphiteTimeoutExceptionTest {
 
-    @Nested
-    @DisplayName("constructor")
-    class Constructor {
+  @Nested
+  @DisplayName("constructor")
+  class Constructor {
 
-        @Test
-        @DisplayName("should create exception with message and timeout type")
-        void shouldCreateWithMessageAndTimeoutType() {
-            var exception = new GraphiteTimeoutException("Request timed out", TimeoutType.REQUEST);
+    @Test
+    @DisplayName("should create exception with message and timeout type")
+    void shouldCreateWithMessageAndTimeoutType() {
+      var exception = new GraphiteTimeoutException("Request timed out", TimeoutType.REQUEST);
 
-            assertThat(exception.getMessage()).isEqualTo("Request timed out");
-            assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.REQUEST);
-            assertThat(exception.getCause()).isNull();
-            assertThat(exception.getConfiguredTimeout()).isNull();
-            assertThat(exception.getElapsedTime()).isNull();
-        }
-
-        @Test
-        @DisplayName("should create exception with message, type, and cause")
-        void shouldCreateWithMessageTypeAndCause() {
-            var cause = new SocketTimeoutException("Read timed out");
-            var exception =
-                    new GraphiteTimeoutException("Read timed out", TimeoutType.READ, cause);
-
-            assertThat(exception.getMessage()).isEqualTo("Read timed out");
-            assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.READ);
-            assertThat(exception.getCause()).isSameAs(cause);
-        }
-
-        @Test
-        @DisplayName("should create exception with all parameters")
-        void shouldCreateWithAllParameters() {
-            var cause = new SocketTimeoutException("Connection timed out");
-            var configuredTimeout = Duration.ofSeconds(10);
-            var elapsedTime = Duration.ofMillis(10023);
-
-            var exception =
-                    new GraphiteTimeoutException(
-                            "Connection timed out",
-                            TimeoutType.CONNECT,
-                            configuredTimeout,
-                            elapsedTime,
-                            cause);
-
-            assertThat(exception.getMessage()).isEqualTo("Connection timed out");
-            assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.CONNECT);
-            assertThat(exception.getConfiguredTimeout()).isEqualTo(configuredTimeout);
-            assertThat(exception.getElapsedTime()).isEqualTo(elapsedTime);
-            assertThat(exception.getCause()).isSameAs(cause);
-        }
+      assertThat(exception.getMessage()).isEqualTo("Request timed out");
+      assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.REQUEST);
+      assertThat(exception.getCause()).isNull();
+      assertThat(exception.getConfiguredTimeout()).isNull();
+      assertThat(exception.getElapsedTime()).isNull();
     }
 
-    @Nested
-    @DisplayName("errorCode")
-    class ErrorCode {
+    @Test
+    @DisplayName("should create exception with message, type, and cause")
+    void shouldCreateWithMessageTypeAndCause() {
+      var cause = new SocketTimeoutException("Read timed out");
+      var exception = new GraphiteTimeoutException("Read timed out", TimeoutType.READ, cause);
 
-        @ParameterizedTest
-        @EnumSource(TimeoutType.class)
-        @DisplayName("should have error code based on timeout type")
-        void shouldHaveErrorCodeBasedOnTimeoutType(TimeoutType type) {
-            var exception = new GraphiteTimeoutException("Timeout", type);
-
-            assertThat(exception.getErrorCode()).isEqualTo("TIMEOUT_" + type.name());
-        }
+      assertThat(exception.getMessage()).isEqualTo("Read timed out");
+      assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.READ);
+      assertThat(exception.getCause()).isSameAs(cause);
     }
 
-    @Nested
-    @DisplayName("isSafeToRetry")
-    class IsSafeToRetry {
+    @Test
+    @DisplayName("should create exception with all parameters")
+    void shouldCreateWithAllParameters() {
+      var cause = new SocketTimeoutException("Connection timed out");
+      var configuredTimeout = Duration.ofSeconds(10);
+      var elapsedTime = Duration.ofMillis(10023);
 
-        @Test
-        @DisplayName("should return true for CONNECT timeout")
-        void shouldReturnTrueForConnectTimeout() {
-            var exception = new GraphiteTimeoutException("Timeout", TimeoutType.CONNECT);
+      var exception =
+          new GraphiteTimeoutException(
+              "Connection timed out", TimeoutType.CONNECT, configuredTimeout, elapsedTime, cause);
 
-            assertThat(exception.isSafeToRetry()).isTrue();
-        }
+      assertThat(exception.getMessage()).isEqualTo("Connection timed out");
+      assertThat(exception.getTimeoutType()).isEqualTo(TimeoutType.CONNECT);
+      assertThat(exception.getConfiguredTimeout()).isEqualTo(configuredTimeout);
+      assertThat(exception.getElapsedTime()).isEqualTo(elapsedTime);
+      assertThat(exception.getCause()).isSameAs(cause);
+    }
+  }
 
-        @Test
-        @DisplayName("should return false for READ timeout")
-        void shouldReturnFalseForReadTimeout() {
-            var exception = new GraphiteTimeoutException("Timeout", TimeoutType.READ);
+  @Nested
+  @DisplayName("errorCode")
+  class ErrorCode {
 
-            assertThat(exception.isSafeToRetry()).isFalse();
-        }
+    @ParameterizedTest
+    @EnumSource(TimeoutType.class)
+    @DisplayName("should have error code based on timeout type")
+    void shouldHaveErrorCodeBasedOnTimeoutType(TimeoutType type) {
+      var exception = new GraphiteTimeoutException("Timeout", type);
 
-        @Test
-        @DisplayName("should return false for REQUEST timeout")
-        void shouldReturnFalseForRequestTimeout() {
-            var exception = new GraphiteTimeoutException("Timeout", TimeoutType.REQUEST);
+      assertThat(exception.getErrorCode()).isEqualTo("TIMEOUT_" + type.name());
+    }
+  }
 
-            assertThat(exception.isSafeToRetry()).isFalse();
-        }
+  @Nested
+  @DisplayName("isSafeToRetry")
+  class IsSafeToRetry {
+
+    @Test
+    @DisplayName("should return true for CONNECT timeout")
+    void shouldReturnTrueForConnectTimeout() {
+      var exception = new GraphiteTimeoutException("Timeout", TimeoutType.CONNECT);
+
+      assertThat(exception.isSafeToRetry()).isTrue();
     }
 
-    @Nested
-    @DisplayName("inheritance")
-    class Inheritance {
+    @Test
+    @DisplayName("should return false for READ timeout")
+    void shouldReturnFalseForReadTimeout() {
+      var exception = new GraphiteTimeoutException("Timeout", TimeoutType.READ);
 
-        @Test
-        @DisplayName("should extend GraphiteClientException")
-        void shouldExtendGraphiteClientException() {
-            var exception = new GraphiteTimeoutException("Test", TimeoutType.CONNECT);
-
-            assertThat(exception).isInstanceOf(GraphiteClientException.class);
-        }
-
-        @Test
-        @DisplayName("should be catchable as GraphiteException")
-        void shouldBeCatchableAsGraphiteException() {
-            GraphiteException exception =
-                    new GraphiteTimeoutException("Test", TimeoutType.CONNECT);
-
-            assertThat(exception).isNotNull();
-        }
+      assertThat(exception.isSafeToRetry()).isFalse();
     }
+
+    @Test
+    @DisplayName("should return false for REQUEST timeout")
+    void shouldReturnFalseForRequestTimeout() {
+      var exception = new GraphiteTimeoutException("Timeout", TimeoutType.REQUEST);
+
+      assertThat(exception.isSafeToRetry()).isFalse();
+    }
+  }
+
+  @Nested
+  @DisplayName("inheritance")
+  class Inheritance {
+
+    @Test
+    @DisplayName("should extend GraphiteClientException")
+    void shouldExtendGraphiteClientException() {
+      var exception = new GraphiteTimeoutException("Test", TimeoutType.CONNECT);
+
+      assertThat(exception).isInstanceOf(GraphiteClientException.class);
+    }
+
+    @Test
+    @DisplayName("should be catchable as GraphiteException")
+    void shouldBeCatchableAsGraphiteException() {
+      GraphiteException exception = new GraphiteTimeoutException("Test", TimeoutType.CONNECT);
+
+      assertThat(exception).isNotNull();
+    }
+  }
 }

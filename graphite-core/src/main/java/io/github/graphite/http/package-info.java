@@ -18,15 +18,16 @@
  * HTTP transport layer for the Graphite GraphQL client.
  *
  * <p>This package contains the HTTP transport abstraction and implementations:
+ *
  * <ul>
- *   <li>{@link io.github.graphite.http.HttpTransport} - Transport interface</li>
- *   <li>{@link io.github.graphite.http.HttpRequest} - Request record</li>
- *   <li>{@link io.github.graphite.http.HttpResponse} - Response record</li>
- *   <li>{@link io.github.graphite.http.HttpMethod} - HTTP method enum</li>
+ *   <li>{@link io.github.graphite.http.HttpTransport} - Transport interface
+ *   <li>{@link io.github.graphite.http.HttpRequest} - Request record
+ *   <li>{@link io.github.graphite.http.HttpResponse} - Response record
+ *   <li>{@link io.github.graphite.http.HttpMethod} - HTTP method enum
  * </ul>
  *
- * <p>The default implementation uses Java's built-in {@code java.net.http.HttpClient}
- * for zero external dependencies.
+ * <p>The default implementation uses Java's built-in {@code java.net.http.HttpClient} for zero
+ * external dependencies.
  *
  * @see io.github.graphite.http.HttpTransport
  */

@@ -13,44 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 /**
  * Enumeration of timeout types that can occur during a GraphQL request.
  *
- * <p>Different timeout types indicate where in the request lifecycle the
- * timeout occurred, which can inform retry strategies:
+ * <p>Different timeout types indicate where in the request lifecycle the timeout occurred, which
+ * can inform retry strategies:
+ *
  * <ul>
- *   <li>{@link #CONNECT} - Timeout establishing the connection; safe to retry</li>
- *   <li>{@link #READ} - Timeout reading the response; may need to verify server state</li>
- *   <li>{@link #REQUEST} - Overall request timeout; may need to verify server state</li>
+ *   <li>{@link #CONNECT} - Timeout establishing the connection; safe to retry
+ *   <li>{@link #READ} - Timeout reading the response; may need to verify server state
+ *   <li>{@link #REQUEST} - Overall request timeout; may need to verify server state
  * </ul>
  *
  * @see GraphiteTimeoutException
  */
 public enum TimeoutType {
 
-    /**
-     * Timeout occurred while establishing the TCP connection.
-     *
-     * <p>This timeout is safe to retry as no request was sent to the server.
-     */
-    CONNECT,
+  /**
+   * Timeout occurred while establishing the TCP connection.
+   *
+   * <p>This timeout is safe to retry as no request was sent to the server.
+   */
+  CONNECT,
 
-    /**
-     * Timeout occurred while reading the response from the server.
-     *
-     * <p>The request was sent and may have been processed by the server.
-     * Retrying may result in duplicate processing for non-idempotent operations.
-     */
-    READ,
+  /**
+   * Timeout occurred while reading the response from the server.
+   *
+   * <p>The request was sent and may have been processed by the server. Retrying may result in
+   * duplicate processing for non-idempotent operations.
+   */
+  READ,
 
-    /**
-     * Timeout for the overall request duration.
-     *
-     * <p>This covers the entire request lifecycle. The request may have been
-     * partially or fully processed by the server.
-     */
-    REQUEST
+  /**
+   * Timeout for the overall request duration.
+   *
+   * <p>This covers the entire request lifecycle. The request may have been partially or fully
+   * processed by the server.
+   */
+  REQUEST
 }

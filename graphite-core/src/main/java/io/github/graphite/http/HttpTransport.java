@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.http;
 
 import io.github.graphite.exception.GraphiteException;
@@ -23,22 +22,25 @@ import java.util.concurrent.CompletableFuture;
  * HTTP transport abstraction for sending GraphQL requests.
  *
  * <p>This interface abstracts the HTTP client implementation, allowing for:
+ *
  * <ul>
- *   <li>Easy testing with mock implementations</li>
- *   <li>Swapping HTTP client libraries</li>
- *   <li>Custom transport implementations (e.g., for WebSocket)</li>
+ *   <li>Easy testing with mock implementations
+ *   <li>Swapping HTTP client libraries
+ *   <li>Custom transport implementations (e.g., for WebSocket)
  * </ul>
  *
- * <p>Implementations must be thread-safe and support concurrent requests.
- * The transport is responsible for:
+ * <p>Implementations must be thread-safe and support concurrent requests. The transport is
+ * responsible for:
+ *
  * <ul>
- *   <li>Executing HTTP requests</li>
- *   <li>Managing connection pools</li>
- *   <li>Handling timeouts</li>
- *   <li>Translating I/O errors to Graphite exceptions</li>
+ *   <li>Executing HTTP requests
+ *   <li>Managing connection pools
+ *   <li>Handling timeouts
+ *   <li>Translating I/O errors to Graphite exceptions
  * </ul>
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try (HttpTransport transport = new DefaultHttpTransport(config)) {
  *     HttpRequest request = HttpRequest.post(uri, headers, body);
@@ -53,39 +55,38 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface HttpTransport extends AutoCloseable {
 
-    /**
-     * Executes an HTTP request synchronously.
-     *
-     * <p>This method blocks until the response is received or an error occurs.
-     * For non-blocking execution, use {@link #executeAsync(HttpRequest)}.
-     *
-     * @param request the HTTP request to execute
-     * @return the HTTP response
-     * @throws GraphiteException if the request fails
-     */
-    HttpResponse execute(HttpRequest request) throws GraphiteException;
+  /**
+   * Executes an HTTP request synchronously.
+   *
+   * <p>This method blocks until the response is received or an error occurs. For non-blocking
+   * execution, use {@link #executeAsync(HttpRequest)}.
+   *
+   * @param request the HTTP request to execute
+   * @return the HTTP response
+   * @throws GraphiteException if the request fails
+   */
+  HttpResponse execute(HttpRequest request) throws GraphiteException;
 
-    /**
-     * Executes an HTTP request asynchronously.
-     *
-     * <p>This method returns immediately with a {@link CompletableFuture} that
-     * will be completed when the response is received or an error occurs.
-     *
-     * <p>The future will be completed exceptionally with a {@link GraphiteException}
-     * if the request fails.
-     *
-     * @param request the HTTP request to execute
-     * @return a future that will be completed with the HTTP response
-     */
-    CompletableFuture<HttpResponse> executeAsync(HttpRequest request);
+  /**
+   * Executes an HTTP request asynchronously.
+   *
+   * <p>This method returns immediately with a {@link CompletableFuture} that will be completed when
+   * the response is received or an error occurs.
+   *
+   * <p>The future will be completed exceptionally with a {@link GraphiteException} if the request
+   * fails.
+   *
+   * @param request the HTTP request to execute
+   * @return a future that will be completed with the HTTP response
+   */
+  CompletableFuture<HttpResponse> executeAsync(HttpRequest request);
 
-    /**
-     * Closes this transport and releases any resources.
-     *
-     * <p>After calling this method, the transport should not be used.
-     * Pending async requests may be cancelled or allowed to complete,
-     * depending on the implementation.
-     */
-    @Override
-    void close();
+  /**
+   * Closes this transport and releases any resources.
+   *
+   * <p>After calling this method, the transport should not be used. Pending async requests may be
+   * cancelled or allowed to complete, depending on the implementation.
+   */
+  @Override
+  void close();
 }

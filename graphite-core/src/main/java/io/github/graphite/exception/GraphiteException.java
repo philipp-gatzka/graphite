@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,17 +20,19 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Base exception for all Graphite-related errors.
  *
- * <p>This is an unchecked exception that serves as the root of the Graphite exception
- * hierarchy. All exceptions thrown by Graphite extend this class, allowing callers
- * to catch all Graphite errors with a single catch block if desired.
+ * <p>This is an unchecked exception that serves as the root of the Graphite exception hierarchy.
+ * All exceptions thrown by Graphite extend this class, allowing callers to catch all Graphite
+ * errors with a single catch block if desired.
  *
  * <p>The exception hierarchy is organized as follows:
+ *
  * <ul>
- *   <li>{@link GraphiteClientException} - Errors occurring on the client side</li>
- *   <li>{@link GraphiteServerException} - Errors returned by the GraphQL server</li>
+ *   <li>{@link GraphiteClientException} - Errors occurring on the client side
+ *   <li>{@link GraphiteServerException} - Errors returned by the GraphQL server
  * </ul>
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try {
  *     client.execute(query);
@@ -46,69 +47,67 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GraphiteException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Nullable
-    private final String errorCode;
+  @Nullable private final String errorCode;
 
-    /**
-     * Constructs a new Graphite exception with the specified message.
-     *
-     * @param message the detail message describing the error
-     */
-    public GraphiteException(String message) {
-        this(message, null, null);
-    }
+  /**
+   * Constructs a new Graphite exception with the specified message.
+   *
+   * @param message the detail message describing the error
+   */
+  public GraphiteException(String message) {
+    this(message, null, null);
+  }
 
-    /**
-     * Constructs a new Graphite exception with the specified message and cause.
-     *
-     * @param message the detail message describing the error
-     * @param cause the underlying cause of this exception, may be {@code null}
-     */
-    public GraphiteException(String message, @Nullable Throwable cause) {
-        this(message, cause, null);
-    }
+  /**
+   * Constructs a new Graphite exception with the specified message and cause.
+   *
+   * @param message the detail message describing the error
+   * @param cause the underlying cause of this exception, may be {@code null}
+   */
+  public GraphiteException(String message, @Nullable Throwable cause) {
+    this(message, cause, null);
+  }
 
-    /**
-     * Constructs a new Graphite exception with the specified message and error code.
-     *
-     * @param message the detail message describing the error
-     * @param errorCode an optional error code for programmatic error handling,
-     *                  may be {@code null}
-     */
-    public GraphiteException(String message, @Nullable String errorCode) {
-        this(message, null, errorCode);
-    }
+  /**
+   * Constructs a new Graphite exception with the specified message and error code.
+   *
+   * @param message the detail message describing the error
+   * @param errorCode an optional error code for programmatic error handling, may be {@code null}
+   */
+  public GraphiteException(String message, @Nullable String errorCode) {
+    this(message, null, errorCode);
+  }
 
-    /**
-     * Constructs a new Graphite exception with the specified message, cause, and error code.
-     *
-     * @param message the detail message describing the error
-     * @param cause the underlying cause of this exception, may be {@code null}
-     * @param errorCode an optional error code for programmatic error handling,
-     *                  may be {@code null}
-     */
-    public GraphiteException(String message, @Nullable Throwable cause, @Nullable String errorCode) {
-        super(message, cause);
-        this.errorCode = errorCode;
-    }
+  /**
+   * Constructs a new Graphite exception with the specified message, cause, and error code.
+   *
+   * @param message the detail message describing the error
+   * @param cause the underlying cause of this exception, may be {@code null}
+   * @param errorCode an optional error code for programmatic error handling, may be {@code null}
+   */
+  public GraphiteException(String message, @Nullable Throwable cause, @Nullable String errorCode) {
+    super(message, cause);
+    this.errorCode = errorCode;
+  }
 
-    /**
-     * Returns the error code associated with this exception, if any.
-     *
-     * <p>Error codes provide a programmatic way to identify specific error conditions
-     * without parsing the error message. They can be used for:
-     * <ul>
-     *   <li>Mapping errors to user-friendly messages</li>
-     *   <li>Implementing error-specific recovery logic</li>
-     *   <li>Logging and monitoring categorization</li>
-     * </ul>
-     *
-     * @return the error code, or {@code null} if no error code was specified
-     */
-    @Nullable
-    public String getErrorCode() {
-        return errorCode;
-    }
+  /**
+   * Returns the error code associated with this exception, if any.
+   *
+   * <p>Error codes provide a programmatic way to identify specific error conditions without parsing
+   * the error message. They can be used for:
+   *
+   * <ul>
+   *   <li>Mapping errors to user-friendly messages
+   *   <li>Implementing error-specific recovery logic
+   *   <li>Logging and monitoring categorization
+   * </ul>
+   *
+   * @return the error code, or {@code null} if no error code was specified
+   */
+  @Nullable
+  public String getErrorCode() {
+    return errorCode;
+  }
 }

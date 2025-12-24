@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,77 +25,76 @@ import org.junit.jupiter.api.Test;
 @DisplayName("GraphiteConnectionException")
 class GraphiteConnectionExceptionTest {
 
-    @Nested
-    @DisplayName("constructor")
-    class Constructor {
+  @Nested
+  @DisplayName("constructor")
+  class Constructor {
 
-        @Test
-        @DisplayName("should create exception with message only")
-        void shouldCreateWithMessageOnly() {
-            var exception = new GraphiteConnectionException("Connection refused");
+    @Test
+    @DisplayName("should create exception with message only")
+    void shouldCreateWithMessageOnly() {
+      var exception = new GraphiteConnectionException("Connection refused");
 
-            assertThat(exception.getMessage()).isEqualTo("Connection refused");
-            assertThat(exception.getCause()).isNull();
-            assertThat(exception.getHost()).isNull();
-            assertThat(exception.getPort()).isNull();
-        }
-
-        @Test
-        @DisplayName("should create exception with message and cause")
-        void shouldCreateWithMessageAndCause() {
-            var cause = new ConnectException("Connection refused");
-            var exception = new GraphiteConnectionException("Connection refused", cause);
-
-            assertThat(exception.getMessage()).isEqualTo("Connection refused");
-            assertThat(exception.getCause()).isSameAs(cause);
-        }
-
-        @Test
-        @DisplayName("should create exception with all parameters")
-        void shouldCreateWithAllParameters() {
-            var cause = new ConnectException("Connection refused");
-            var exception =
-                    new GraphiteConnectionException(
-                            "Connection refused", cause, "api.example.com", 443);
-
-            assertThat(exception.getMessage()).isEqualTo("Connection refused");
-            assertThat(exception.getCause()).isSameAs(cause);
-            assertThat(exception.getHost()).isEqualTo("api.example.com");
-            assertThat(exception.getPort()).isEqualTo(443);
-        }
+      assertThat(exception.getMessage()).isEqualTo("Connection refused");
+      assertThat(exception.getCause()).isNull();
+      assertThat(exception.getHost()).isNull();
+      assertThat(exception.getPort()).isNull();
     }
 
-    @Nested
-    @DisplayName("errorCode")
-    class ErrorCode {
+    @Test
+    @DisplayName("should create exception with message and cause")
+    void shouldCreateWithMessageAndCause() {
+      var cause = new ConnectException("Connection refused");
+      var exception = new GraphiteConnectionException("Connection refused", cause);
 
-        @Test
-        @DisplayName("should have CONNECTION_FAILED error code")
-        void shouldHaveConnectionFailedErrorCode() {
-            var exception = new GraphiteConnectionException("Connection failed");
-
-            assertThat(exception.getErrorCode()).isEqualTo("CONNECTION_FAILED");
-        }
+      assertThat(exception.getMessage()).isEqualTo("Connection refused");
+      assertThat(exception.getCause()).isSameAs(cause);
     }
 
-    @Nested
-    @DisplayName("inheritance")
-    class Inheritance {
+    @Test
+    @DisplayName("should create exception with all parameters")
+    void shouldCreateWithAllParameters() {
+      var cause = new ConnectException("Connection refused");
+      var exception =
+          new GraphiteConnectionException("Connection refused", cause, "api.example.com", 443);
 
-        @Test
-        @DisplayName("should extend GraphiteClientException")
-        void shouldExtendGraphiteClientException() {
-            var exception = new GraphiteConnectionException("Test");
-
-            assertThat(exception).isInstanceOf(GraphiteClientException.class);
-        }
-
-        @Test
-        @DisplayName("should be catchable as GraphiteException")
-        void shouldBeCatchableAsGraphiteException() {
-            GraphiteException exception = new GraphiteConnectionException("Test");
-
-            assertThat(exception).isNotNull();
-        }
+      assertThat(exception.getMessage()).isEqualTo("Connection refused");
+      assertThat(exception.getCause()).isSameAs(cause);
+      assertThat(exception.getHost()).isEqualTo("api.example.com");
+      assertThat(exception.getPort()).isEqualTo(443);
     }
+  }
+
+  @Nested
+  @DisplayName("errorCode")
+  class ErrorCode {
+
+    @Test
+    @DisplayName("should have CONNECTION_FAILED error code")
+    void shouldHaveConnectionFailedErrorCode() {
+      var exception = new GraphiteConnectionException("Connection failed");
+
+      assertThat(exception.getErrorCode()).isEqualTo("CONNECTION_FAILED");
+    }
+  }
+
+  @Nested
+  @DisplayName("inheritance")
+  class Inheritance {
+
+    @Test
+    @DisplayName("should extend GraphiteClientException")
+    void shouldExtendGraphiteClientException() {
+      var exception = new GraphiteConnectionException("Test");
+
+      assertThat(exception).isInstanceOf(GraphiteClientException.class);
+    }
+
+    @Test
+    @DisplayName("should be catchable as GraphiteException")
+    void shouldBeCatchableAsGraphiteException() {
+      GraphiteException exception = new GraphiteConnectionException("Test");
+
+      assertThat(exception).isNotNull();
+    }
+  }
 }

@@ -13,32 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.http;
 
 /**
  * HTTP methods used for GraphQL requests.
  *
- * <p>GraphQL typically uses POST for queries and mutations, but GET can be used
- * for queries when the query is passed as a URL parameter.
+ * <p>GraphQL typically uses POST for queries and mutations, but GET can be used for queries when
+ * the query is passed as a URL parameter.
  *
  * @see HttpRequest
  */
 public enum HttpMethod {
 
-    /**
-     * HTTP GET method.
-     *
-     * <p>Can be used for GraphQL queries when the query is URL-encoded in the
-     * query string. Not suitable for mutations or large queries.
-     */
-    GET,
+  /**
+   * HTTP GET method.
+   *
+   * <p>Can be used for GraphQL queries when the query is URL-encoded in the query string. Not
+   * suitable for mutations or large queries.
+   */
+  GET,
 
-    /**
-     * HTTP POST method.
-     *
-     * <p>The standard method for GraphQL requests. The query is sent in the
-     * request body as JSON.
-     */
-    POST
+  /**
+   * HTTP POST method.
+   *
+   * <p>The standard method for GraphQL requests. The query is sent in the request body as JSON.
+   */
+  POST
 }

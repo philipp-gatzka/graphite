@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.graphite.exception;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,19 +20,21 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Exception indicating a connection failure to the GraphQL server.
  *
- * <p>This exception is thrown when the client cannot establish a connection to the
- * GraphQL endpoint. Common causes include:
+ * <p>This exception is thrown when the client cannot establish a connection to the GraphQL
+ * endpoint. Common causes include:
+ *
  * <ul>
- *   <li>DNS resolution failures (host not found)</li>
- *   <li>Connection refused (server not listening)</li>
- *   <li>Network unreachable</li>
- *   <li>SSL/TLS handshake failures</li>
+ *   <li>DNS resolution failures (host not found)
+ *   <li>Connection refused (server not listening)
+ *   <li>Network unreachable
+ *   <li>SSL/TLS handshake failures
  * </ul>
  *
- * <p>Connection exceptions are typically retryable after a delay, as the underlying
- * network issue may be transient.
+ * <p>Connection exceptions are typically retryable after a delay, as the underlying network issue
+ * may be transient.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try {
  *     client.execute(query);
@@ -48,68 +49,63 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GraphiteConnectionException extends GraphiteClientException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Nullable
-    private final String host;
+  @Nullable private final String host;
 
-    @Nullable
-    private final Integer port;
+  @Nullable private final Integer port;
 
-    /**
-     * Constructs a new connection exception with the specified message.
-     *
-     * @param message the detail message describing the connection failure
-     */
-    public GraphiteConnectionException(String message) {
-        this(message, null, null, null);
-    }
+  /**
+   * Constructs a new connection exception with the specified message.
+   *
+   * @param message the detail message describing the connection failure
+   */
+  public GraphiteConnectionException(String message) {
+    this(message, null, null, null);
+  }
 
-    /**
-     * Constructs a new connection exception with the specified message and cause.
-     *
-     * @param message the detail message describing the connection failure
-     * @param cause the underlying cause (e.g., {@link java.net.ConnectException})
-     */
-    public GraphiteConnectionException(String message, @Nullable Throwable cause) {
-        this(message, cause, null, null);
-    }
+  /**
+   * Constructs a new connection exception with the specified message and cause.
+   *
+   * @param message the detail message describing the connection failure
+   * @param cause the underlying cause (e.g., {@link java.net.ConnectException})
+   */
+  public GraphiteConnectionException(String message, @Nullable Throwable cause) {
+    this(message, cause, null, null);
+  }
 
-    /**
-     * Constructs a new connection exception with host and port information.
-     *
-     * @param message the detail message describing the connection failure
-     * @param cause the underlying cause, may be {@code null}
-     * @param host the host that could not be reached, may be {@code null}
-     * @param port the port that could not be reached, may be {@code null}
-     */
-    public GraphiteConnectionException(
-            String message,
-            @Nullable Throwable cause,
-            @Nullable String host,
-            @Nullable Integer port) {
-        super(message, cause, "CONNECTION_FAILED");
-        this.host = host;
-        this.port = port;
-    }
+  /**
+   * Constructs a new connection exception with host and port information.
+   *
+   * @param message the detail message describing the connection failure
+   * @param cause the underlying cause, may be {@code null}
+   * @param host the host that could not be reached, may be {@code null}
+   * @param port the port that could not be reached, may be {@code null}
+   */
+  public GraphiteConnectionException(
+      String message, @Nullable Throwable cause, @Nullable String host, @Nullable Integer port) {
+    super(message, cause, "CONNECTION_FAILED");
+    this.host = host;
+    this.port = port;
+  }
 
-    /**
-     * Returns the host that could not be reached, if available.
-     *
-     * @return the host, or {@code null} if not specified
-     */
-    @Nullable
-    public String getHost() {
-        return host;
-    }
+  /**
+   * Returns the host that could not be reached, if available.
+   *
+   * @return the host, or {@code null} if not specified
+   */
+  @Nullable
+  public String getHost() {
+    return host;
+  }
 
-    /**
-     * Returns the port that could not be reached, if available.
-     *
-     * @return the port, or {@code null} if not specified
-     */
-    @Nullable
-    public Integer getPort() {
-        return port;
-    }
+  /**
+   * Returns the port that could not be reached, if available.
+   *
+   * @return the port, or {@code null} if not specified
+   */
+  @Nullable
+  public Integer getPort() {
+    return port;
+  }
 }

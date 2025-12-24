@@ -18,16 +18,16 @@
  * Graphite Core module providing the runtime client library for type-safe GraphQL queries.
  *
  * <p>This module contains:
+ *
  * <ul>
- *   <li>{@code GraphiteClient} - The main client interface for executing GraphQL operations</li>
- *   <li>{@code GraphiteResponse} - Response wrapper with data, errors, and extensions</li>
- *   <li>HTTP transport layer using Java 11+ HttpClient</li>
- *   <li>Retry and rate limiting mechanisms</li>
- *   <li>Custom scalar support</li>
- *   <li>Request and response interceptors</li>
+ *   <li>{@code GraphiteClient} - The main client interface for executing GraphQL operations
+ *   <li>{@code GraphiteResponse} - Response wrapper with data, errors, and extensions
+ *   <li>HTTP transport layer using Java 11+ HttpClient
+ *   <li>Retry and rate limiting mechanisms
+ *   <li>Custom scalar support
+ *   <li>Request and response interceptors
  * </ul>
  *
  * @see io.github.graphite.GraphiteClient
  */
-
 package io.github.graphite;

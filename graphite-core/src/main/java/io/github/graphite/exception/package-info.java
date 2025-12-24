@@ -17,8 +17,8 @@
 /**
  * Exception hierarchy for the Graphite GraphQL client.
  *
- * <p>This package contains all exceptions that may be thrown by the Graphite client.
- * The exception hierarchy is organized as follows:
+ * <p>This package contains all exceptions that may be thrown by the Graphite client. The exception
+ * hierarchy is organized as follows:
  *
  * <pre>
  * GraphiteException (base)
@@ -30,9 +30,9 @@
  *     └── GraphiteGraphQLException (GraphQL-level errors)
  * </pre>
  *
- * <p>All exceptions extend {@link java.lang.RuntimeException}, making them unchecked.
- * This design choice allows callers to catch specific exceptions when needed while
- * not forcing exception handling at every call site.
+ * <p>All exceptions extend {@link java.lang.RuntimeException}, making them unchecked. This design
+ * choice allows callers to catch specific exceptions when needed while not forcing exception
+ * handling at every call site.
  *
  * @see io.github.graphite.exception.GraphiteException
  */
