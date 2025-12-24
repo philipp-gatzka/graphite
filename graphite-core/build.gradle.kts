@@ -37,4 +37,5 @@ dependencies {
     // Testing
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
+    testImplementation(libs.wiremock)
 }
