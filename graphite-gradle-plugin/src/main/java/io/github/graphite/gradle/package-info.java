@@ -18,14 +18,14 @@
  * Graphite Gradle Plugin for GraphQL code generation.
  *
  * <p>This module provides a Gradle plugin that:
+ *
  * <ul>
- *   <li>Generates type-safe Java code from GraphQL schema</li>
- *   <li>Supports incremental builds</li>
- *   <li>Automatically adds generated sources to the main source set</li>
- *   <li>Works with both Groovy and Kotlin DSL</li>
+ *   <li>Generates type-safe Java code from GraphQL schema
+ *   <li>Supports incremental builds
+ *   <li>Automatically adds generated sources to the main source set
+ *   <li>Works with both Groovy and Kotlin DSL
  * </ul>
  *
  * @see io.github.graphite.gradle.GraphitePlugin
  */
-
 package io.github.graphite.gradle;
