@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# commit-msg hook: Enforces commit message format
+# Format: #<issue-id> <message-in-lowercase>
+#
+# Rules:
+# - Must start with #<number> followed by a space
+# - Message after issue reference must be lowercase
+# - Rejects non-compliant commits
+#
+
+set -e
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Extract the first line (subject line)
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+
+# Pattern: #<number> <lowercase message>
+PATTERN="^#[0-9]+ [a-z].*$"
+
+# Check if message matches the required pattern
+if ! echo "$FIRST_LINE" | grep -qE "$PATTERN"; then
+    echo ""
+    echo "ERROR: Invalid commit message format!"
+    echo ""
+    echo "Your message:  $FIRST_LINE"
+    echo ""
+    echo "Required format: #<issue-id> <message-in-lowercase>"
+    echo ""
+    echo "Examples:"
+    echo "  #42 add login button component"
+    echo "  #7 fix null check in payload handler"
+    echo "  #123 update user documentation"
+    echo ""
+    echo "Rules:"
+    echo "  - Must start with # followed by issue number"
+    echo "  - Must have a space after the issue number"
+    echo "  - Message must be lowercase"
+    echo ""
+    exit 1
+fi
+
+# Check that the message part (after issue reference) is all lowercase
+MESSAGE_PART=$(echo "$FIRST_LINE" | sed 's/^#[0-9]* //')
+
+if echo "$MESSAGE_PART" | grep -q '[A-Z]'; then
+    echo ""
+    echo "ERROR: Commit message must be lowercase!"
+    echo ""
+    echo "Your message:  $FIRST_LINE"
+    echo "Problem:       Message contains uppercase characters"
+    echo ""
+    echo "Please use lowercase only after the issue reference."
+    echo ""
+    exit 1
+fi
+
+# Check max length (72 characters)
+if [ ${#FIRST_LINE} -gt 72 ]; then
+    echo ""
+    echo "ERROR: Commit message too long!"
+    echo ""
+    echo "Your message:  $FIRST_LINE"
+    echo "Length:        ${#FIRST_LINE} characters (max 72)"
+    echo ""
+    echo "Please shorten your commit message."
+    echo ""
+    exit 1
+fi
+
+exit 0
