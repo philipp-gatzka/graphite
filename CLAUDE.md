@@ -4,6 +4,19 @@ These rules are **non-negotiable** and apply to all work in this repository.
 
 ---
 
+## 0. Getting Started
+
+After cloning the repository, run the setup script to configure git hooks:
+
+```bash
+./scripts/setup.sh
+```
+
+This configures:
+- `commit-msg` hook: Enforces commit message format `#<issue-id> <message-in-lowercase>`
+
+---
+
 ## 1. Issue Management
 
 ### 1.1 Issue Requirements
