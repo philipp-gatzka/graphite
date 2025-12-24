@@ -14,42 +14,11 @@ Type-safe GraphQL client library for Spring Boot with code generation.
 - **Gradle & Maven plugins** - Seamless build tool integration
 - **Zero runtime reflection** - Fast and GraalVM-friendly
 
-## Quick Example
+## Quick Start
 
-```java
-// Type-safe query building
-var response = client.query()
-    .user(u -> u
-        .id("123")
-        .selecting(s -> s.id().name().email())
-    )
-    .execute();
+### 1. Add Dependencies
 
-// Access data safely
-UserDTO user = response.getDataOrThrow();
-System.out.println(user.name());
-```
-
-## Modules
-
-| Module | Description |
-|--------|-------------|
-| `graphite-core` | Runtime client library |
-| `graphite-codegen` | Code generation engine |
-| `graphite-gradle-plugin` | Gradle plugin for code generation |
-| `graphite-maven-plugin` | Maven plugin for code generation |
-| `graphite-spring-boot-starter` | Spring Boot auto-configuration |
-| `graphite-test-utils` | Testing utilities |
-
-## Requirements
-
-- Java 21+
-- Gradle 8.5+ or Maven 3.8+
-- Spring Boot 3.x (for starter module)
-
-## Installation
-
-### Gradle (Kotlin DSL)
+**Gradle (Kotlin DSL)**
 
 ```kotlin
 plugins {
@@ -58,6 +27,7 @@ plugins {
 
 dependencies {
     implementation("io.github.graphite:graphite-spring-boot-starter:0.1.0")
+    testImplementation("io.github.graphite:graphite-test-utils:0.1.0")
 }
 
 graphite {
@@ -66,7 +36,7 @@ graphite {
 }
 ```
 
-### Maven
+**Maven**
 
 ```xml
 <plugin>
@@ -86,14 +56,24 @@ graphite {
     </configuration>
 </plugin>
 
-<dependency>
-    <groupId>io.github.graphite</groupId>
-    <artifactId>graphite-spring-boot-starter</artifactId>
-    <version>0.1.0</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>io.github.graphite</groupId>
+        <artifactId>graphite-spring-boot-starter</artifactId>
+        <version>0.1.0</version>
+    </dependency>
+    <dependency>
+        <groupId>io.github.graphite</groupId>
+        <artifactId>graphite-test-utils</artifactId>
+        <version>0.1.0</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
-## Configuration
+### 2. Configure the Client
+
+Add to `application.yml`:
 
 ```yaml
 graphite:
@@ -106,7 +86,193 @@ graphite:
     max-attempts: 3
     initial-delay: 100ms
   headers:
+    Authorization: Bearer ${GRAPHQL_TOKEN}
+```
+
+### 3. Add Your Schema
+
+Place your GraphQL introspection schema at `src/main/resources/graphql/schema.json`. Generate it from your GraphQL server:
+
+```bash
+# Using graphql-cli
+graphql get-schema --endpoint https://api.example.com/graphql --json > src/main/resources/graphql/schema.json
+```
+
+### 4. Generate Code
+
+```bash
+# Gradle
+./gradlew graphiteGenerate
+
+# Maven
+mvn graphite:generate
+```
+
+This generates type-safe Java classes in `build/generated/sources/graphite/` (Gradle) or `target/generated-sources/graphite/` (Maven).
+
+### 5. Use the Client
+
+```java
+import org.springframework.stereotype.Service;
+import io.github.graphite.GraphiteClient;
+import com.example.graphql.query.GetUserQuery;
+import com.example.graphql.type.UserDTO;
+
+@Service
+public class UserService {
+
+    private final GraphiteClient client;
+
+    public UserService(GraphiteClient client) {
+        this.client = client;
+    }
+
+    public UserDTO getUser(String id) {
+        var response = client.execute(
+            GetUserQuery.builder()
+                .id(id)
+                .selecting(s -> s.id().name().email().createdAt())
+                .build()
+        );
+
+        return response.getDataOrThrow();
+    }
+}
+```
+
+### 6. Write Tests
+
+```java
+import io.github.graphite.test.GraphiteMockServer;
+import io.github.graphite.test.GraphiteAssertions;
+import org.junit.jupiter.api.Test;
+import java.util.Map;
+
+class UserServiceTest {
+
+    @Test
+    void shouldFetchUser() {
+        try (GraphiteMockServer server = GraphiteMockServer.create()) {
+            // Stub the GraphQL response
+            server.stubQuery("GetUser", Map.of(
+                "id", "123",
+                "name", "John Doe",
+                "email", "john@example.com"
+            ));
+
+            // Configure client to use mock server
+            GraphiteClient client = GraphiteClient.builder()
+                .endpoint(URI.create(server.getUrl()))
+                .build();
+
+            // Execute and verify
+            UserDTO user = new UserService(client).getUser("123");
+
+            assertThat(user.name()).isEqualTo("John Doe");
+            server.verify("GetUser", 1);
+        }
+    }
+}
+```
+
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| `graphite-core` | Runtime client library |
+| `graphite-codegen` | Code generation engine |
+| `graphite-gradle-plugin` | Gradle plugin for code generation |
+| `graphite-maven-plugin` | Maven plugin for code generation |
+| `graphite-spring-boot-starter` | Spring Boot auto-configuration |
+| `graphite-test-utils` | Testing utilities |
+
+## Requirements
+
+- Java 21+
+- Gradle 8.5+ or Maven 3.8+
+- Spring Boot 3.x (for starter module)
+
+## Spring Boot Configuration Reference
+
+```yaml
+graphite:
+  # Required: GraphQL endpoint URL
+  url: https://api.example.com/graphql
+
+  # Optional: Static headers
+  headers:
     Authorization: Bearer ${TOKEN}
+    X-Custom-Header: value
+
+  # Optional: Timeout configuration
+  timeout:
+    connect: 10s      # Connection timeout (default: 10s)
+    read: 30s         # Read timeout (default: 30s)
+    request: 60s      # Overall request timeout (default: 60s)
+
+  # Optional: Retry configuration
+  retry:
+    max-attempts: 3           # Max retry attempts (default: 3)
+    initial-delay: 100ms      # Initial delay between retries (default: 100ms)
+    multiplier: 2.0           # Backoff multiplier (default: 2.0)
+    max-delay: 5s             # Maximum delay between retries (default: 5s)
+
+  # Optional: Rate limiting
+  rate-limit:
+    requests-per-second: 100  # Max requests per second (default: unlimited)
+    burst-capacity: 150       # Burst capacity (default: same as rps)
+
+  # Optional: Connection pool
+  connection-pool:
+    max-connections: 50       # Maximum connections (default: 50)
+    idle-timeout: 30s         # Idle connection timeout (default: 30s)
+```
+
+## Observability
+
+Graphite integrates with Spring Boot Actuator for observability:
+
+- **Metrics** - Request duration, success/error counts via Micrometer
+- **Tracing** - Distributed tracing with trace context propagation
+- **Health** - Health indicator for GraphQL endpoint availability
+
+Enable in `application.yml`:
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  health:
+    graphite:
+      enabled: true
+```
+
+## Testing Utilities
+
+The `graphite-test-utils` module provides:
+
+- **GraphiteMockServer** - WireMock-based mock GraphQL server
+- **GraphiteRequestMatcher** - Fluent request matching
+- **GraphiteResponseBuilder** - Fluent response building
+- **GraphiteAssertions** - Fluent assertions for responses
+
+Example with advanced matching:
+
+```java
+try (GraphiteMockServer server = GraphiteMockServer.create()) {
+    // Match requests with specific variables and headers
+    GraphiteRequestMatcher matcher = GraphiteRequestMatcher.forQuery("GetUser")
+        .withVariable("id", "123")
+        .withBearerToken("secret-token");
+
+    server.stub(matcher, Map.of("id", "123", "name", "John"));
+
+    // ... execute request ...
+
+    server.verify("GetUser", 1);
+}
 ```
 
 ## Documentation
