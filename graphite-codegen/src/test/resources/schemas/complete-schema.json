@@ -1,0 +1,426 @@
+{
+  "__schema": {
+    "queryType": { "name": "Query" },
+    "mutationType": { "name": "Mutation" },
+    "subscriptionType": null,
+    "types": [
+      {
+        "kind": "OBJECT",
+        "name": "Query",
+        "description": "The root query type",
+        "fields": [
+          {
+            "name": "user",
+            "description": "Get a user by ID",
+            "args": [
+              {
+                "name": "id",
+                "description": "The user ID",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+                "defaultValue": null
+              }
+            ],
+            "type": { "kind": "OBJECT", "name": "User" },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "users",
+            "description": "List all users",
+            "args": [
+              {
+                "name": "limit",
+                "description": "Maximum number of users to return",
+                "type": { "kind": "SCALAR", "name": "Int" },
+                "defaultValue": "10"
+              },
+              {
+                "name": "offset",
+                "description": "Number of users to skip",
+                "type": { "kind": "SCALAR", "name": "Int" },
+                "defaultValue": "0"
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "ofType": {
+                "kind": "LIST",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "ofType": { "kind": "OBJECT", "name": "User" }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "search",
+            "description": "Search for content",
+            "args": [
+              {
+                "name": "query",
+                "description": "Search query",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "ofType": {
+                "kind": "LIST",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "ofType": { "kind": "UNION", "name": "SearchResult" }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": []
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Mutation",
+        "description": "The root mutation type",
+        "fields": [
+          {
+            "name": "createUser",
+            "description": "Create a new user",
+            "args": [
+              {
+                "name": "input",
+                "description": "User creation input",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "INPUT_OBJECT", "name": "CreateUserInput" } },
+                "defaultValue": null
+              }
+            ],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "OBJECT", "name": "User" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updateUser",
+            "description": "Update an existing user",
+            "args": [
+              {
+                "name": "id",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "INPUT_OBJECT", "name": "UpdateUserInput" } },
+                "defaultValue": null
+              }
+            ],
+            "type": { "kind": "OBJECT", "name": "User" },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deleteUser",
+            "description": "Delete a user (deprecated, use deactivateUser instead)",
+            "args": [
+              {
+                "name": "id",
+                "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+                "defaultValue": null
+              }
+            ],
+            "type": { "kind": "SCALAR", "name": "Boolean" },
+            "isDeprecated": true,
+            "deprecationReason": "Use deactivateUser instead"
+          }
+        ],
+        "interfaces": []
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "Node",
+        "description": "An object with a globally unique ID",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The globally unique ID",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": [
+          { "name": "User" },
+          { "name": "Post" }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "Timestamped",
+        "description": "An object with timestamp fields",
+        "fields": [
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "updatedAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          }
+        ],
+        "possibleTypes": [
+          { "name": "User" },
+          { "name": "Post" }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "User",
+        "description": "A user in the system",
+        "fields": [
+          {
+            "name": "id",
+            "description": "The user's unique ID",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "The user's display name",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "email",
+            "description": "The user's email address",
+            "args": [],
+            "type": { "kind": "SCALAR", "name": "String" },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "status",
+            "description": "The user's current status",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "ENUM", "name": "UserStatus" } },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "posts",
+            "description": "Posts authored by this user",
+            "args": [
+              {
+                "name": "limit",
+                "type": { "kind": "SCALAR", "name": "Int" },
+                "defaultValue": "10"
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "ofType": {
+                "kind": "LIST",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "ofType": { "kind": "OBJECT", "name": "Post" }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "updatedAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          }
+        ],
+        "interfaces": [
+          { "name": "Node" },
+          { "name": "Timestamped" }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Post",
+        "description": "A blog post",
+        "fields": [
+          {
+            "name": "id",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "ID" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "title",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "content",
+            "args": [],
+            "type": { "kind": "SCALAR", "name": "String" },
+            "isDeprecated": false
+          },
+          {
+            "name": "author",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "OBJECT", "name": "User" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          },
+          {
+            "name": "updatedAt",
+            "args": [],
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "DateTime" } },
+            "isDeprecated": false
+          }
+        ],
+        "interfaces": [
+          { "name": "Node" },
+          { "name": "Timestamped" }
+        ]
+      },
+      {
+        "kind": "ENUM",
+        "name": "UserStatus",
+        "description": "The status of a user account",
+        "enumValues": [
+          {
+            "name": "ACTIVE",
+            "description": "User is active and can log in",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INACTIVE",
+            "description": "User is inactive",
+            "isDeprecated": true,
+            "deprecationReason": "Use SUSPENDED instead"
+          },
+          {
+            "name": "SUSPENDED",
+            "description": "User account is suspended",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DELETED",
+            "description": "User account has been deleted",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ]
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CreateUserInput",
+        "description": "Input for creating a new user",
+        "inputFields": [
+          {
+            "name": "name",
+            "description": "The user's display name",
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+            "defaultValue": null
+          },
+          {
+            "name": "email",
+            "description": "The user's email address",
+            "type": { "kind": "NON_NULL", "ofType": { "kind": "SCALAR", "name": "String" } },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "description": "Initial status (defaults to ACTIVE)",
+            "type": { "kind": "ENUM", "name": "UserStatus" },
+            "defaultValue": "ACTIVE"
+          }
+        ]
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "UpdateUserInput",
+        "description": "Input for updating a user",
+        "inputFields": [
+          {
+            "name": "name",
+            "type": { "kind": "SCALAR", "name": "String" },
+            "defaultValue": null
+          },
+          {
+            "name": "email",
+            "type": { "kind": "SCALAR", "name": "String" },
+            "defaultValue": null
+          },
+          {
+            "name": "status",
+            "type": { "kind": "ENUM", "name": "UserStatus" },
+            "defaultValue": null
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "SearchResult",
+        "description": "A search result that can be a user or post",
+        "possibleTypes": [
+          { "name": "User" },
+          { "name": "Post" }
+        ]
+      },
+      {
+        "kind": "SCALAR",
+        "name": "DateTime",
+        "description": "An ISO-8601 encoded UTC date time string"
+      },
+      {
+        "kind": "SCALAR",
+        "name": "String",
+        "description": "Built-in String scalar"
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Int",
+        "description": "Built-in Int scalar"
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Float",
+        "description": "Built-in Float scalar"
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Boolean",
+        "description": "Built-in Boolean scalar"
+      },
+      {
+        "kind": "SCALAR",
+        "name": "ID",
+        "description": "Built-in ID scalar"
+      }
+    ]
+  }
+}
