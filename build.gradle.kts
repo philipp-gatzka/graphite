@@ -31,6 +31,7 @@
 plugins {
     base
     id("jacoco-report-aggregation")
+    alias(libs.plugins.owasp.dependency.check)
 }
 
 description = "Graphite - Type-safe GraphQL client for Spring Boot"
@@ -58,4 +59,22 @@ tasks.check {
 tasks.wrapper {
     gradleVersion = "8.12"
     distributionType = Wrapper.DistributionType.ALL
+}
+
+// Configure OWASP Dependency Check
+dependencyCheck {
+    // Fail the build on high or critical vulnerabilities
+    failBuildOnCVSS = 7f
+
+    // Scan all configurations
+    scanConfigurations = listOf("runtimeClasspath", "compileClasspath")
+
+    // Suppress known false positives (create suppression file if needed)
+    suppressionFiles = listOf("$projectDir/config/owasp-suppressions.xml")
+
+    // Output format
+    formats = listOf("HTML", "JSON")
+
+    // Include all subprojects
+    analyzedTypes = listOf("jar")
 }
