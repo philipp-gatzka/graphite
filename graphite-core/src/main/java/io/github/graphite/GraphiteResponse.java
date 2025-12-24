@@ -127,4 +127,36 @@ public record GraphiteResponse<T>(
   public boolean isSuccess() {
     return hasData() && !hasErrors();
   }
+
+  /**
+   * Returns the data or throws an exception if there are errors.
+   *
+   * <p>This method provides a convenient way to access the data when you expect the operation to
+   * succeed. If there are any errors in the response, a {@link
+   * io.github.graphite.exception.GraphiteGraphQLException} is thrown containing all the errors.
+   *
+   * <p>Example usage:
+   *
+   * <pre>{@code
+   * // When you expect success
+   * UserDTO user = client.execute(query).dataOrThrow();
+   *
+   * // Equivalent to:
+   * GraphiteResponse<UserDTO> response = client.execute(query);
+   * if (response.hasErrors()) {
+   *     throw new GraphiteGraphQLException(response.errors());
+   * }
+   * return response.data();
+   * }</pre>
+   *
+   * @return the data, may be {@code null} if the operation returned null data without errors
+   * @throws io.github.graphite.exception.GraphiteGraphQLException if the response contains errors
+   */
+  @Nullable
+  public T dataOrThrow() {
+    if (hasErrors()) {
+      throw new io.github.graphite.exception.GraphiteGraphQLException(errors);
+    }
+    return data;
+  }
 }
