@@ -133,7 +133,7 @@ public final class TypeGenerator {
 
     // Add interface implementations if any
     for (String interfaceName : type.interfaces()) {
-      ClassName interfaceType = ClassName.get(packageName, interfaceName);
+      ClassName interfaceType = ClassName.get(packageName, interfaceName + DTO_SUFFIX);
       recordBuilder.addSuperinterface(interfaceType);
     }
 

@@ -247,6 +247,39 @@ class TypeGeneratorTest {
   }
 
   @Nested
+  @DisplayName("Interface implementation")
+  class InterfaceImplementation {
+
+    @Test
+    @DisplayName("should implement interfaces from schema")
+    void shouldImplementInterfaces() {
+      TypeGenerator generator = new TypeGenerator(configuration, schema);
+
+      List<JavaFile> files = generator.generate();
+      JavaFile userFile = findFileByTypeName(files, "UserDTO");
+
+      String source = userFile.toString();
+
+      // User implements Node and Timestamped interfaces
+      assertThat(source).contains("implements NodeDTO, TimestampedDTO");
+    }
+
+    @Test
+    @DisplayName("should implement multiple interfaces")
+    void shouldImplementMultipleInterfaces() {
+      TypeGenerator generator = new TypeGenerator(configuration, schema);
+
+      List<JavaFile> files = generator.generate();
+      JavaFile postFile = findFileByTypeName(files, "PostDTO");
+
+      String source = postFile.toString();
+
+      // Post implements Node and Timestamped interfaces
+      assertThat(source).contains("implements NodeDTO, TimestampedDTO");
+    }
+  }
+
+  @Nested
   @DisplayName("Deprecation handling")
   class DeprecationHandling {
 
