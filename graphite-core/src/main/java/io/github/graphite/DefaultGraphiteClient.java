@@ -15,7 +15,18 @@
  */
 package io.github.graphite;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.graphite.exception.GraphiteClientException;
+import io.github.graphite.exception.GraphiteException;
+import io.github.graphite.exception.GraphiteRateLimitException;
+import io.github.graphite.exception.GraphiteServerException;
+import io.github.graphite.http.DefaultHttpTransport;
+import io.github.graphite.http.HttpRequest;
+import io.github.graphite.http.HttpResponse;
+import io.github.graphite.http.HttpTransport;
+import io.github.graphite.http.HttpTransportConfig;
 import io.github.graphite.interceptor.RequestInterceptor;
 import io.github.graphite.interceptor.ResponseInterceptor;
 import io.github.graphite.ratelimit.RateLimiter;
@@ -23,6 +34,8 @@ import io.github.graphite.retry.RetryPolicy;
 import io.github.graphite.scalar.ScalarRegistry;
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -32,9 +45,25 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Default implementation of {@link GraphiteClient}.
  *
+ * <p>This class provides the core functionality for executing GraphQL operations:
+ *
+ * <ul>
+ *   <li>Serialization of operations to JSON
+ *   <li>HTTP execution via {@link HttpTransport}
+ *   <li>Response deserialization using Jackson
+ *   <li>Retry policy application on failures
+ *   <li>Rate limiting support
+ *   <li>Request/response interceptor chains
+ * </ul>
+ *
  * <p>This class is package-private and should be created via {@link GraphiteClientBuilder}.
+ *
+ * @see GraphiteClient
+ * @see GraphiteClientBuilder
  */
 final class DefaultGraphiteClient implements GraphiteClient {
+
+  private static final String CONTENT_TYPE_JSON = "application/json";
 
   private final URI endpoint;
   private final Map<String, String> headers;
@@ -47,6 +76,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
   private final List<RequestInterceptor> requestInterceptors;
   private final List<ResponseInterceptor> responseInterceptors;
   private final ObjectMapper objectMapper;
+  private final HttpTransport httpTransport;
 
   private volatile boolean closed = false;
 
@@ -73,6 +103,17 @@ final class DefaultGraphiteClient implements GraphiteClient {
     this.requestInterceptors = requestInterceptors;
     this.responseInterceptors = responseInterceptors;
     this.objectMapper = objectMapper;
+    this.httpTransport = createTransport();
+  }
+
+  private HttpTransport createTransport() {
+    HttpTransportConfig config =
+        HttpTransportConfig.builder()
+            .connectTimeout(connectTimeout)
+            .readTimeout(readTimeout)
+            .requestTimeout(requestTimeout)
+            .build();
+    return new DefaultHttpTransport(config);
   }
 
   @Override
@@ -83,9 +124,33 @@ final class DefaultGraphiteClient implements GraphiteClient {
     }
     ensureNotClosed();
 
-    // TODO: Implement actual HTTP execution
-    // For now, return an empty response as a placeholder
-    return GraphiteResponse.success(null);
+    try {
+      // Step 1: Serialize operation to JSON
+      String requestBody = serializeOperation(operation);
+
+      // Step 2: Create HTTP request with headers
+      HttpRequest request = createRequest(requestBody);
+
+      // Step 3: Apply request interceptors
+      request = applyRequestInterceptors(request);
+
+      // Step 4: Acquire rate limit permit
+      acquireRateLimitPermit();
+
+      // Step 5: Execute with retry
+      HttpResponse response = executeWithRetry(request);
+
+      // Step 6: Apply response interceptors
+      response = applyResponseInterceptors(response);
+
+      // Step 7: Deserialize response and return
+      return deserializeResponse(response, operation.responseType());
+
+    } catch (GraphiteException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new GraphiteClientException("Failed to execute GraphQL operation", e);
+    }
   }
 
   @Override
@@ -102,7 +167,216 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   @Override
   public void close() {
-    closed = true;
+    if (!closed) {
+      closed = true;
+      httpTransport.close();
+    }
+  }
+
+  private String serializeOperation(GraphQLOperation<?> operation) {
+    try {
+      Map<String, Object> payload = new HashMap<>();
+      payload.put("query", operation.toGraphQL());
+      payload.put("operationName", operation.operationName());
+
+      Map<String, Object> variables = operation.variables();
+      if (!variables.isEmpty()) {
+        payload.put("variables", variables);
+      }
+
+      return objectMapper.writeValueAsString(payload);
+    } catch (JsonProcessingException e) {
+      throw new GraphiteClientException("Failed to serialize GraphQL operation", e);
+    }
+  }
+
+  private HttpRequest createRequest(String body) {
+    Map<String, String> requestHeaders = new HashMap<>(headers);
+    requestHeaders.put("Content-Type", CONTENT_TYPE_JSON);
+    requestHeaders.put("Accept", CONTENT_TYPE_JSON);
+
+    return HttpRequest.post(endpoint, requestHeaders, body);
+  }
+
+  private HttpRequest applyRequestInterceptors(HttpRequest request) {
+    HttpRequest result = request;
+    for (RequestInterceptor interceptor : requestInterceptors) {
+      result = interceptor.intercept(result);
+    }
+    return result;
+  }
+
+  private void acquireRateLimitPermit() {
+    if (rateLimiter != null) {
+      if (!rateLimiter.tryAcquire()) {
+        throw new GraphiteRateLimitException(
+            "Rate limit exceeded: max " + rateLimiter.getRequestsPerSecond() + " requests/second");
+      }
+    }
+  }
+
+  private HttpResponse executeWithRetry(HttpRequest request) {
+    GraphiteException lastException = null;
+    int attempt = 0;
+
+    while (true) {
+      try {
+        HttpResponse response = httpTransport.execute(request);
+
+        // Check for server errors that might be retryable
+        if (response.isServerError()) {
+          GraphiteServerException serverException =
+              new GraphiteServerException(
+                  "Server error: HTTP " + response.statusCode(), response.statusCode());
+
+          if (retryPolicy.shouldRetry(serverException, attempt + 1)) {
+            lastException = serverException;
+            attempt++;
+            sleepForRetry(attempt);
+            continue;
+          }
+          throw serverException;
+        }
+
+        return response;
+
+      } catch (GraphiteException e) {
+        if (retryPolicy.shouldRetry(e, attempt + 1)) {
+          lastException = e;
+          attempt++;
+          sleepForRetry(attempt);
+          continue;
+        }
+        throw e;
+      }
+    }
+  }
+
+  private void sleepForRetry(int attempt) {
+    Duration delay = retryPolicy.getDelay(attempt);
+    try {
+      Thread.sleep(delay.toMillis());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new GraphiteClientException("Retry interrupted", e);
+    }
+  }
+
+  private HttpResponse applyResponseInterceptors(HttpResponse response) {
+    HttpResponse result = response;
+    for (ResponseInterceptor interceptor : responseInterceptors) {
+      result = interceptor.intercept(result);
+    }
+    return result;
+  }
+
+  private <T> GraphiteResponse<T> deserializeResponse(HttpResponse response, Class<T> responseType)
+      throws JsonProcessingException {
+    String body = response.body();
+    if (body == null || body.isBlank()) {
+      throw new GraphiteClientException("Empty response body from server");
+    }
+
+    JsonNode rootNode = objectMapper.readTree(body);
+
+    // Parse errors
+    List<GraphQLError> errors = parseErrors(rootNode);
+
+    // Parse data
+    T data = parseData(rootNode, responseType);
+
+    // Parse extensions
+    Map<String, Object> extensions = parseExtensions(rootNode);
+
+    return new GraphiteResponse<>(data, errors, extensions);
+  }
+
+  private List<GraphQLError> parseErrors(JsonNode rootNode) {
+    List<GraphQLError> errors = new ArrayList<>();
+    JsonNode errorsNode = rootNode.get("errors");
+
+    if (errorsNode != null && errorsNode.isArray()) {
+      for (JsonNode errorNode : errorsNode) {
+        String message =
+            errorNode.has("message") ? errorNode.get("message").asText() : "Unknown error";
+
+        List<GraphQLError.Location> locations = parseLocations(errorNode.get("locations"));
+        List<Object> path = parsePath(errorNode.get("path"));
+        Map<String, Object> extensions = parseExtensionsNode(errorNode.get("extensions"));
+
+        errors.add(new GraphQLError(message, locations, path, extensions));
+      }
+    }
+
+    return errors;
+  }
+
+  private List<GraphQLError.Location> parseLocations(JsonNode locationsNode) {
+    if (locationsNode == null || !locationsNode.isArray()) {
+      return null;
+    }
+
+    List<GraphQLError.Location> locations = new ArrayList<>();
+    for (JsonNode locationNode : locationsNode) {
+      int line = locationNode.has("line") ? locationNode.get("line").asInt() : 0;
+      int column = locationNode.has("column") ? locationNode.get("column").asInt() : 0;
+      locations.add(new GraphQLError.Location(line, column));
+    }
+    return locations;
+  }
+
+  private List<Object> parsePath(JsonNode pathNode) {
+    if (pathNode == null || !pathNode.isArray()) {
+      return null;
+    }
+
+    List<Object> path = new ArrayList<>();
+    for (JsonNode element : pathNode) {
+      if (element.isNumber()) {
+        path.add(element.asInt());
+      } else {
+        path.add(element.asText());
+      }
+    }
+    return path;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> parseExtensionsNode(JsonNode extensionsNode) {
+    if (extensionsNode == null || !extensionsNode.isObject()) {
+      return null;
+    }
+    try {
+      return objectMapper.treeToValue(extensionsNode, Map.class);
+    } catch (JsonProcessingException e) {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> parseExtensions(JsonNode rootNode) {
+    JsonNode extensionsNode = rootNode.get("extensions");
+    if (extensionsNode == null || !extensionsNode.isObject()) {
+      return Map.of();
+    }
+    try {
+      Map<String, Object> result = objectMapper.treeToValue(extensionsNode, Map.class);
+      return result != null ? result : Map.of();
+    } catch (JsonProcessingException e) {
+      return Map.of();
+    }
+  }
+
+  private <T> T parseData(JsonNode rootNode, Class<T> responseType) {
+    JsonNode dataNode = rootNode.get("data");
+    if (dataNode == null || dataNode.isNull()) {
+      return null;
+    }
+    try {
+      return objectMapper.treeToValue(dataNode, responseType);
+    } catch (JsonProcessingException e) {
+      throw new GraphiteClientException("Failed to deserialize response data", e);
+    }
   }
 
   /**
