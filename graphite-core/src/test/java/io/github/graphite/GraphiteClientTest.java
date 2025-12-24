@@ -39,13 +39,22 @@ class GraphiteClientTest {
     }
 
     @Test
-    @DisplayName("build should throw UnsupportedOperationException until implemented")
-    void buildShouldThrowUnsupportedOperationException() {
+    @DisplayName("build should throw when endpoint not set")
+    void buildShouldThrowWhenEndpointNotSet() {
       var builder = GraphiteClient.builder();
 
       assertThatThrownBy(builder::build)
-          .isInstanceOf(UnsupportedOperationException.class)
-          .hasMessageContaining("not yet available");
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("endpoint is required");
+    }
+
+    @Test
+    @DisplayName("build should succeed with endpoint")
+    void buildShouldSucceedWithEndpoint() {
+      var client = GraphiteClient.builder().endpoint("https://api.example.com/graphql").build();
+
+      assertThat(client).isNotNull();
+      assertThat(client).isInstanceOf(GraphiteClient.class);
     }
   }
 
