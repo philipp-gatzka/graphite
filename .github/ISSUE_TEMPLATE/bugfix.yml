@@ -1,0 +1,87 @@
+name: Bug Fix
+description: Report a bug that needs to be fixed
+labels: ["type/bugfix"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Please fill out all required fields. Issues missing required information will be rejected.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Describe the expected behavior from a user's perspective
+      placeholder: "As a [role], I want [feature], so that [benefit]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the bug and its impact
+      placeholder: |
+        **Current behavior:** What happens now?
+        **Expected behavior:** What should happen?
+        **Steps to reproduce:** How can this be reproduced?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List all conditions that must be met. The first two are mandatory and pre-filled.
+      value: |
+        - [ ] Implemented code is covered with automated tests
+        - [ ] Documentation has been updated
+        - [ ] Bug is no longer reproducible
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Estimated size of the fix
+      options:
+        - size/xs
+        - size/s
+        - size/m
+        - size/l
+        - size/xl
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      description: Technical complexity of the fix
+      options:
+        - complexity/trivial
+        - complexity/simple
+        - complexity/moderate
+        - complexity/complex
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area (Optional)
+      description: Which area of the codebase does this affect?
+      multiple: true
+      options:
+        - area/ui
+        - area/backend
+        - area/api
+        - area/database
+        - area/infra
+        - area/docs
+        - area/testing
+    validations:
+      required: false
