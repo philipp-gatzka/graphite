@@ -26,6 +26,7 @@ import io.github.graphite.codegen.CodegenConfiguration;
 import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.TypeDefinition;
+import io.github.graphite.codegen.schema.UnionDefinition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +64,9 @@ import org.jetbrains.annotations.Nullable;
 public final class TypeGenerator {
 
   private static final String TYPE_PACKAGE_SUFFIX = ".type";
+  private static final String UNION_PACKAGE_SUFFIX = ".union";
   private static final String DTO_SUFFIX = "DTO";
+  private static final String UNION_SUFFIX = "Union";
   private static final Set<String> ROOT_TYPE_NAMES = Set.of("Query", "Mutation", "Subscription");
 
   private final CodegenConfiguration configuration;
@@ -137,6 +140,13 @@ public final class TypeGenerator {
       recordBuilder.addSuperinterface(interfaceType);
     }
 
+    // Add union implementations if any
+    String unionPackage = configuration.packageName() + UNION_PACKAGE_SUFFIX;
+    for (String unionName : findUnionsContainingType(type.name())) {
+      ClassName unionType = ClassName.get(unionPackage, unionName + UNION_SUFFIX);
+      recordBuilder.addSuperinterface(unionType);
+    }
+
     TypeSpec recordSpec = recordBuilder.build();
 
     return JavaFile.builder(packageName, recordSpec)
@@ -175,6 +185,22 @@ public final class TypeGenerator {
     }
 
     return paramBuilder.build();
+  }
+
+  /**
+   * Finds all unions that contain the given type.
+   *
+   * @param typeName the type name to search for
+   * @return a list of union names that contain this type
+   */
+  private List<String> findUnionsContainingType(String typeName) {
+    List<String> unions = new ArrayList<>();
+    for (UnionDefinition union : schema.unions().values()) {
+      if (union.possibleTypes().contains(typeName)) {
+        unions.add(union.name());
+      }
+    }
+    return unions;
   }
 
   /**
