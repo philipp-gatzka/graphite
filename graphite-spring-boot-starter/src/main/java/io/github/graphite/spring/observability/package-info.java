@@ -24,11 +24,17 @@
  *       Micrometer metrics
  *   <li>{@link io.github.graphite.spring.observability.GraphiteMetricsInterceptor} - Interceptor
  *       for automatic metrics collection
+ *   <li>{@link io.github.graphite.spring.observability.GraphiteTracingInterceptor} - Interceptor
+ *       for distributed tracing
+ *   <li>{@link io.github.graphite.spring.observability.HeaderPropagatingInterceptor} - Interceptor
+ *       for trace context propagation
  * </ul>
  *
- * <p>These components are automatically configured when Micrometer is on the classpath.
+ * <p>These components are automatically configured when Micrometer and Micrometer Tracing are on
+ * the classpath.
  *
  * @see io.github.graphite.spring.autoconfigure.GraphiteMetricsAutoConfiguration
+ * @see io.github.graphite.spring.autoconfigure.GraphiteTracingAutoConfiguration
  */
 @org.jetbrains.annotations.ApiStatus.Experimental
 package io.github.graphite.spring.observability;
