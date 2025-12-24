@@ -6,14 +6,37 @@ These rules are **non-negotiable** and apply to all work in this repository.
 
 ## 0. Getting Started
 
-After cloning the repository, run the setup script to configure git hooks:
+After cloning the repository, run the setup script to configure the development environment:
 
 ```bash
+git clone --recurse-submodules git@github.com:philipp-gatzka/graphite.git
+cd graphite
 ./scripts/setup.sh
 ```
 
-This configures:
+If you already cloned without `--recurse-submodules`:
+
+```bash
+git submodule update --init --recursive
+./scripts/setup.sh
+```
+
+### Repository Structure
+
+```
+graphite/
+├── wiki/              # Documentation (git submodule → graphite.wiki)
+├── scripts/           # Development scripts
+│   └── setup.sh       # Setup script for new collaborators
+├── .githooks/         # Shared git hooks
+│   └── commit-msg     # Commit message validation
+└── .github/           # GitHub templates and config
+```
+
+### What Setup Configures
+
 - `commit-msg` hook: Enforces commit message format `#<issue-id> <message-in-lowercase>`
+- Git hooks path: Points to `.githooks/` directory
 
 ---
 
