@@ -277,6 +277,37 @@ class TypeGeneratorTest {
       // Post implements Node and Timestamped interfaces
       assertThat(source).contains("implements NodeDTO, TimestampedDTO");
     }
+
+    @Test
+    @DisplayName("should implement union interfaces")
+    void shouldImplementUnionInterfaces() {
+      TypeGenerator generator = new TypeGenerator(configuration, schema);
+
+      List<JavaFile> files = generator.generate();
+      JavaFile userFile = findFileByTypeName(files, "UserDTO");
+
+      String source = userFile.toString();
+
+      // User is part of SearchResult union
+      assertThat(source).contains("SearchResultUnion");
+      assertThat(source).contains("import com.example.graphql.union.SearchResultUnion;");
+    }
+
+    @Test
+    @DisplayName("should implement both interfaces and unions")
+    void shouldImplementBothInterfacesAndUnions() {
+      TypeGenerator generator = new TypeGenerator(configuration, schema);
+
+      List<JavaFile> files = generator.generate();
+      JavaFile postFile = findFileByTypeName(files, "PostDTO");
+
+      String source = postFile.toString();
+
+      // Post implements NodeDTO, TimestampedDTO, and SearchResultUnion
+      assertThat(source).contains("NodeDTO");
+      assertThat(source).contains("TimestampedDTO");
+      assertThat(source).contains("SearchResultUnion");
+    }
   }
 
   @Nested
