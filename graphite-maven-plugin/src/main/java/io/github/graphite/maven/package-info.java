@@ -18,13 +18,13 @@
  * Graphite Maven Plugin for GraphQL code generation.
  *
  * <p>This module provides a Maven plugin that:
+ *
  * <ul>
- *   <li>Generates type-safe Java code from GraphQL schema</li>
- *   <li>Binds to the generate-sources lifecycle phase</li>
- *   <li>Automatically adds generated sources to the compile path</li>
+ *   <li>Generates type-safe Java code from GraphQL schema
+ *   <li>Binds to the generate-sources lifecycle phase
+ *   <li>Automatically adds generated sources to the compile path
  * </ul>
  *
  * @see io.github.graphite.maven.GraphiteGenerateMojo
  */
-
 package io.github.graphite.maven;
