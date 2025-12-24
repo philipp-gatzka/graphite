@@ -1,0 +1,120 @@
+/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Convention plugin for Java modules in the Graphite project.
+ *
+ * <p>This plugin configures:
+ * <ul>
+ *   <li>Java 21 toolchain</li>
+ *   <li>Compiler options with strict warnings</li>
+ *   <li>Google Java Format via Spotless</li>
+ *   <li>Checkstyle for code style enforcement</li>
+ *   <li>JaCoCo for code coverage</li>
+ *   <li>JUnit 5 for testing</li>
+ * </ul>
+ */
+
+plugins {
+    `java-library`
+    checkstyle
+    jacoco
+    id("com.diffplug.spotless")
+}
+
+group = "io.github.graphite"
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(
+        listOf(
+            "-Xlint:all",
+            "-Xlint:-processing",
+            "-Werror"
+        )
+    )
+}
+
+tasks.withType<Javadoc>().configureEach {
+    options.encoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:all,-missing", "-quiet")
+        links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat("1.24.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        licenseHeaderFile(rootProject.file("gradle/license-header.txt"))
+    }
+}
+
+checkstyle {
+    toolVersion = "10.21.1"
+    configFile = rootProject.file("gradle/checkstyle.xml")
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
