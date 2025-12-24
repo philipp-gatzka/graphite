@@ -1,0 +1,29 @@
+# Graphite Configuration
+graphite:
+  url: https://api.example.com/graphql
+  timeout:
+    connect: 10s
+    read: 30s
+    request: 60s
+  retry:
+    max-attempts: 3
+    initial-delay: 100ms
+    multiplier: 2.0
+    max-delay: 5s
+  # headers:
+  #   Authorization: Bearer ${GRAPHQL_TOKEN}
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  health:
+    graphite:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    io.github.graphite: DEBUG
