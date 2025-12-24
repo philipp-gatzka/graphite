@@ -18,14 +18,14 @@
  * Graphite Test Utilities for testing GraphQL client applications.
  *
  * <p>This module provides testing utilities including:
+ *
  * <ul>
- *   <li>GraphiteMockServer for mocking GraphQL endpoints</li>
- *   <li>Type-safe request matchers</li>
- *   <li>Response builders</li>
- *   <li>Assertion helpers</li>
+ *   <li>GraphiteMockServer for mocking GraphQL endpoints
+ *   <li>Type-safe request matchers
+ *   <li>Response builders
+ *   <li>Assertion helpers
  * </ul>
  *
  * @see io.github.graphite.test.GraphiteMockServer
  */
-
 package io.github.graphite.test;
