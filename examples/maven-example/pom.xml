@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Graphite Maven Example Project
+
+  This example demonstrates how to use Graphite with Maven
+  to build a type-safe GraphQL client application.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>graphite-maven-example</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Graphite Maven Example</name>
+    <description>Example project demonstrating Graphite with Maven</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <graphite.version>0.1.0</graphite.version>
+    </properties>
+
+    <dependencies>
+        <!-- Graphite Spring Boot Starter -->
+        <!--
+        <dependency>
+            <groupId>io.github.graphite</groupId>
+            <artifactId>graphite-spring-boot-starter</artifactId>
+            <version>${graphite.version}</version>
+        </dependency>
+        -->
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>io.github.graphite</groupId>
+            <artifactId>graphite-test-utils</artifactId>
+            <version>${graphite.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Graphite Code Generation Plugin -->
+            <!--
+            <plugin>
+                <groupId>io.github.graphite</groupId>
+                <artifactId>graphite-maven-plugin</artifactId>
+                <version>${graphite.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaFile>${project.basedir}/src/main/resources/graphql/schema.json</schemaFile>
+                    <packageName>com.example.graphql.generated</packageName>
+                </configuration>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+
+    <!-- Uncomment for snapshot versions -->
+    <!--
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/philipp-gatzka/graphite</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/philipp-gatzka/graphite</url>
+        </pluginRepository>
+    </pluginRepositories>
+    -->
+</project>
