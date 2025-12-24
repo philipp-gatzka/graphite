@@ -1,0 +1,87 @@
+name: Refactor
+description: Code refactoring or technical improvement
+labels: ["type/refactor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Refactoring Request
+        Please fill out all required fields. Issues missing required information will be rejected.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Describe the improvement from a maintainability perspective
+      placeholder: "As a [role], I want [improvement], so that [benefit]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe what needs to be refactored and why
+      placeholder: |
+        **Current state:** What is the problem with the current code?
+        **Proposed change:** What refactoring should be done?
+        **Benefits:** Why is this refactoring valuable?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List all conditions that must be met. The first two are mandatory and pre-filled.
+      value: |
+        - [ ] Implemented code is covered with automated tests
+        - [ ] Documentation has been updated
+        - [ ] No functional changes introduced
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Estimated size of the refactoring
+      options:
+        - size/xs
+        - size/s
+        - size/m
+        - size/l
+        - size/xl
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      description: Technical complexity of the refactoring
+      options:
+        - complexity/trivial
+        - complexity/simple
+        - complexity/moderate
+        - complexity/complex
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area (Optional)
+      description: Which area of the codebase does this affect?
+      multiple: true
+      options:
+        - area/ui
+        - area/backend
+        - area/api
+        - area/database
+        - area/infra
+        - area/docs
+        - area/testing
+    validations:
+      required: false
