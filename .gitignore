@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+out/
+target/
+bin/
+
+# Logs
+*.log
+
+# Local configuration
+local.properties
+*.local
+
+# Test outputs
+test-output/
