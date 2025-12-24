@@ -18,15 +18,15 @@
  * Graphite Spring Boot Starter for auto-configuration.
  *
  * <p>This module provides Spring Boot auto-configuration including:
+ *
  * <ul>
- *   <li>Automatic GraphiteClient bean creation</li>
- *   <li>Configuration properties binding</li>
- *   <li>Micrometer metrics integration</li>
- *   <li>Micrometer tracing integration</li>
- *   <li>Actuator health indicator</li>
+ *   <li>Automatic GraphiteClient bean creation
+ *   <li>Configuration properties binding
+ *   <li>Micrometer metrics integration
+ *   <li>Micrometer tracing integration
+ *   <li>Actuator health indicator
  * </ul>
  *
  * @see io.github.graphite.spring.autoconfigure.GraphiteAutoConfiguration
  */
-
 package io.github.graphite.spring;
