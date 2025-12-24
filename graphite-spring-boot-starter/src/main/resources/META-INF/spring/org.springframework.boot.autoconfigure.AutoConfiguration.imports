@@ -1,3 +1,4 @@
 io.github.graphite.spring.autoconfigure.GraphiteAutoConfiguration
 io.github.graphite.spring.autoconfigure.GraphiteMetricsAutoConfiguration
 io.github.graphite.spring.autoconfigure.GraphiteTracingAutoConfiguration
+io.github.graphite.spring.autoconfigure.GraphiteHealthIndicatorAutoConfiguration
