@@ -58,6 +58,7 @@
         <!-- Javadoc -->
         <module name="JavadocType">
             <property name="scope" value="public"/>
+            <property name="allowUnknownTags" value="true"/>
         </module>
         <module name="JavadocMethod">
             <property name="accessModifiers" value="public"/>
@@ -99,6 +100,12 @@
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAround">
+            <!-- Allow empty braces for records and lambdas -->
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+        </module>
     </module>
 </module>

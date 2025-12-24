@@ -43,7 +43,23 @@ class GraphiteGenerateMojoTest {
       {
         "__schema": {
           "queryType": { "name": "Query" },
-          "types": []
+          "mutationType": null,
+          "subscriptionType": null,
+          "types": [
+            {
+              "kind": "OBJECT",
+              "name": "Query",
+              "fields": [
+                {
+                  "name": "hello",
+                  "args": [],
+                  "type": { "kind": "SCALAR", "name": "String" },
+                  "isDeprecated": false
+                }
+              ],
+              "interfaces": []
+            }
+          ]
         }
       }
       """;
