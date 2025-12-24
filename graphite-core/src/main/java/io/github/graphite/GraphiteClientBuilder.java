@@ -180,13 +180,14 @@ public final class GraphiteClientBuilder {
   /**
    * Sets the connection timeout.
    *
-   * <p>This is the maximum time to wait when establishing a connection to the server. Default is
-   * {@value #DEFAULT_CONNECT_TIMEOUT}.
+   * <p>This is the maximum time to wait when establishing a connection to the server. Default is 10
+   * seconds.
    *
    * @param timeout the connect timeout
    * @return this builder
    * @throws NullPointerException if timeout is null
    * @throws IllegalArgumentException if timeout is negative or zero
+   * @see #DEFAULT_CONNECT_TIMEOUT
    */
   @NotNull
   public GraphiteClientBuilder connectTimeout(@NotNull Duration timeout) {
@@ -199,12 +200,13 @@ public final class GraphiteClientBuilder {
    * Sets the read timeout.
    *
    * <p>This is the maximum time to wait for data after a connection has been established. Default
-   * is {@value #DEFAULT_READ_TIMEOUT}.
+   * is 30 seconds.
    *
    * @param timeout the read timeout
    * @return this builder
    * @throws NullPointerException if timeout is null
    * @throws IllegalArgumentException if timeout is negative or zero
+   * @see #DEFAULT_READ_TIMEOUT
    */
   @NotNull
   public GraphiteClientBuilder readTimeout(@NotNull Duration timeout) {
@@ -217,12 +219,13 @@ public final class GraphiteClientBuilder {
    * Sets the request timeout.
    *
    * <p>This is the maximum total time for an entire request, including connection, sending, and
-   * receiving. Default is {@value #DEFAULT_REQUEST_TIMEOUT}.
+   * receiving. Default is 60 seconds.
    *
    * @param timeout the request timeout
    * @return this builder
    * @throws NullPointerException if timeout is null
    * @throws IllegalArgumentException if timeout is negative or zero
+   * @see #DEFAULT_REQUEST_TIMEOUT
    */
   @NotNull
   public GraphiteClientBuilder requestTimeout(@NotNull Duration timeout) {

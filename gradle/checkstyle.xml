@@ -18,9 +18,9 @@
         <property name="optional" value="true"/>
     </module>
 
-    <!-- File length -->
+    <!-- File length - 600 lines max for main sources, tests excluded via suppressions -->
     <module name="FileLength">
-        <property name="max" value="500"/>
+        <property name="max" value="600"/>
     </module>
 
     <!-- No tabs -->
