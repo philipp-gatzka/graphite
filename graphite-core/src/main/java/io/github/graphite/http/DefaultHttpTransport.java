@@ -214,6 +214,7 @@ public final class DefaultHttpTransport implements HttpTransport {
         String body = request.body() != null ? request.body() : "";
         builder.POST(java.net.http.HttpRequest.BodyPublishers.ofString(body));
       }
+      default -> throw new IllegalArgumentException("Unsupported HTTP method: " + request.method());
     }
 
     return builder.build();

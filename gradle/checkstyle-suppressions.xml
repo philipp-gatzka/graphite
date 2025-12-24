@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!--
+    Checkstyle suppressions for Graphite project.
+-->
+<suppressions>
+    <!-- Allow longer test files - integration tests can be comprehensive -->
+    <suppress checks="FileLength" files=".*Test\.java$"/>
+    <suppress checks="FileLength" files=".*Tests\.java$"/>
+    <suppress checks="FileLength" files=".*IntegrationTest\.java$"/>
+
+    <!-- Allow longer assertion utility files -->
+    <suppress checks="FileLength" files=".*Assertions\.java$"/>
+
+    <!-- Allow star imports in test files - common pattern with WireMock, Mockito -->
+    <suppress checks="AvoidStarImport" files=".*Test\.java$"/>
+    <suppress checks="AvoidStarImport" files=".*Tests\.java$"/>
+
+    <!-- Allow test methods without Javadoc -->
+    <suppress checks="MissingJavadocMethod" files=".*Test\.java$"/>
+    <suppress checks="MissingJavadocMethod" files=".*Tests\.java$"/>
+    <suppress checks="JavadocMethod" files=".*Test\.java$"/>
+    <suppress checks="JavadocMethod" files=".*Tests\.java$"/>
+
+    <!-- Allow test classes without Javadoc -->
+    <suppress checks="MissingJavadocType" files=".*Test\.java$"/>
+    <suppress checks="MissingJavadocType" files=".*Tests\.java$"/>
+    <suppress checks="JavadocType" files=".*Test\.java$"/>
+    <suppress checks="JavadocType" files=".*Tests\.java$"/>
+</suppressions>
