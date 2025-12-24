@@ -43,4 +43,5 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.micrometer.core)
 }
