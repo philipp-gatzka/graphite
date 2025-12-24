@@ -1,0 +1,83 @@
+name: Feature
+description: Request a new feature or enhancement
+labels: ["type/feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Please fill out all required fields. Issues missing required information will be rejected.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Describe the feature from a user's perspective
+      placeholder: "As a [role], I want [feature], so that [benefit]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief technical explanation of the feature
+      placeholder: "Describe what needs to be implemented and how it should work..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List all conditions that must be met. The first two are mandatory and pre-filled.
+      value: |
+        - [ ] Implemented code is covered with automated tests
+        - [ ] Documentation has been updated
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Estimated size of the task
+      options:
+        - size/xs
+        - size/s
+        - size/m
+        - size/l
+        - size/xl
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      description: Technical complexity of the task
+      options:
+        - complexity/trivial
+        - complexity/simple
+        - complexity/moderate
+        - complexity/complex
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area (Optional)
+      description: Which area of the codebase does this affect?
+      multiple: true
+      options:
+        - area/ui
+        - area/backend
+        - area/api
+        - area/database
+        - area/infra
+        - area/docs
+        - area/testing
+    validations:
+      required: false
