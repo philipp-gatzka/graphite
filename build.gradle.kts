@@ -32,6 +32,7 @@ plugins {
     base
     id("jacoco-report-aggregation")
     alias(libs.plugins.owasp.dependency.check)
+    alias(libs.plugins.sonarqube)
 }
 
 description = "Graphite - Type-safe GraphQL client for Spring Boot"
@@ -77,4 +78,26 @@ dependencyCheck {
 
     // Include all subprojects
     analyzedTypes = listOf("jar")
+}
+
+// Configure SonarCloud
+sonar {
+    properties {
+        property("sonar.projectKey", "philipp-gatzka_graphite")
+        property("sonar.organization", "philipp-gatzka")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        // Coverage reporting
+        property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml")
+
+        // Source encoding
+        property("sonar.sourceEncoding", "UTF-8")
+
+        // Java version
+        property("sonar.java.source", "21")
+        property("sonar.java.target", "21")
+
+        // Exclude generated code and build directories
+        property("sonar.exclusions", "**/build/**,**/generated/**")
+    }
 }
