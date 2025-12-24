@@ -26,6 +26,7 @@ dependencies {
     api(platform(libs.jackson.bom))
 
     // Core dependencies
+    api(project(":graphite-core"))
     api(libs.jackson.databind)
     api(libs.jetbrains.annotations)
 
