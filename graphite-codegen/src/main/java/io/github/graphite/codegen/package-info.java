@@ -18,14 +18,14 @@
  * Graphite Codegen module providing code generation from GraphQL schema.
  *
  * <p>This module contains:
+ *
  * <ul>
- *   <li>Schema parsing for schema.json (GraphQL introspection format)</li>
- *   <li>Code generators for DTOs, input types, enums, queries, and mutations</li>
- *   <li>Incremental build support with schema change detection</li>
- *   <li>Custom scalar mapping support</li>
+ *   <li>Schema parsing for schema.json (GraphQL introspection format)
+ *   <li>Code generators for DTOs, input types, enums, queries, and mutations
+ *   <li>Incremental build support with schema change detection
+ *   <li>Custom scalar mapping support
  * </ul>
  *
  * @see io.github.graphite.codegen.GraphiteCodegen
  */
-
 package io.github.graphite.codegen;
