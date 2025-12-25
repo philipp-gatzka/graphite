@@ -80,6 +80,9 @@ public final class MutationGenerator {
   private static final String MUTATION_SUFFIX = "Mutation";
   private static final String DTO_SUFFIX = "DTO";
   private static final String PROJECTION_SUFFIX = "Projection";
+  private static final String BUILDER_CLASS_NAME = "Builder";
+  private static final String INHERITDOC = "{@inheritDoc}\n";
+  private static final String MUTATION_TYPE_NAME = "Mutation";
 
   private final CodegenConfiguration configuration;
   private final SchemaModel schema;
@@ -107,7 +110,7 @@ public final class MutationGenerator {
   public List<JavaFile> generate() {
     List<JavaFile> files = new ArrayList<>();
 
-    TypeDefinition mutationType = schema.types().get("Mutation");
+    TypeDefinition mutationType = schema.types().get(MUTATION_TYPE_NAME);
     if (mutationType == null) {
       return files;
     }
@@ -153,7 +156,7 @@ public final class MutationGenerator {
         ParameterizedTypeName.get(ClassName.get(GraphQLOperation.class), actualResponseType);
 
     ClassName mutationClassName = ClassName.get(packageName, className);
-    ClassName builderClassName = mutationClassName.nestedClass("Builder");
+    ClassName builderClassName = mutationClassName.nestedClass(BUILDER_CLASS_NAME);
 
     TypeSpec.Builder classBuilder =
         TypeSpec.classBuilder(className)
@@ -196,7 +199,7 @@ public final class MutationGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(String.class)
             .addStatement("return $S", operationName)
-            .addJavadoc("{@inheritDoc}\n")
+            .addJavadoc(INHERITDOC)
             .build());
 
     // Add toGraphQL() method
@@ -265,7 +268,7 @@ public final class MutationGenerator {
             .addAnnotation(NotNull.class)
             .addModifiers(Modifier.PUBLIC)
             .returns(String.class)
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     // Build variable definitions
     StringBuilder varDefs = new StringBuilder();
@@ -308,7 +311,7 @@ public final class MutationGenerator {
                     ClassName.get(Map.class),
                     ClassName.get(String.class),
                     ClassName.get(Object.class)))
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     if (field.arguments().isEmpty()) {
       method.addStatement("return $T.emptyMap()", Collections.class);
@@ -332,7 +335,7 @@ public final class MutationGenerator {
             .addAnnotation(Override.class)
             .addAnnotation(NotNull.class)
             .addModifiers(Modifier.PUBLIC)
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     if (isList) {
       // For List types, we need to return a Class<List<T>> which requires casting
@@ -358,7 +361,7 @@ public final class MutationGenerator {
       ClassName projectionClass,
       boolean hasProjection) {
     TypeSpec.Builder builder =
-        TypeSpec.classBuilder("Builder")
+        TypeSpec.classBuilder(BUILDER_CLASS_NAME)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
 
     builder.addJavadoc("Builder for {@link $T}.\n", mutationClassName);
@@ -381,7 +384,7 @@ public final class MutationGenerator {
 
     // Add selecting() method for projection
     if (hasProjection) {
-      ClassName projectionBuilderClass = projectionClass.nestedClass("Builder");
+      ClassName projectionBuilderClass = projectionClass.nestedClass(BUILDER_CLASS_NAME);
       ParameterizedTypeName consumerType =
           ParameterizedTypeName.get(ClassName.get(Consumer.class), projectionBuilderClass);
 
