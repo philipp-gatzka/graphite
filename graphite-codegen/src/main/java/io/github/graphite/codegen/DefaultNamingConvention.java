@@ -44,6 +44,7 @@ final class DefaultNamingConvention implements NamingConvention {
   private static final String DEFAULT_QUERY_SUFFIX = "Query";
   private static final String DEFAULT_MUTATION_SUFFIX = "Mutation";
   private static final String DEFAULT_PROJECTION_SUFFIX = "Projection";
+  private static final String GRAPHQL_NAME_NULL_MSG = "graphQLName must not be null";
 
   private final String typeSuffix;
   private final String inputSuffix;
@@ -77,14 +78,14 @@ final class DefaultNamingConvention implements NamingConvention {
   @Override
   @NotNull
   public String getTypeName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName) + typeSuffix;
   }
 
   @Override
   @NotNull
   public String getInputTypeName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     String name = capitalize(graphQLName);
     // Don't double-add Input suffix
     if (name.endsWith(inputSuffix)) {
@@ -96,7 +97,7 @@ final class DefaultNamingConvention implements NamingConvention {
   @Override
   @NotNull
   public String getQueryName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     String name = capitalize(graphQLName);
     // Don't double-add Query suffix
     if (name.endsWith(querySuffix)) {
@@ -108,7 +109,7 @@ final class DefaultNamingConvention implements NamingConvention {
   @Override
   @NotNull
   public String getMutationName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     String name = capitalize(graphQLName);
     // Don't double-add Mutation suffix
     if (name.endsWith(mutationSuffix)) {
@@ -120,28 +121,28 @@ final class DefaultNamingConvention implements NamingConvention {
   @Override
   @NotNull
   public String getEnumName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName);
   }
 
   @Override
   @NotNull
   public String getInterfaceName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName);
   }
 
   @Override
   @NotNull
   public String getUnionName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName);
   }
 
   @Override
   @NotNull
   public String getProjectionName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, "graphQLName must not be null");
+    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName) + DEFAULT_PROJECTION_SUFFIX;
   }
 
