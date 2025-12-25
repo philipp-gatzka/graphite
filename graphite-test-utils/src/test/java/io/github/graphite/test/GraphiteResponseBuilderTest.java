@@ -36,9 +36,10 @@ class GraphiteResponseBuilderTest {
     void shouldCreateEmptySuccessResponse() {
       GraphiteResponseBuilder builder = GraphiteResponseBuilder.success();
 
-      assertThat(builder.hasData()).isFalse();
-      assertThat(builder.hasErrors()).isFalse();
-      assertThat(builder.hasExtensions()).isFalse();
+      assertThat(builder)
+          .returns(false, GraphiteResponseBuilder::hasData)
+          .returns(false, GraphiteResponseBuilder::hasErrors)
+          .returns(false, GraphiteResponseBuilder::hasExtensions);
     }
   }
 
@@ -197,8 +198,9 @@ class GraphiteResponseBuilderTest {
     void shouldCreateResponseWithNullData() {
       GraphiteResponseBuilder builder = GraphiteResponseBuilder.nullData();
 
-      assertThat(builder.hasData()).isFalse();
-      assertThat(builder.getDataObject()).isNull();
+      assertThat(builder)
+          .returns(false, GraphiteResponseBuilder::hasData)
+          .returns(null, GraphiteResponseBuilder::getDataObject);
     }
   }
 
@@ -214,9 +216,7 @@ class GraphiteResponseBuilderTest {
 
       String json = builder.toJson();
 
-      assertThat(json).contains("\"data\"");
-      assertThat(json).contains("\"user\"");
-      assertThat(json).contains("\"id\":\"123\"");
+      assertThat(json).contains("\"data\"").contains("\"user\"").contains("\"id\":\"123\"");
     }
 
     @Test
@@ -288,12 +288,12 @@ class GraphiteResponseBuilderTest {
               .data("user", userData)
               .error(GraphiteErrorBuilder.validation("name", "Name cannot be null").build());
 
-      assertThat(builder.hasData()).isTrue();
-      assertThat(builder.hasErrors()).isTrue();
+      assertThat(builder)
+          .returns(true, GraphiteResponseBuilder::hasData)
+          .returns(true, GraphiteResponseBuilder::hasErrors);
 
       String json = builder.toJson();
-      assertThat(json).contains("\"data\"");
-      assertThat(json).contains("\"errors\"");
+      assertThat(json).contains("\"data\"").contains("\"errors\"");
     }
   }
 }
