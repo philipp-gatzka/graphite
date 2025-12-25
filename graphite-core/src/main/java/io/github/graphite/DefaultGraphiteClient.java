@@ -289,7 +289,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   private List<GraphQLError.Location> parseLocations(JsonNode locationsNode) {
     if (locationsNode == null || !locationsNode.isArray()) {
-      return null;
+      return List.of();
     }
 
     List<GraphQLError.Location> locations = new ArrayList<>();
@@ -303,7 +303,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   private List<Object> parsePath(JsonNode pathNode) {
     if (pathNode == null || !pathNode.isArray()) {
-      return null;
+      return List.of();
     }
 
     List<Object> path = new ArrayList<>();
@@ -320,12 +320,13 @@ final class DefaultGraphiteClient implements GraphiteClient {
   @SuppressWarnings("unchecked")
   private Map<String, Object> parseExtensionsNode(JsonNode extensionsNode) {
     if (extensionsNode == null || !extensionsNode.isObject()) {
-      return null;
+      return Map.of();
     }
     try {
-      return objectMapper.treeToValue(extensionsNode, Map.class);
+      Map<String, Object> result = objectMapper.treeToValue(extensionsNode, Map.class);
+      return result != null ? result : Map.of();
     } catch (JsonProcessingException e) {
-      return null;
+      return Map.of();
     }
   }
 
