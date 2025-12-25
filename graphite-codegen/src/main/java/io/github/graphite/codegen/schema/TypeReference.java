@@ -68,9 +68,9 @@ public sealed interface TypeReference {
    */
   default boolean isList() {
     return switch (this) {
-      case ListType ignored -> true;
+      case ListType(var ignored) -> true;
       case NonNull(var inner) -> inner.isList();
-      case Named ignored -> false;
+      case Named(var ignored) -> false;
     };
   }
 
