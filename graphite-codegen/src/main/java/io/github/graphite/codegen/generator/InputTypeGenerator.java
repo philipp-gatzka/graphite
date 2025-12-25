@@ -250,8 +250,12 @@ public final class InputTypeGenerator {
             .returns(inputClassName)
             .addStatement("return new $T(this)", inputClassName)
             .addJavadoc(
-                "Builds the input type instance.\n\n@return the built instance\n"
-                    + "@throws NullPointerException if required fields are not set\n")
+                """
+                Builds the input type instance.
+
+                @return the built instance
+                @throws NullPointerException if required fields are not set
+                """)
             .build());
 
     return builder.build();
