@@ -84,7 +84,7 @@ dependencyCheck {
 sonar {
     properties {
         property("sonar.projectKey", "philipp-gatzka_graphite")
-        property("sonar.organization", "philipp-gatzka")
+        property("sonar.organization", "philipp-gatzka-1")
         property("sonar.host.url", "https://sonarcloud.io")
 
         // Coverage reporting
