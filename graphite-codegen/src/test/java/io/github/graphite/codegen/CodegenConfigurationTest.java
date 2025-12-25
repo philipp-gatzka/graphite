@@ -158,12 +158,9 @@ class CodegenConfigurationTest {
     @Test
     @DisplayName("should throw when schemaFile is not set")
     void shouldThrowWhenSchemaFileNotSet() {
-      assertThatThrownBy(
-              () ->
-                  CodegenConfiguration.builder()
-                      .outputDirectory(OUTPUT_DIR)
-                      .packageName(PACKAGE_NAME)
-                      .build())
+      var builder =
+          CodegenConfiguration.builder().outputDirectory(OUTPUT_DIR).packageName(PACKAGE_NAME);
+      assertThatThrownBy(builder::build)
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("schemaFile");
     }
@@ -171,12 +168,9 @@ class CodegenConfigurationTest {
     @Test
     @DisplayName("should throw when outputDirectory is not set")
     void shouldThrowWhenOutputDirectoryNotSet() {
-      assertThatThrownBy(
-              () ->
-                  CodegenConfiguration.builder()
-                      .schemaFile(SCHEMA_FILE)
-                      .packageName(PACKAGE_NAME)
-                      .build())
+      var builder =
+          CodegenConfiguration.builder().schemaFile(SCHEMA_FILE).packageName(PACKAGE_NAME);
+      assertThatThrownBy(builder::build)
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("outputDirectory");
     }
@@ -184,12 +178,9 @@ class CodegenConfigurationTest {
     @Test
     @DisplayName("should throw when packageName is not set")
     void shouldThrowWhenPackageNameNotSet() {
-      assertThatThrownBy(
-              () ->
-                  CodegenConfiguration.builder()
-                      .schemaFile(SCHEMA_FILE)
-                      .outputDirectory(OUTPUT_DIR)
-                      .build())
+      var builder =
+          CodegenConfiguration.builder().schemaFile(SCHEMA_FILE).outputDirectory(OUTPUT_DIR);
+      assertThatThrownBy(builder::build)
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("packageName");
     }
@@ -199,13 +190,16 @@ class CodegenConfigurationTest {
   @DisplayName("record validation")
   class RecordValidation {
 
+    private static final Map<String, String> EMPTY_MAPPINGS = Map.of();
+    private static final NamingConvention DEFAULT_CONVENTION = NamingConvention.defaults();
+
     @Test
     @DisplayName("should throw on null schemaFile")
     void shouldThrowOnNullSchemaFile() {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      null, OUTPUT_DIR, PACKAGE_NAME, Map.of(), NamingConvention.defaults(), true))
+                      null, OUTPUT_DIR, PACKAGE_NAME, EMPTY_MAPPINGS, DEFAULT_CONVENTION, true))
           .isInstanceOf(NullPointerException.class)
           .hasMessageContaining("schemaFile");
     }
@@ -216,7 +210,7 @@ class CodegenConfigurationTest {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      SCHEMA_FILE, null, PACKAGE_NAME, Map.of(), NamingConvention.defaults(), true))
+                      SCHEMA_FILE, null, PACKAGE_NAME, EMPTY_MAPPINGS, DEFAULT_CONVENTION, true))
           .isInstanceOf(NullPointerException.class)
           .hasMessageContaining("outputDirectory");
     }
@@ -227,7 +221,7 @@ class CodegenConfigurationTest {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      SCHEMA_FILE, OUTPUT_DIR, null, Map.of(), NamingConvention.defaults(), true))
+                      SCHEMA_FILE, OUTPUT_DIR, null, EMPTY_MAPPINGS, DEFAULT_CONVENTION, true))
           .isInstanceOf(NullPointerException.class)
           .hasMessageContaining("packageName");
     }
@@ -238,7 +232,7 @@ class CodegenConfigurationTest {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      SCHEMA_FILE, OUTPUT_DIR, "  ", Map.of(), NamingConvention.defaults(), true))
+                      SCHEMA_FILE, OUTPUT_DIR, "  ", EMPTY_MAPPINGS, DEFAULT_CONVENTION, true))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("packageName");
     }
@@ -249,12 +243,7 @@ class CodegenConfigurationTest {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      SCHEMA_FILE,
-                      OUTPUT_DIR,
-                      PACKAGE_NAME,
-                      null,
-                      NamingConvention.defaults(),
-                      true))
+                      SCHEMA_FILE, OUTPUT_DIR, PACKAGE_NAME, null, DEFAULT_CONVENTION, true))
           .isInstanceOf(NullPointerException.class)
           .hasMessageContaining("customScalarMappings");
     }
@@ -265,7 +254,7 @@ class CodegenConfigurationTest {
       assertThatThrownBy(
               () ->
                   new CodegenConfiguration(
-                      SCHEMA_FILE, OUTPUT_DIR, PACKAGE_NAME, Map.of(), null, true))
+                      SCHEMA_FILE, OUTPUT_DIR, PACKAGE_NAME, EMPTY_MAPPINGS, null, true))
           .isInstanceOf(NullPointerException.class)
           .hasMessageContaining("namingConvention");
     }
@@ -278,9 +267,10 @@ class CodegenConfigurationTest {
 
       CodegenConfiguration config =
           new CodegenConfiguration(
-              SCHEMA_FILE, OUTPUT_DIR, PACKAGE_NAME, mutableMap, NamingConvention.defaults(), true);
+              SCHEMA_FILE, OUTPUT_DIR, PACKAGE_NAME, mutableMap, DEFAULT_CONVENTION, true);
 
-      assertThatThrownBy(() -> config.customScalarMappings().put("New", "Value"))
+      Map<String, String> mappings = config.customScalarMappings();
+      assertThatThrownBy(() -> mappings.put("New", "Value"))
           .isInstanceOf(UnsupportedOperationException.class);
     }
   }
