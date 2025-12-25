@@ -48,6 +48,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GraphiteAssertions {
 
+  private static final String ERRORS_KEY = "errors";
+  private static final String EXTENSIONS_KEY = "extensions";
+
   private GraphiteAssertions() {
     // Utility class
   }
@@ -172,7 +175,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteResponseAssert hasNoErrors() {
-      Object errors = response.get("errors");
+      Object errors = response.get(ERRORS_KEY);
       if (errors != null) {
         if (errors instanceof List && !((List<?>) errors).isEmpty()) {
           throw new AssertionError("Expected no errors, but found: " + errors);
@@ -189,7 +192,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteResponseAssert hasErrors() {
-      Object errors = response.get("errors");
+      Object errors = response.get(ERRORS_KEY);
       if (errors == null || (errors instanceof List && ((List<?>) errors).isEmpty())) {
         throw new AssertionError("Expected response to have errors, but found none");
       }
@@ -205,7 +208,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteResponseAssert hasErrorCount(int count) {
-      Object errors = response.get("errors");
+      Object errors = response.get(ERRORS_KEY);
       int actualCount = 0;
       if (errors instanceof List) {
         actualCount = ((List<?>) errors).size();
@@ -225,7 +228,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteErrorAssert errorAt(int index) {
-      Object errors = response.get("errors");
+      Object errors = response.get(ERRORS_KEY);
       if (!(errors instanceof List)) {
         throw new AssertionError("Expected errors to be a List, but was: " + errors);
       }
@@ -254,7 +257,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteResponseAssert hasExtensions() {
-      Object extensions = response.get("extensions");
+      Object extensions = response.get(EXTENSIONS_KEY);
       if (extensions == null || (extensions instanceof Map && ((Map<?, ?>) extensions).isEmpty())) {
         throw new AssertionError("Expected response to have extensions, but found none");
       }
@@ -270,7 +273,7 @@ public class GraphiteAssertions {
      */
     @NotNull
     public GraphiteResponseAssert hasExtension(@NotNull String key) {
-      Object extensions = response.get("extensions");
+      Object extensions = response.get(EXTENSIONS_KEY);
       if (!(extensions instanceof Map)) {
         throw new AssertionError("Expected extensions to be present, but was: " + extensions);
       }
@@ -365,7 +368,7 @@ public class GraphiteAssertions {
 
       @SuppressWarnings("unchecked")
       Map<String, Object> extensions =
-          (Map<String, Object>) map.getOrDefault("extensions", Map.of());
+          (Map<String, Object>) map.getOrDefault(EXTENSIONS_KEY, Map.of());
 
       return new GraphQLError(message, locations, path, extensions);
     }
