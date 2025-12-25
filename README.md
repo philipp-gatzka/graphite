@@ -1,7 +1,7 @@
 # Graphite
 
 [![Build Status](https://github.com/philipp-gatzka/graphite/actions/workflows/ci.yml/badge.svg)](https://github.com/philipp-gatzka/graphite/actions)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=graphite&metric=coverage)](https://sonarcloud.io/dashboard?id=graphite)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=philipp-gatzka_graphite&metric=coverage)](https://sonarcloud.io/dashboard?id=philipp-gatzka_graphite)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 Type-safe GraphQL client library for Spring Boot with code generation.
