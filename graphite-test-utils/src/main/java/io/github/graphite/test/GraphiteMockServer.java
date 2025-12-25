@@ -169,7 +169,7 @@ public class GraphiteMockServer implements AutoCloseable {
                       .withHeader("Content-Type", CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response", e);
+      throw new GraphiteTestException("Failed to serialize response", e);
     }
   }
 
@@ -190,7 +190,7 @@ public class GraphiteMockServer implements AutoCloseable {
                       .withHeader("Content-Type", CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response", e);
+      throw new GraphiteTestException("Failed to serialize response", e);
     }
   }
 
@@ -228,7 +228,7 @@ public class GraphiteMockServer implements AutoCloseable {
                       .withBody(responseBody)
                       .withFixedDelay(delayMillis)));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response", e);
+      throw new GraphiteTestException("Failed to serialize response", e);
     }
   }
 
@@ -279,7 +279,7 @@ public class GraphiteMockServer implements AutoCloseable {
                       .withHeader("Content-Type", CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response", e);
+      throw new GraphiteTestException("Failed to serialize response", e);
     }
   }
 
@@ -315,7 +315,7 @@ public class GraphiteMockServer implements AutoCloseable {
                       .withBody(responseBody)
                       .withFixedDelay(delayMillis)));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response", e);
+      throw new GraphiteTestException("Failed to serialize response", e);
     }
   }
 
