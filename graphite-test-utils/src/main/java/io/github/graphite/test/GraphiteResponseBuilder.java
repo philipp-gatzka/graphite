@@ -313,7 +313,7 @@ public class GraphiteResponseBuilder {
 
       return OBJECT_MAPPER.writeValueAsString(response);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to serialize response to JSON", e);
+      throw new GraphiteTestException("Failed to serialize response to JSON", e);
     }
   }
 
