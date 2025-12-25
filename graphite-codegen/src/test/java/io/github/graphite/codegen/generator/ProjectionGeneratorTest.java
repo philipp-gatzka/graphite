@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("ProjectionGenerator")
 class ProjectionGeneratorTest {
@@ -104,23 +108,21 @@ class ProjectionGeneratorTest {
       assertThat(source).contains("public final class UserProjection");
     }
 
-    @Test
-    @DisplayName("should generate selectedFields set")
-    void shouldGenerateSelectedFieldsSet() {
-      ProjectionGenerator generator = new ProjectionGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userProjection = findFileByTypeName(files, "UserProjection");
-
-      String source = userProjection.toString();
-
-      assertThat(source).contains("private final Set<String> selectedFields");
-      assertThat(source).contains("new LinkedHashSet<>()");
+    static Stream<Arguments> projectionStructureTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "selectedFields set",
+              new String[] {"private final Set<String> selectedFields", "new LinkedHashSet<>()"}),
+          Arguments.of(
+              "static builder method",
+              new String[] {"public static Builder builder()", "return new Builder()"}),
+          Arguments.of(
+              "toGraphQL method", new String[] {"public String toGraphQL()", "StringBuilder"}));
     }
 
-    @Test
-    @DisplayName("should generate static builder method")
-    void shouldGenerateStaticBuilderMethod() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("projectionStructureTestCases")
+    void shouldGenerateProjectionStructure(String description, String[] expectedContents) {
       ProjectionGenerator generator = new ProjectionGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
@@ -128,22 +130,9 @@ class ProjectionGeneratorTest {
 
       String source = userProjection.toString();
 
-      assertThat(source).contains("public static Builder builder()");
-      assertThat(source).contains("return new Builder()");
-    }
-
-    @Test
-    @DisplayName("should generate toGraphQL method")
-    void shouldGenerateToGraphQLMethod() {
-      ProjectionGenerator generator = new ProjectionGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userProjection = findFileByTypeName(files, "UserProjection");
-
-      String source = userProjection.toString();
-
-      assertThat(source).contains("public String toGraphQL()");
-      assertThat(source).contains("StringBuilder");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
   }
 
