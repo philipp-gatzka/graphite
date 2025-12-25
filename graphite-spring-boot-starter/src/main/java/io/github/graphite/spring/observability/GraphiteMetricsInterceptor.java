@@ -247,7 +247,7 @@ public class GraphiteMetricsInterceptor {
           }
         }
 
-        return name.length() > 0 ? name.toString() : null;
+        return !name.isEmpty() ? name.toString() : null;
       }
     }
 
