@@ -59,7 +59,8 @@ class FixedBackoffTest {
     @Test
     @DisplayName("should reject negative delay")
     void shouldRejectNegativeDelay() {
-      assertThatThrownBy(() -> FixedBackoff.of(Duration.ofMillis(-1)))
+      Duration negativeDelay = Duration.ofMillis(-1);
+      assertThatThrownBy(() -> FixedBackoff.of(negativeDelay))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("delay must not be negative");
     }

@@ -96,7 +96,8 @@ class GraphiteClientBuilderTest {
     @Test
     @DisplayName("should throw when endpoint not set")
     void shouldThrowWhenEndpointNotSet() {
-      assertThatThrownBy(() -> GraphiteClient.builder().build())
+      var builder = GraphiteClient.builder();
+      assertThatThrownBy(builder::build)
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("endpoint is required");
     }
@@ -221,7 +222,8 @@ class GraphiteClientBuilderTest {
     @Test
     @DisplayName("should reject zero connect timeout")
     void shouldRejectZeroConnectTimeout() {
-      assertThatThrownBy(() -> GraphiteClient.builder().connectTimeout(Duration.ZERO))
+      var builder = GraphiteClient.builder();
+      assertThatThrownBy(() -> builder.connectTimeout(Duration.ZERO))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("connectTimeout must be positive");
     }
@@ -229,7 +231,9 @@ class GraphiteClientBuilderTest {
     @Test
     @DisplayName("should reject negative connect timeout")
     void shouldRejectNegativeConnectTimeout() {
-      assertThatThrownBy(() -> GraphiteClient.builder().connectTimeout(Duration.ofSeconds(-1)))
+      var builder = GraphiteClient.builder();
+      Duration negativeTimeout = Duration.ofSeconds(-1);
+      assertThatThrownBy(() -> builder.connectTimeout(negativeTimeout))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("connectTimeout must be positive");
     }

@@ -100,7 +100,8 @@ class DateTimeCoercingTest {
     @Test
     @DisplayName("should throw for unsupported type")
     void shouldThrowForUnsupportedType() {
-      assertThatThrownBy(() -> coercing.deserialize(new Object()))
+      Object unsupportedType = new Object();
+      assertThatThrownBy(() -> coercing.deserialize(unsupportedType))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Cannot coerce");
     }
