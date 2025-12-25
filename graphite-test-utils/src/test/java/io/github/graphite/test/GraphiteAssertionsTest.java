@@ -49,7 +49,8 @@ class GraphiteAssertionsTest {
         Map<String, Object> response = new java.util.HashMap<>();
         response.put("data", null);
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasData())
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(assertion::hasData)
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("data was null");
       }
@@ -73,7 +74,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenDataIsPresent() {
         Map<String, Object> response = Map.of("data", Map.of("user", "John"));
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasNullData())
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(assertion::hasNullData)
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("null data");
       }
@@ -96,7 +98,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenKeyIsMissing() {
         Map<String, Object> response = Map.of("data", Map.of("user", "John"));
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasData("posts"))
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(() -> assertion.hasData("posts"))
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("posts");
       }
@@ -129,8 +132,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenPathValueDoesntMatch() {
         Map<String, Object> response = Map.of("data", Map.of("user", Map.of("name", "John")));
 
-        assertThatThrownBy(
-                () -> GraphiteAssertions.assertThat(response).dataAt("user.name").isEqualTo("Jane"))
+        var dataAssert = GraphiteAssertions.assertThat(response).dataAt("user.name");
+        assertThatThrownBy(() -> dataAssert.isEqualTo("Jane"))
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("Jane")
             .hasMessageContaining("John");
@@ -162,7 +165,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenErrorsPresent() {
         Map<String, Object> response = Map.of("errors", List.of(Map.of("message", "Error")));
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasNoErrors())
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(assertion::hasNoErrors)
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("no errors");
       }
@@ -186,7 +190,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenNoErrors() {
         Map<String, Object> response = Map.of("data", Map.of());
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasErrors())
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(assertion::hasErrors)
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("have errors");
       }
@@ -214,7 +219,8 @@ class GraphiteAssertionsTest {
         List<GraphQLError> errors = List.of(GraphiteErrorBuilder.create("Error").build());
         Map<String, Object> response = Map.of("errors", errors);
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasErrorCount(2))
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(() -> assertion.hasErrorCount(2))
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("2 errors")
             .hasMessageContaining("found 1");
@@ -244,7 +250,8 @@ class GraphiteAssertionsTest {
         List<GraphQLError> errors = List.of(GraphiteErrorBuilder.create("Error").build());
         Map<String, Object> response = Map.of("errors", errors);
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).errorAt(5))
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(() -> assertion.errorAt(5))
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("out of bounds");
       }
@@ -268,7 +275,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenNoExtensions() {
         Map<String, Object> response = Map.of("data", Map.of());
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(response).hasExtensions())
+        var assertion = GraphiteAssertions.assertThat(response);
+        assertThatThrownBy(assertion::hasExtensions)
             .isInstanceOf(AssertionError.class)
             .hasMessageContaining("extensions");
       }
@@ -429,7 +437,8 @@ class GraphiteAssertionsTest {
       void shouldFailWhenMessageDoesntMatch() {
         GraphQLError error = GraphiteErrorBuilder.create("User not found").build();
 
-        assertThatThrownBy(() -> GraphiteAssertions.assertThat(error).hasMessage("Post not found"))
+        var assertion = GraphiteAssertions.assertThat(error);
+        assertThatThrownBy(() -> assertion.hasMessage("Post not found"))
             .isInstanceOf(AssertionError.class);
       }
     }
