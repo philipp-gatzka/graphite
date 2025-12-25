@@ -89,9 +89,10 @@ class GraphiteMockServerTest {
       String response =
           sendGraphQLRequest("{\"operationName\":\"GetUser\",\"query\":\"{ user }\"}");
 
-      assertThat(response).contains("\"data\"");
-      assertThat(response).contains("\"id\":\"1\"");
-      assertThat(response).contains("\"name\":\"John\"");
+      assertThat(response)
+          .contains("\"data\"")
+          .contains("\"id\":\"1\"")
+          .contains("\"name\":\"John\"");
     }
 
     @Test
@@ -119,8 +120,7 @@ class GraphiteMockServerTest {
           sendGraphQLRequest(
               "{\"operationName\":\"CreateUser\",\"query\":\"mutation { createUser }\"}");
 
-      assertThat(response).contains("\"data\"");
-      assertThat(response).contains("\"id\":\"2\"");
+      assertThat(response).contains("\"data\"").contains("\"id\":\"2\"");
     }
   }
 
@@ -138,8 +138,7 @@ class GraphiteMockServerTest {
       String response =
           sendGraphQLRequest("{\"operationName\":\"GetUser\",\"query\":\"{ user }\"}");
 
-      assertThat(response).contains("\"errors\"");
-      assertThat(response).contains("User not found");
+      assertThat(response).contains("\"errors\"").contains("User not found");
     }
   }
 
