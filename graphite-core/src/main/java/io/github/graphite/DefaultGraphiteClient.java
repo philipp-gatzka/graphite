@@ -66,13 +66,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   private static final String CONTENT_TYPE_JSON = "application/json";
 
-  private final URI endpoint;
-  private final Map<String, String> headers;
-  private final Duration connectTimeout;
-  private final Duration readTimeout;
-  private final Duration requestTimeout;
-  private final RetryPolicy retryPolicy;
-  private final RateLimiter rateLimiter;
+  private final GraphiteConfiguration configuration;
   private final ScalarRegistry scalarRegistry;
   private final List<RequestInterceptor> requestInterceptors;
   private final List<ResponseInterceptor> responseInterceptors;
@@ -82,24 +76,12 @@ final class DefaultGraphiteClient implements GraphiteClient {
   private volatile boolean closed = false;
 
   DefaultGraphiteClient(
-      @NotNull URI endpoint,
-      @NotNull Map<String, String> headers,
-      @NotNull Duration connectTimeout,
-      @NotNull Duration readTimeout,
-      @NotNull Duration requestTimeout,
-      @NotNull RetryPolicy retryPolicy,
-      @Nullable RateLimiter rateLimiter,
+      @NotNull GraphiteConfiguration configuration,
       @NotNull ScalarRegistry scalarRegistry,
       @NotNull List<RequestInterceptor> requestInterceptors,
       @NotNull List<ResponseInterceptor> responseInterceptors,
       @NotNull ObjectMapper objectMapper) {
-    this.endpoint = endpoint;
-    this.headers = headers;
-    this.connectTimeout = connectTimeout;
-    this.readTimeout = readTimeout;
-    this.requestTimeout = requestTimeout;
-    this.retryPolicy = retryPolicy;
-    this.rateLimiter = rateLimiter;
+    this.configuration = configuration;
     this.scalarRegistry = scalarRegistry;
     this.requestInterceptors = requestInterceptors;
     this.responseInterceptors = responseInterceptors;
@@ -110,9 +92,9 @@ final class DefaultGraphiteClient implements GraphiteClient {
   private HttpTransport createTransport() {
     HttpTransportConfig config =
         HttpTransportConfig.builder()
-            .connectTimeout(connectTimeout)
-            .readTimeout(readTimeout)
-            .requestTimeout(requestTimeout)
+            .connectTimeout(configuration.connectTimeout())
+            .readTimeout(configuration.readTimeout())
+            .requestTimeout(configuration.requestTimeout())
             .build();
     return new DefaultHttpTransport(config);
   }
@@ -188,11 +170,11 @@ final class DefaultGraphiteClient implements GraphiteClient {
   }
 
   private HttpRequest createRequest(String body) {
-    Map<String, String> requestHeaders = new HashMap<>(headers);
+    Map<String, String> requestHeaders = new HashMap<>(configuration.headers());
     requestHeaders.put("Content-Type", CONTENT_TYPE_JSON);
     requestHeaders.put("Accept", CONTENT_TYPE_JSON);
 
-    return HttpRequest.post(endpoint, requestHeaders, body);
+    return HttpRequest.post(configuration.endpoint(), requestHeaders, body);
   }
 
   private HttpRequest applyRequestInterceptors(HttpRequest request) {
@@ -204,16 +186,15 @@ final class DefaultGraphiteClient implements GraphiteClient {
   }
 
   private void acquireRateLimitPermit() {
-    if (rateLimiter != null) {
-      if (!rateLimiter.tryAcquire()) {
-        throw new GraphiteRateLimitException(
-            "Rate limit exceeded: max " + rateLimiter.getRequestsPerSecond() + " requests/second");
-      }
+    RateLimiter limiter = configuration.rateLimiter();
+    if (limiter != null && !limiter.tryAcquire()) {
+      throw new GraphiteRateLimitException(
+          "Rate limit exceeded: max " + limiter.getRequestsPerSecond() + " requests/second");
     }
   }
 
   private HttpResponse executeWithRetry(HttpRequest request) {
-    GraphiteException lastException = null;
+    RetryPolicy retryPolicy = configuration.retryPolicy();
     int attempt = 0;
 
     while (true) {
@@ -227,9 +208,8 @@ final class DefaultGraphiteClient implements GraphiteClient {
                   "Server error: HTTP " + response.statusCode(), response.statusCode());
 
           if (retryPolicy.shouldRetry(serverException, attempt + 1)) {
-            lastException = serverException;
             attempt++;
-            sleepForRetry(attempt);
+            sleepForRetry(retryPolicy, attempt);
             continue;
           }
           throw serverException;
@@ -239,9 +219,8 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
       } catch (GraphiteException e) {
         if (retryPolicy.shouldRetry(e, attempt + 1)) {
-          lastException = e;
           attempt++;
-          sleepForRetry(attempt);
+          sleepForRetry(retryPolicy, attempt);
           continue;
         }
         throw e;
@@ -249,7 +228,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
     }
   }
 
-  private void sleepForRetry(int attempt) {
+  private void sleepForRetry(RetryPolicy retryPolicy, int attempt) {
     Duration delay = retryPolicy.getDelay(attempt);
     try {
       Thread.sleep(delay.toMillis());
@@ -383,7 +362,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   URI getEndpoint() {
-    return endpoint;
+    return configuration.endpoint();
   }
 
   /**
@@ -393,7 +372,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   Map<String, String> getHeaders() {
-    return headers;
+    return configuration.headers();
   }
 
   /**
@@ -403,7 +382,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   Duration getConnectTimeout() {
-    return connectTimeout;
+    return configuration.connectTimeout();
   }
 
   /**
@@ -413,7 +392,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   Duration getReadTimeout() {
-    return readTimeout;
+    return configuration.readTimeout();
   }
 
   /**
@@ -423,7 +402,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   Duration getRequestTimeout() {
-    return requestTimeout;
+    return configuration.requestTimeout();
   }
 
   /**
@@ -433,7 +412,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @NotNull
   RetryPolicy getRetryPolicy() {
-    return retryPolicy;
+    return configuration.retryPolicy();
   }
 
   /**
@@ -443,7 +422,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
    */
   @Nullable
   RateLimiter getRateLimiter() {
-    return rateLimiter;
+    return configuration.rateLimiter();
   }
 
   /**
