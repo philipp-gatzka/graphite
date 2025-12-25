@@ -111,10 +111,10 @@ public final class TypeMapper {
   @NotNull
   public TypeName mapType(@NotNull TypeReference typeRef) {
     return switch (typeRef) {
-      case TypeReference.NonNull nonNull -> mapType(nonNull.inner());
-      case TypeReference.ListType list ->
-          ParameterizedTypeName.get(ClassName.get(List.class), mapType(list.inner()));
-      case TypeReference.Named named -> mapNamedType(named.name());
+      case TypeReference.NonNull(var inner) -> mapType(inner);
+      case TypeReference.ListType(var inner) ->
+          ParameterizedTypeName.get(ClassName.get(List.class), mapType(inner));
+      case TypeReference.Named(var name) -> mapNamedType(name);
     };
   }
 

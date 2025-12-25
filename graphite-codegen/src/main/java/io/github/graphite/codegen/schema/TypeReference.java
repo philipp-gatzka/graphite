@@ -46,9 +46,9 @@ public sealed interface TypeReference {
    */
   default @NotNull String getBaseName() {
     return switch (this) {
-      case Named named -> named.name();
-      case NonNull nonNull -> nonNull.inner().getBaseName();
-      case ListType list -> list.inner().getBaseName();
+      case Named(var name) -> name;
+      case NonNull(var inner) -> inner.getBaseName();
+      case ListType(var inner) -> inner.getBaseName();
     };
   }
 
@@ -69,7 +69,7 @@ public sealed interface TypeReference {
   default boolean isList() {
     return switch (this) {
       case ListType ignored -> true;
-      case NonNull nonNull -> nonNull.inner().isList();
+      case NonNull(var inner) -> inner.isList();
       case Named ignored -> false;
     };
   }
@@ -82,9 +82,9 @@ public sealed interface TypeReference {
   @NotNull
   default String toGraphQL() {
     return switch (this) {
-      case Named named -> named.name();
-      case NonNull nonNull -> nonNull.inner().toGraphQL() + "!";
-      case ListType list -> "[" + list.inner().toGraphQL() + "]";
+      case Named(var name) -> name;
+      case NonNull(var inner) -> inner.toGraphQL() + "!";
+      case ListType(var inner) -> "[" + inner.toGraphQL() + "]";
     };
   }
 
