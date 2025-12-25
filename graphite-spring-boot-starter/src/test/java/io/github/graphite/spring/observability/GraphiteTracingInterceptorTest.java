@@ -31,10 +31,14 @@ import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import java.net.URI;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("GraphiteTracingInterceptor")
 class GraphiteTracingInterceptorTest {
@@ -154,34 +158,21 @@ class GraphiteTracingInterceptorTest {
       verify(span).tag(GraphiteTracingInterceptor.ATTR_OPERATION_NAME, "CreateUser");
     }
 
-    @Test
-    @DisplayName("should tag with query operation type")
-    void shouldTagWithQueryOperationType() {
-      HttpRequest request = createRequest("{\"query\":\"query GetUser { user }\"}");
-
-      interceptor.requestInterceptor().intercept(request);
-
-      verify(span).tag(GraphiteTracingInterceptor.ATTR_OPERATION_TYPE, "query");
+    static Stream<Arguments> operationTypeTestCases() {
+      return Stream.of(
+          Arguments.of("query", "{\"query\":\"query GetUser { user }\"}"),
+          Arguments.of("mutation", "{\"query\":\"mutation CreateUser { createUser }\"}"),
+          Arguments.of("subscription", "{\"query\":\"subscription OnMessage { onMessage }\"}"));
     }
 
-    @Test
-    @DisplayName("should tag with mutation operation type")
-    void shouldTagWithMutationOperationType() {
-      HttpRequest request = createRequest("{\"query\":\"mutation CreateUser { createUser }\"}");
+    @ParameterizedTest(name = "should tag with {0} operation type")
+    @MethodSource("operationTypeTestCases")
+    void shouldTagWithOperationType(String operationType, String requestBody) {
+      HttpRequest request = createRequest(requestBody);
 
       interceptor.requestInterceptor().intercept(request);
 
-      verify(span).tag(GraphiteTracingInterceptor.ATTR_OPERATION_TYPE, "mutation");
-    }
-
-    @Test
-    @DisplayName("should tag with subscription operation type")
-    void shouldTagWithSubscriptionOperationType() {
-      HttpRequest request = createRequest("{\"query\":\"subscription OnMessage { onMessage }\"}");
-
-      interceptor.requestInterceptor().intercept(request);
-
-      verify(span).tag(GraphiteTracingInterceptor.ATTR_OPERATION_TYPE, "subscription");
+      verify(span).tag(GraphiteTracingInterceptor.ATTR_OPERATION_TYPE, operationType);
     }
 
     @Test

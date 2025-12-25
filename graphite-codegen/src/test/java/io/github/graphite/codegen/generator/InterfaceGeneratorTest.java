@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("InterfaceGenerator")
 class InterfaceGeneratorTest {
@@ -89,62 +93,37 @@ class InterfaceGeneratorTest {
   @DisplayName("Generated interface structure")
   class GeneratedInterfaceStructure {
 
-    @Test
-    @DisplayName("should generate public sealed interface")
-    void shouldGeneratePublicSealedInterface() {
-      InterfaceGenerator generator = new InterfaceGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile nodeFile = findFileByTypeName(files, "NodeDTO");
-
-      String source = nodeFile.toString();
-
-      assertThat(source).contains("public sealed interface NodeDTO");
+    static Stream<Arguments> interfaceStructureTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "public sealed interface",
+              "NodeDTO",
+              new String[] {"public sealed interface NodeDTO"}),
+          Arguments.of(
+              "permits clause with implementing types",
+              "NodeDTO",
+              new String[] {"permits", "UserDTO", "PostDTO"}),
+          Arguments.of("abstract accessor methods", "NodeDTO", new String[] {"String id();"}),
+          Arguments.of(
+              "multiple accessor methods for interface with multiple fields",
+              "TimestampedDTO",
+              new String[] {"Instant createdAt();", "Instant updatedAt();"}));
     }
 
-    @Test
-    @DisplayName("should include permits clause with implementing types")
-    void shouldIncludePermitsClause() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("interfaceStructureTestCases")
+    void shouldGenerateInterfaceStructure(
+        String description, String typeName, String[] expectedContents) {
       InterfaceGenerator generator = new InterfaceGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
-      JavaFile nodeFile = findFileByTypeName(files, "NodeDTO");
+      JavaFile file = findFileByTypeName(files, typeName);
 
-      String source = nodeFile.toString();
+      String source = file.toString();
 
-      // Node interface is implemented by User and Post
-      assertThat(source).contains("permits");
-      assertThat(source).contains("UserDTO");
-      assertThat(source).contains("PostDTO");
-    }
-
-    @Test
-    @DisplayName("should generate abstract accessor methods")
-    void shouldGenerateAbstractAccessorMethods() {
-      InterfaceGenerator generator = new InterfaceGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile nodeFile = findFileByTypeName(files, "NodeDTO");
-
-      String source = nodeFile.toString();
-
-      // Node interface has id field
-      assertThat(source).contains("String id();");
-    }
-
-    @Test
-    @DisplayName("should generate multiple accessor methods for interface with multiple fields")
-    void shouldGenerateMultipleAccessorMethods() {
-      InterfaceGenerator generator = new InterfaceGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile timestampedFile = findFileByTypeName(files, "TimestampedDTO");
-
-      String source = timestampedFile.toString();
-
-      // Timestamped interface has createdAt and updatedAt fields
-      assertThat(source).contains("Instant createdAt();");
-      assertThat(source).contains("Instant updatedAt();");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
 
     @Test

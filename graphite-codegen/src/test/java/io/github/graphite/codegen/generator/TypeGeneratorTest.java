@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("TypeGenerator")
 class TypeGeneratorTest {
@@ -112,24 +116,24 @@ class TypeGeneratorTest {
       assertThat(source).contains("UserStatus status");
     }
 
-    @Test
-    @DisplayName("should add @NotNull annotation for non-nullable fields")
-    void shouldAddNotNullAnnotation() {
-      TypeGenerator generator = new TypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userFile = findFileByTypeName(files, "UserDTO");
-
-      String source = userFile.toString();
-
-      // id is non-null in schema
-      assertThat(source).contains("@NotNull String id");
-      assertThat(source).contains("@NotNull String name");
+    static Stream<Arguments> fieldAnnotationTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "@NotNull annotation for non-nullable fields",
+              new String[] {"@NotNull String id", "@NotNull String name"}),
+          Arguments.of(
+              "@Nullable annotation for nullable fields", new String[] {"@Nullable String email"}),
+          Arguments.of(
+              "DateTime scalar mapped to Instant",
+              new String[] {"Instant createdAt", "import java.time.Instant;"}),
+          Arguments.of(
+              "list types correctly",
+              new String[] {"List<PostDTO> posts", "import java.util.List;"}));
     }
 
-    @Test
-    @DisplayName("should add @Nullable annotation for nullable fields")
-    void shouldAddNullableAnnotation() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("fieldAnnotationTestCases")
+    void shouldGenerateFieldAnnotations(String description, String[] expectedContents) {
       TypeGenerator generator = new TypeGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
@@ -137,37 +141,9 @@ class TypeGeneratorTest {
 
       String source = userFile.toString();
 
-      // email is nullable in schema
-      assertThat(source).contains("@Nullable String email");
-    }
-
-    @Test
-    @DisplayName("should map DateTime scalar to Instant")
-    void shouldMapDateTimeToInstant() {
-      TypeGenerator generator = new TypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userFile = findFileByTypeName(files, "UserDTO");
-
-      String source = userFile.toString();
-
-      assertThat(source).contains("Instant createdAt");
-      assertThat(source).contains("import java.time.Instant;");
-    }
-
-    @Test
-    @DisplayName("should generate list types correctly")
-    void shouldGenerateListTypes() {
-      TypeGenerator generator = new TypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userFile = findFileByTypeName(files, "UserDTO");
-
-      String source = userFile.toString();
-
-      // posts is a list in schema: [Post!]!
-      assertThat(source).contains("List<PostDTO> posts");
-      assertThat(source).contains("import java.util.List;");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
 
     @Test

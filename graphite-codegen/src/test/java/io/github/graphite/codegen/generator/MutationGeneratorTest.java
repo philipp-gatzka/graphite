@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("MutationGenerator")
 class MutationGeneratorTest {
@@ -137,23 +141,30 @@ class MutationGeneratorTest {
   @DisplayName("GraphQLOperation interface methods")
   class GraphQLOperationMethods {
 
-    @Test
-    @DisplayName("should generate operationName method")
-    void shouldGenerateOperationNameMethod() {
-      MutationGenerator generator = new MutationGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserMutation = findFileByTypeName(files, "CreateUserMutation");
-
-      String source = createUserMutation.toString();
-
-      assertThat(source).contains("public String operationName()");
-      assertThat(source).contains("return \"CreateUser\"");
+    static Stream<Arguments> operationMethodsTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "operationName method",
+              new String[] {"public String operationName()", "return \"CreateUser\""}),
+          Arguments.of(
+              "toGraphQL method with mutation keyword",
+              new String[] {
+                "public String toGraphQL()",
+                "mutation CreateUser",
+                "$input: CreateUserInput!",
+                "createUser(input: $input)",
+                "projection.toGraphQL()"
+              }),
+          Arguments.of(
+              "variables method",
+              new String[] {
+                "public Map<String, Object> variables()", "vars.put(\"input\", input)"
+              }));
     }
 
-    @Test
-    @DisplayName("should generate toGraphQL method with mutation keyword")
-    void shouldGenerateToGraphQLMethodWithMutationKeyword() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("operationMethodsTestCases")
+    void shouldGenerateOperationMethods(String description, String[] expectedContents) {
       MutationGenerator generator = new MutationGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
@@ -161,25 +172,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public String toGraphQL()");
-      assertThat(source).contains("mutation CreateUser");
-      assertThat(source).contains("$input: CreateUserInput!");
-      assertThat(source).contains("createUser(input: $input)");
-      assertThat(source).contains("projection.toGraphQL()");
-    }
-
-    @Test
-    @DisplayName("should generate variables method")
-    void shouldGenerateVariablesMethod() {
-      MutationGenerator generator = new MutationGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserMutation = findFileByTypeName(files, "CreateUserMutation");
-
-      String source = createUserMutation.toString();
-
-      assertThat(source).contains("public Map<String, Object> variables()");
-      assertThat(source).contains("vars.put(\"input\", input)");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
 
     @Test

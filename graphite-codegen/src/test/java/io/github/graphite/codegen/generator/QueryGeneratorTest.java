@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("QueryGenerator")
 class QueryGeneratorTest {
@@ -136,50 +140,41 @@ class QueryGeneratorTest {
   @DisplayName("GraphQLOperation interface methods")
   class GraphQLOperationMethods {
 
-    @Test
-    @DisplayName("should generate operationName method")
-    void shouldGenerateOperationNameMethod() {
-      QueryGenerator generator = new QueryGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile userQuery = findFileByTypeName(files, "UserQuery");
-
-      String source = userQuery.toString();
-
-      assertThat(source).contains("public String operationName()");
-      assertThat(source).contains("return \"User\"");
+    static Stream<Arguments> operationMethodsTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "operationName method",
+              "UserQuery",
+              new String[] {"public String operationName()", "return \"User\""}),
+          Arguments.of(
+              "toGraphQL method with arguments",
+              "UserQuery",
+              new String[] {
+                "public String toGraphQL()",
+                "query User($id: ID!)",
+                "user(id: $id)",
+                "projection.toGraphQL()"
+              }),
+          Arguments.of(
+              "toGraphQL method with multiple arguments",
+              "UsersQuery",
+              new String[] {"query Users", "$limit: Int", "$offset: Int"}));
     }
 
-    @Test
-    @DisplayName("should generate toGraphQL method with arguments")
-    void shouldGenerateToGraphQLMethodWithArguments() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("operationMethodsTestCases")
+    void shouldGenerateOperationMethods(
+        String description, String queryTypeName, String[] expectedContents) {
       QueryGenerator generator = new QueryGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
-      JavaFile userQuery = findFileByTypeName(files, "UserQuery");
+      JavaFile queryFile = findFileByTypeName(files, queryTypeName);
 
-      String source = userQuery.toString();
+      String source = queryFile.toString();
 
-      assertThat(source).contains("public String toGraphQL()");
-      assertThat(source).contains("query User($id: ID!)");
-      assertThat(source).contains("user(id: $id)");
-      assertThat(source).contains("projection.toGraphQL()");
-    }
-
-    @Test
-    @DisplayName("should generate toGraphQL method for query with multiple arguments")
-    void shouldGenerateToGraphQLMethodForQueryWithMultipleArguments() {
-      QueryGenerator generator = new QueryGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile usersQuery = findFileByTypeName(files, "UsersQuery");
-
-      String source = usersQuery.toString();
-
-      // users(limit: Int, offset: Int) query
-      assertThat(source).contains("query Users");
-      assertThat(source).contains("$limit: Int");
-      assertThat(source).contains("$offset: Int");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
 
     @Test
