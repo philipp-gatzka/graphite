@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,9 +120,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
   @Override
   @NotNull
   public <T> GraphiteResponse<T> execute(@NotNull GraphQLOperation<T> operation) {
-    if (operation == null) {
-      throw new NullPointerException("operation must not be null");
-    }
+    Objects.requireNonNull(operation, "operation must not be null");
     ensureNotClosed();
 
     try {
@@ -157,9 +156,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
   @NotNull
   public <T> CompletableFuture<GraphiteResponse<T>> executeAsync(
       @NotNull GraphQLOperation<T> operation) {
-    if (operation == null) {
-      throw new NullPointerException("operation must not be null");
-    }
+    Objects.requireNonNull(operation, "operation must not be null");
     ensureNotClosed();
 
     return CompletableFuture.supplyAsync(() -> execute(operation));
