@@ -348,9 +348,7 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
       String content = Files.readString(userDto);
-      assertThat(content)
-          .contains("java.time.Instant")
-          .contains("Instant createdAt");
+      assertThat(content).contains("java.time.Instant").contains("Instant createdAt");
     }
 
     @Test
@@ -373,9 +371,7 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
       String content = Files.readString(userDto);
-      assertThat(content)
-          .contains("java.time.Instant")
-          .contains("java.util.UUID");
+      assertThat(content).contains("java.time.Instant").contains("java.util.UUID");
     }
   }
 
