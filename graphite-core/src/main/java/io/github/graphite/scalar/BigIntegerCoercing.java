@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * @see BigInteger
  * @see ScalarCoercing
  */
+@SuppressWarnings("java:S6548") // Singleton is appropriate for stateless, immutable coercing
 public final class BigIntegerCoercing implements ScalarCoercing<BigInteger> {
 
   /** Singleton instance for convenience. */

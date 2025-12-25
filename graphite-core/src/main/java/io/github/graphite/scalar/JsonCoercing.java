@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
  * @see JsonNode
  * @see ScalarCoercing
  */
+@SuppressWarnings("java:S6548") // Singleton is appropriate for stateless, immutable coercing
 public final class JsonCoercing implements ScalarCoercing<JsonNode> {
 
   /** Singleton instance for convenience. */

@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
  * @see UUID
  * @see ScalarCoercing
  */
+@SuppressWarnings("java:S6548") // Singleton is appropriate for stateless, immutable coercing
 public final class UuidCoercing implements ScalarCoercing<UUID> {
 
   /** Singleton instance for convenience. */
