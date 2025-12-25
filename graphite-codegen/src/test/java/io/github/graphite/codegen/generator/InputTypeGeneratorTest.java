@@ -23,10 +23,14 @@ import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.SchemaParser;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("InputTypeGenerator")
 class InputTypeGeneratorTest {
@@ -89,22 +93,27 @@ class InputTypeGeneratorTest {
   @DisplayName("Generated class structure")
   class GeneratedClassStructure {
 
-    @Test
-    @DisplayName("should generate final class")
-    void shouldGenerateFinalClass() {
-      InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserFile = findFileByTypeName(files, "CreateUserInput");
-
-      String source = createUserFile.toString();
-
-      assertThat(source).contains("public final class CreateUserInput");
+    static Stream<Arguments> classStructureTestCases() {
+      return Stream.of(
+          Arguments.of("final class", new String[] {"public final class CreateUserInput"}),
+          Arguments.of(
+              "private final fields",
+              new String[] {"private final String name;", "private final String email;"}),
+          Arguments.of(
+              "private constructor", new String[] {"private CreateUserInput(Builder builder)"}),
+          Arguments.of(
+              "static builder method",
+              new String[] {"public static Builder builder()", "return new Builder();"}),
+          Arguments.of(
+              "getters for all fields",
+              new String[] {"public String getName()", "public String getEmail()"}),
+          Arguments.of(
+              "JavaDoc from GraphQL description", new String[] {"Input for creating a new user"}));
     }
 
-    @Test
-    @DisplayName("should generate private final fields")
-    void shouldGeneratePrivateFinalFields() {
+    @ParameterizedTest(name = "should generate {0}")
+    @MethodSource("classStructureTestCases")
+    void shouldGenerateClassStructure(String description, String[] expectedContents) {
       InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
 
       List<JavaFile> files = generator.generate();
@@ -112,63 +121,9 @@ class InputTypeGeneratorTest {
 
       String source = createUserFile.toString();
 
-      assertThat(source).contains("private final String name;");
-      assertThat(source).contains("private final String email;");
-    }
-
-    @Test
-    @DisplayName("should generate private constructor")
-    void shouldGeneratePrivateConstructor() {
-      InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserFile = findFileByTypeName(files, "CreateUserInput");
-
-      String source = createUserFile.toString();
-
-      assertThat(source).contains("private CreateUserInput(Builder builder)");
-    }
-
-    @Test
-    @DisplayName("should generate static builder method")
-    void shouldGenerateStaticBuilderMethod() {
-      InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserFile = findFileByTypeName(files, "CreateUserInput");
-
-      String source = createUserFile.toString();
-
-      assertThat(source).contains("public static Builder builder()");
-      assertThat(source).contains("return new Builder();");
-    }
-
-    @Test
-    @DisplayName("should generate getters for all fields")
-    void shouldGenerateGetters() {
-      InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserFile = findFileByTypeName(files, "CreateUserInput");
-
-      String source = createUserFile.toString();
-
-      assertThat(source).contains("public String getName()");
-      assertThat(source).contains("public String getEmail()");
-    }
-
-    @Test
-    @DisplayName("should add JavaDoc from GraphQL description")
-    void shouldAddJavaDoc() {
-      InputTypeGenerator generator = new InputTypeGenerator(configuration, schema);
-
-      List<JavaFile> files = generator.generate();
-      JavaFile createUserFile = findFileByTypeName(files, "CreateUserInput");
-
-      String source = createUserFile.toString();
-
-      // CreateUserInput has description "Input for creating a new user"
-      assertThat(source).contains("Input for creating a new user");
+      for (String expected : expectedContents) {
+        assertThat(source).contains(expected);
+      }
     }
   }
 
