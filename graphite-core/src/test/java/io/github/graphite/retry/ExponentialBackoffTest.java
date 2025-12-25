@@ -193,7 +193,8 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject zero initial delay")
     void shouldRejectZeroInitialDelay() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().initialDelay(Duration.ZERO))
+      var builder = ExponentialBackoff.builder();
+      assertThatThrownBy(() -> builder.initialDelay(Duration.ZERO))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("initialDelay must be positive");
     }
@@ -201,7 +202,9 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject negative initial delay")
     void shouldRejectNegativeInitialDelay() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().initialDelay(Duration.ofMillis(-1)))
+      var builder = ExponentialBackoff.builder();
+      Duration negativeDelay = Duration.ofMillis(-1);
+      assertThatThrownBy(() -> builder.initialDelay(negativeDelay))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("initialDelay must be positive");
     }
@@ -225,7 +228,8 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject zero max delay")
     void shouldRejectZeroMaxDelay() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().maxDelay(Duration.ZERO))
+      var builder = ExponentialBackoff.builder();
+      assertThatThrownBy(() -> builder.maxDelay(Duration.ZERO))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("maxDelay must be positive");
     }
@@ -233,7 +237,9 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject negative max delay")
     void shouldRejectNegativeMaxDelay() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().maxDelay(Duration.ofMillis(-1)))
+      var builder = ExponentialBackoff.builder();
+      Duration negativeDelay = Duration.ofMillis(-1);
+      assertThatThrownBy(() -> builder.maxDelay(negativeDelay))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("maxDelay must be positive");
     }
@@ -249,7 +255,8 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject multiplier of 1.0")
     void shouldRejectMultiplierOf1() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().multiplier(1.0))
+      var builder = ExponentialBackoff.builder();
+      assertThatThrownBy(() -> builder.multiplier(1.0))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("multiplier must be greater than 1.0");
     }
@@ -257,7 +264,8 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should reject multiplier less than 1.0")
     void shouldRejectMultiplierLessThan1() {
-      assertThatThrownBy(() -> ExponentialBackoff.builder().multiplier(0.5))
+      var builder = ExponentialBackoff.builder();
+      assertThatThrownBy(() -> builder.multiplier(0.5))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("multiplier must be greater than 1.0");
     }
