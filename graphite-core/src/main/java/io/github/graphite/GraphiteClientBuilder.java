@@ -336,14 +336,18 @@ public final class GraphiteClientBuilder {
 
     ObjectMapper mapper = objectMapper != null ? objectMapper : createDefaultObjectMapper();
 
+    GraphiteConfiguration configuration =
+        new GraphiteConfiguration(
+            endpoint,
+            Map.copyOf(headers),
+            connectTimeout,
+            readTimeout,
+            requestTimeout,
+            retryPolicy,
+            rateLimiter);
+
     return new DefaultGraphiteClient(
-        endpoint,
-        Map.copyOf(headers),
-        connectTimeout,
-        readTimeout,
-        requestTimeout,
-        retryPolicy,
-        rateLimiter,
+        configuration,
         scalarRegistry,
         List.copyOf(requestInterceptors),
         List.copyOf(responseInterceptors),
