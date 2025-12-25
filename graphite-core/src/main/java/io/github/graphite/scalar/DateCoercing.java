@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
  * @see LocalDate
  * @see ScalarCoercing
  */
+@SuppressWarnings("java:S6548") // Singleton is appropriate for stateless, immutable coercing
 public final class DateCoercing implements ScalarCoercing<LocalDate> {
 
   /** Singleton instance for convenience. */
