@@ -61,8 +61,8 @@ class GraphitePluginTest {
     void shouldRegisterGenerateTask() {
       project.getPlugins().apply(GraphitePlugin.class);
 
-      assertThat(project.getTasks().findByName(GraphitePlugin.TASK_NAME)).isNotNull();
       assertThat(project.getTasks().findByName(GraphitePlugin.TASK_NAME))
+          .isNotNull()
           .isInstanceOf(GraphiteGenerateTask.class);
     }
 

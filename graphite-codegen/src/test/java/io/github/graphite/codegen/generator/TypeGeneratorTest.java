@@ -75,8 +75,9 @@ class TypeGeneratorTest {
 
       // Should have User and Post DTOs
       List<String> typeNames = files.stream().map(f -> f.typeSpec().name()).toList();
-      assertThat(typeNames).contains("UserDTO", "PostDTO");
-      assertThat(typeNames).doesNotContain("QueryDTO", "MutationDTO");
+      assertThat(typeNames)
+          .contains("UserDTO", "PostDTO")
+          .doesNotContain("QueryDTO", "MutationDTO");
     }
 
     @Test
@@ -110,10 +111,11 @@ class TypeGeneratorTest {
       assertThat(source).contains("public record UserDTO(");
 
       // Should have expected fields
-      assertThat(source).contains("String id");
-      assertThat(source).contains("String name");
-      assertThat(source).contains("String email");
-      assertThat(source).contains("UserStatus status");
+      assertThat(source)
+          .contains("String id")
+          .contains("String name")
+          .contains("String email")
+          .contains("UserStatus status");
     }
 
     static Stream<Arguments> fieldAnnotationTestCases() {
@@ -157,8 +159,9 @@ class TypeGeneratorTest {
       String source = userFile.toString();
 
       // status is UserStatus enum
-      assertThat(source).contains("UserStatus status");
-      assertThat(source).contains("import com.example.graphql.enumeration.UserStatus;");
+      assertThat(source)
+          .contains("UserStatus status")
+          .contains("import com.example.graphql.enumeration.UserStatus;");
     }
 
     @Test
@@ -217,8 +220,9 @@ class TypeGeneratorTest {
 
       String source = userFile.toString();
 
-      assertThat(source).contains("OffsetDateTime createdAt");
-      assertThat(source).contains("import java.time.OffsetDateTime;");
+      assertThat(source)
+          .contains("OffsetDateTime createdAt")
+          .contains("import java.time.OffsetDateTime;");
     }
   }
 
@@ -265,8 +269,9 @@ class TypeGeneratorTest {
       String source = userFile.toString();
 
       // User is part of SearchResult union
-      assertThat(source).contains("SearchResultUnion");
-      assertThat(source).contains("import com.example.graphql.union.SearchResultUnion;");
+      assertThat(source)
+          .contains("SearchResultUnion")
+          .contains("import com.example.graphql.union.SearchResultUnion;");
     }
 
     @Test
@@ -280,9 +285,10 @@ class TypeGeneratorTest {
       String source = postFile.toString();
 
       // Post implements NodeDTO, TimestampedDTO, and SearchResultUnion
-      assertThat(source).contains("NodeDTO");
-      assertThat(source).contains("TimestampedDTO");
-      assertThat(source).contains("SearchResultUnion");
+      assertThat(source)
+          .contains("NodeDTO")
+          .contains("TimestampedDTO")
+          .contains("SearchResultUnion");
     }
   }
 

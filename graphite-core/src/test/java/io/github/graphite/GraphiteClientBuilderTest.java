@@ -44,8 +44,7 @@ class GraphiteClientBuilderTest {
     void shouldReturnNewBuilderInstance() {
       var builder = GraphiteClientBuilder.create();
 
-      assertThat(builder).isNotNull();
-      assertThat(builder).isInstanceOf(GraphiteClientBuilder.class);
+      assertThat(builder).isNotNull().isInstanceOf(GraphiteClientBuilder.class);
     }
   }
 
@@ -107,8 +106,7 @@ class GraphiteClientBuilderTest {
     void shouldCreateClientWithEndpoint() {
       var client = GraphiteClient.builder().endpoint("https://api.example.com/graphql").build();
 
-      assertThat(client).isNotNull();
-      assertThat(client).isInstanceOf(DefaultGraphiteClient.class);
+      assertThat(client).isNotNull().isInstanceOf(DefaultGraphiteClient.class);
     }
   }
 
@@ -139,8 +137,9 @@ class GraphiteClientBuilderTest {
                   .headers(Map.of("X-Custom", "value", "X-Another", "value2"))
                   .build();
 
-      assertThat(client.getHeaders()).containsEntry("X-Custom", "value");
-      assertThat(client.getHeaders()).containsEntry("X-Another", "value2");
+      assertThat(client.getHeaders())
+          .containsEntry("X-Custom", "value")
+          .containsEntry("X-Another", "value2");
     }
 
     @Test
@@ -480,8 +479,7 @@ class GraphiteClientBuilderTest {
                   .build();
 
       assertThat(client.getEndpoint()).isEqualTo(URI.create("https://api.example.com/graphql"));
-      assertThat(client.getHeaders()).containsKey("Authorization");
-      assertThat(client.getHeaders()).containsKey("X-Custom");
+      assertThat(client.getHeaders()).containsKey("Authorization").containsKey("X-Custom");
       assertThat(client.getConnectTimeout()).isEqualTo(Duration.ofSeconds(5));
       assertThat(client.getReadTimeout()).isEqualTo(Duration.ofSeconds(15));
       assertThat(client.getRequestTimeout()).isEqualTo(Duration.ofSeconds(45));
