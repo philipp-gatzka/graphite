@@ -399,9 +399,12 @@ public final class MutationGenerator {
               .addStatement("this.projection = projBuilder.build()")
               .addStatement("return this")
               .addJavadoc(
-                  "Configures the field selection for this mutation.\n\n"
-                      + "@param config the projection configuration\n"
-                      + "@return this builder\n")
+                  """
+                  Configures the field selection for this mutation.
+
+                  @param config the projection configuration
+                  @return this builder
+                  """)
               .build());
     }
 
@@ -412,8 +415,12 @@ public final class MutationGenerator {
             .returns(mutationClassName)
             .addStatement("return new $T(this)", mutationClassName)
             .addJavadoc(
-                "Builds the mutation.\n\n@return the built mutation\n"
-                    + "@throws NullPointerException if required fields are not set\n")
+                """
+                Builds the mutation.
+
+                @return the built mutation
+                @throws NullPointerException if required fields are not set
+                """)
             .build());
 
     return builder.build();

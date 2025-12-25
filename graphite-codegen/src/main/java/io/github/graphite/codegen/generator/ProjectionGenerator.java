@@ -144,7 +144,11 @@ public final class ProjectionGenerator {
     // Add JavaDoc
     if (type.description() != null && !type.description().isBlank()) {
       classBuilder.addJavadoc(
-          "Projection for selecting fields from {@code $L}.\n\n" + "<p>$L\n",
+          """
+          Projection for selecting fields from {@code $L}.
+
+          <p>$L
+          """,
           type.name(),
           escapeJavadoc(type.description()));
     } else {
@@ -201,8 +205,11 @@ public final class ProjectionGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(String.class)
             .addJavadoc(
-                "Generates the GraphQL selection set for this projection.\n\n"
-                    + "@return the GraphQL selection set string\n");
+                """
+                Generates the GraphQL selection set for this projection.
+
+                @return the GraphQL selection set string
+                """);
 
     method.addStatement("$T sb = new $T(\"{ \")", StringBuilder.class, StringBuilder.class);
 
@@ -267,8 +274,12 @@ public final class ProjectionGenerator {
             .returns(projectionClassName)
             .addStatement("return projection")
             .addJavadoc(
-                "Builds the projection.\n\n@return the built projection\n"
-                    + "@throws IllegalStateException if no fields are selected\n")
+                """
+                Builds the projection.
+
+                @return the built projection
+                @throws IllegalStateException if no fields are selected
+                """)
             .build());
 
     return builder.build();
@@ -309,12 +320,21 @@ public final class ProjectionGenerator {
 
     if (field.description() != null && !field.description().isBlank()) {
       method.addJavadoc(
-          escapeJavadoc(field.description())
-              + "\n\n@param config the nested projection configuration\n@return this builder\n");
+          """
+          %s
+
+          @param config the nested projection configuration
+          @return this builder
+          """
+              .formatted(escapeJavadoc(field.description())));
     } else {
       method.addJavadoc(
-          "Selects the $N field with nested projection.\n\n"
-              + "@param config the nested projection configuration\n@return this builder\n",
+          """
+          Selects the $N field with nested projection.
+
+          @param config the nested projection configuration
+          @return this builder
+          """,
           field.name());
     }
 

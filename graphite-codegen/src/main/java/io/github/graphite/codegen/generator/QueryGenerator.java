@@ -404,9 +404,12 @@ public final class QueryGenerator {
               .addStatement("this.projection = projBuilder.build()")
               .addStatement("return this")
               .addJavadoc(
-                  "Configures the field selection for this query.\n\n"
-                      + "@param config the projection configuration\n"
-                      + "@return this builder\n")
+                  """
+                  Configures the field selection for this query.
+
+                  @param config the projection configuration
+                  @return this builder
+                  """)
               .build());
     }
 
@@ -417,8 +420,12 @@ public final class QueryGenerator {
             .returns(queryClassName)
             .addStatement("return new $T(this)", queryClassName)
             .addJavadoc(
-                "Builds the query.\n\n@return the built query\n"
-                    + "@throws NullPointerException if required fields are not set\n")
+                """
+                Builds the query.
+
+                @return the built query
+                @throws NullPointerException if required fields are not set
+                """)
             .build());
 
     return builder.build();
