@@ -85,7 +85,7 @@ public class HeaderPropagatingInterceptor {
       propagator.inject(
           tracer.currentTraceContext().context(),
           traceHeaders,
-          (carrier, key, value) -> carrier.put(key, value));
+          Map::put);
 
       if (traceHeaders.isEmpty()) {
         return request;
