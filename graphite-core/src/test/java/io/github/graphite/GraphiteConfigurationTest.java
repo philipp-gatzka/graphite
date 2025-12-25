@@ -540,8 +540,7 @@ class GraphiteConfigurationTest {
               retryPolicy,
               null);
 
-      assertThat(config1).isEqualTo(config2);
-      assertThat(config1.hashCode()).isEqualTo(config2.hashCode());
+      assertThat(config1).isEqualTo(config2).hasSameHashCodeAs(config2);
     }
 
     @Test
