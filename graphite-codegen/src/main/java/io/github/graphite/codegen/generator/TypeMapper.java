@@ -96,10 +96,7 @@ public final class TypeMapper {
     // Add custom scalar mappings from configuration
     configuration
         .customScalarMappings()
-        .forEach(
-            (name, className) -> {
-              scalarMappings.put(name, ClassName.bestGuess(className));
-            });
+        .forEach((name, className) -> scalarMappings.put(name, ClassName.bestGuess(className)));
   }
 
   /**
