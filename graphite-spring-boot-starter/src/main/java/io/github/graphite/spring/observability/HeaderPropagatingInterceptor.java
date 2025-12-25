@@ -82,10 +82,7 @@ public class HeaderPropagatingInterceptor {
       Map<String, String> traceHeaders = new HashMap<>();
 
       // Inject trace context using the propagator
-      propagator.inject(
-          tracer.currentTraceContext().context(),
-          traceHeaders,
-          (carrier, key, value) -> carrier.put(key, value));
+      propagator.inject(tracer.currentTraceContext().context(), traceHeaders, Map::put);
 
       if (traceHeaders.isEmpty()) {
         return request;
