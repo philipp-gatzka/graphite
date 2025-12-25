@@ -68,6 +68,12 @@ public class GraphiteTracingInterceptor {
   /** Span attribute for HTTP status code. */
   public static final String ATTR_HTTP_STATUS_CODE = "http.status_code";
 
+  private static final String OPERATION_NAME_FIELD = "operationName";
+  private static final String QUERY_FIELD = "query";
+  private static final String OP_TYPE_QUERY = "query";
+  private static final String OP_TYPE_MUTATION = "mutation";
+  private static final String OP_TYPE_SUBSCRIPTION = "subscription";
+
   /** Default span name. */
   public static final String SPAN_NAME = "graphite";
 
@@ -204,14 +210,14 @@ public class GraphiteTracingInterceptor {
 
       // Get operation name
       String name = null;
-      JsonNode operationNameNode = json.get("operationName");
+      JsonNode operationNameNode = json.get(OPERATION_NAME_FIELD);
       if (operationNameNode != null && operationNameNode.isTextual()) {
         name = operationNameNode.asText();
       }
 
       // Get operation type from query
       String type = null;
-      JsonNode queryNode = json.get("query");
+      JsonNode queryNode = json.get(QUERY_FIELD);
       if (queryNode != null && queryNode.isTextual()) {
         String query = queryNode.asText().trim();
 
@@ -224,24 +230,24 @@ public class GraphiteTracingInterceptor {
           query = query.substring(newlineIndex + 1).trim();
         }
 
-        if (query.startsWith("query")) {
-          type = "query";
+        if (query.startsWith(OP_TYPE_QUERY)) {
+          type = OP_TYPE_QUERY;
           if (name == null) {
-            name = extractNameFromQuery(query, "query");
+            name = extractNameFromQuery(query, OP_TYPE_QUERY);
           }
-        } else if (query.startsWith("mutation")) {
-          type = "mutation";
+        } else if (query.startsWith(OP_TYPE_MUTATION)) {
+          type = OP_TYPE_MUTATION;
           if (name == null) {
-            name = extractNameFromQuery(query, "mutation");
+            name = extractNameFromQuery(query, OP_TYPE_MUTATION);
           }
-        } else if (query.startsWith("subscription")) {
-          type = "subscription";
+        } else if (query.startsWith(OP_TYPE_SUBSCRIPTION)) {
+          type = OP_TYPE_SUBSCRIPTION;
           if (name == null) {
-            name = extractNameFromQuery(query, "subscription");
+            name = extractNameFromQuery(query, OP_TYPE_SUBSCRIPTION);
           }
         } else if (query.startsWith("{")) {
           // Anonymous query
-          type = "query";
+          type = OP_TYPE_QUERY;
         }
       }
 
