@@ -206,26 +206,24 @@ final class DefaultGraphiteClient implements GraphiteClient {
           GraphiteServerException serverException =
               new GraphiteServerException(
                   "Server error: HTTP " + response.statusCode(), response.statusCode());
-
-          if (retryPolicy.shouldRetry(serverException, attempt + 1)) {
-            attempt++;
-            sleepForRetry(retryPolicy, attempt);
-            continue;
-          }
-          throw serverException;
+          attempt = retryOrThrow(retryPolicy, serverException, attempt);
+        } else {
+          return response;
         }
-
-        return response;
 
       } catch (GraphiteException e) {
-        if (retryPolicy.shouldRetry(e, attempt + 1)) {
-          attempt++;
-          sleepForRetry(retryPolicy, attempt);
-          continue;
-        }
-        throw e;
+        attempt = retryOrThrow(retryPolicy, e, attempt);
       }
     }
+  }
+
+  private int retryOrThrow(RetryPolicy retryPolicy, GraphiteException e, int attempt) {
+    if (!retryPolicy.shouldRetry(e, attempt + 1)) {
+      throw e;
+    }
+    attempt++;
+    sleepForRetry(retryPolicy, attempt);
+    return attempt;
   }
 
   private void sleepForRetry(RetryPolicy retryPolicy, int attempt) {
