@@ -63,6 +63,10 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
   /** Key for the reason detail in health responses. */
   private static final String REASON_KEY = "reason";
 
+  private static final String URL_KEY = "url";
+  private static final String RESPONSE_TIME_KEY = "responseTime";
+  private static final String STATUS_CODE_KEY = "statusCode";
+
   private final String url;
   private final HttpClient httpClient;
   private final Duration timeout;
@@ -125,15 +129,15 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
       if (response.statusCode() >= 200 && response.statusCode() < 300) {
         builder
             .up()
-            .withDetail("url", url)
-            .withDetail("responseTime", responseTime + "ms")
-            .withDetail("statusCode", response.statusCode());
+            .withDetail(URL_KEY, url)
+            .withDetail(RESPONSE_TIME_KEY, responseTime + "ms")
+            .withDetail(STATUS_CODE_KEY, response.statusCode());
       } else {
         builder
             .down()
-            .withDetail("url", url)
-            .withDetail("responseTime", responseTime + "ms")
-            .withDetail("statusCode", response.statusCode())
+            .withDetail(URL_KEY, url)
+            .withDetail(RESPONSE_TIME_KEY, responseTime + "ms")
+            .withDetail(STATUS_CODE_KEY, response.statusCode())
             .withDetail(REASON_KEY, "Non-2xx response");
       }
 
@@ -142,15 +146,15 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
       long responseTime = System.currentTimeMillis() - startTime;
       builder
           .down(e)
-          .withDetail("url", url)
-          .withDetail("responseTime", responseTime + "ms")
+          .withDetail(URL_KEY, url)
+          .withDetail(RESPONSE_TIME_KEY, responseTime + "ms")
           .withDetail(REASON_KEY, "Interrupted");
     } catch (Exception e) {
       long responseTime = System.currentTimeMillis() - startTime;
       builder
           .down(e)
-          .withDetail("url", url)
-          .withDetail("responseTime", responseTime + "ms")
+          .withDetail(URL_KEY, url)
+          .withDetail(RESPONSE_TIME_KEY, responseTime + "ms")
           .withDetail(REASON_KEY, e.getMessage());
     }
   }
