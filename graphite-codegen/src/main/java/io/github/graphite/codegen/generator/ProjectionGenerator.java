@@ -172,7 +172,7 @@ public final class ProjectionGenerator {
     }
 
     // Add toGraphQL method
-    classBuilder.addMethod(generateToGraphQLMethod(type, objectFields));
+    classBuilder.addMethod(generateToGraphQLMethod(objectFields));
 
     // Add static builder() method
     classBuilder.addMethod(
@@ -195,8 +195,7 @@ public final class ProjectionGenerator {
         .build();
   }
 
-  private MethodSpec generateToGraphQLMethod(
-      TypeDefinition type, List<FieldDefinition> objectFields) {
+  private MethodSpec generateToGraphQLMethod(List<FieldDefinition> objectFields) {
     MethodSpec.Builder method =
         MethodSpec.methodBuilder("toGraphQL")
             .addModifiers(Modifier.PUBLIC)
