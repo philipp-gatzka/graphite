@@ -17,6 +17,7 @@ package io.github.graphite.ratelimit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
@@ -247,7 +248,7 @@ class RateLimiterTest {
 
     @Test
     @DisplayName("should refill tokens over time")
-    void shouldRefillTokensOverTime() throws InterruptedException {
+    void shouldRefillTokensOverTime() {
       var limiter = RateLimiter.builder().requestsPerSecond(1000).burstCapacity(10).build();
 
       // Exhaust all tokens
@@ -256,21 +257,22 @@ class RateLimiterTest {
       }
       assertThat(limiter.availablePermits()).isEqualTo(0);
 
-      // Wait for refill (100ms should add ~100 tokens at 1000/s rate)
-      Thread.sleep(100);
-
-      assertThat(limiter.availablePermits()).isGreaterThan(0);
+      // Wait for refill using Awaitility
+      await()
+          .atMost(Duration.ofMillis(200))
+          .untilAsserted(() -> assertThat(limiter.availablePermits()).isGreaterThan(0));
     }
 
     @Test
     @DisplayName("should not exceed burst capacity")
-    void shouldNotExceedBurstCapacity() throws InterruptedException {
+    void shouldNotExceedBurstCapacity() {
       var limiter = RateLimiter.builder().requestsPerSecond(1000).burstCapacity(10).build();
 
-      // Wait for potential overfill
-      Thread.sleep(50);
-
-      assertThat(limiter.availablePermits()).isLessThanOrEqualTo(10);
+      // Verify burst capacity is not exceeded after waiting for potential overfill
+      await()
+          .pollDelay(Duration.ofMillis(100))
+          .atMost(Duration.ofMillis(150))
+          .untilAsserted(() -> assertThat(limiter.availablePermits()).isLessThanOrEqualTo(10));
     }
   }
 }

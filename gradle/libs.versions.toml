@@ -26,6 +26,7 @@ junit = "5.11.4"
 assertj = "3.27.0"
 mockito = "5.15.2"
 wiremock = "3.10.0"
+awaitility = "4.2.2"
 
 # Build plugins
 spotless = "8.1.0"
@@ -70,10 +71,11 @@ assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
+awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-annotations", "jackson-datatype-jsr310"]
-testing = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter"]
+testing = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter", "awaitility"]
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
