@@ -113,9 +113,7 @@ class InterfaceGeneratorTest {
       String source = nodeFile.toString();
 
       // Node interface is implemented by User and Post
-      assertThat(source).contains("permits");
-      assertThat(source).contains("UserDTO");
-      assertThat(source).contains("PostDTO");
+      assertThat(source).contains("permits").contains("UserDTO").contains("PostDTO");
     }
 
     @Test
@@ -143,8 +141,7 @@ class InterfaceGeneratorTest {
       String source = timestampedFile.toString();
 
       // Timestamped interface has createdAt and updatedAt fields
-      assertThat(source).contains("Instant createdAt();");
-      assertThat(source).contains("Instant updatedAt();");
+      assertThat(source).contains("Instant createdAt();").contains("Instant updatedAt();");
     }
 
     @Test
@@ -203,8 +200,7 @@ class InterfaceGeneratorTest {
 
       String source = timestampedFile.toString();
 
-      assertThat(source).contains("Instant createdAt();");
-      assertThat(source).contains("import java.time.Instant;");
+      assertThat(source).contains("Instant createdAt();").contains("import java.time.Instant;");
     }
   }
 
@@ -265,8 +261,9 @@ class InterfaceGeneratorTest {
       String source = file.toString();
 
       // Should still be a sealed interface, just with no permits
-      assertThat(source).contains("public sealed interface OrphanInterfaceDTO");
-      assertThat(source).contains("String id();");
+      assertThat(source)
+          .contains("public sealed interface OrphanInterfaceDTO")
+          .contains("String id();");
     }
 
     @Test
