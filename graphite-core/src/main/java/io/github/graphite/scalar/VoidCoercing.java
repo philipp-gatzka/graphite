@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see ScalarCoercing
  */
+@SuppressWarnings("java:S6548") // Singleton is appropriate for stateless, immutable coercing
 public final class VoidCoercing implements ScalarCoercing<Void> {
 
   /** Singleton instance for convenience. */
