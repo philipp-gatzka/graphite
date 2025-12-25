@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -547,11 +549,10 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
 
-      // Get initial modification time
+      // Set file timestamp to a known past value to detect any regeneration
+      FileTime pastTime = FileTime.from(Instant.now().minusSeconds(60));
+      Files.setLastModifiedTime(userDto, pastTime);
       long firstModTime = Files.getLastModifiedTime(userDto).toMillis();
-
-      // Small delay to ensure different timestamps if regenerated
-      Thread.sleep(100);
 
       // Second execution should be skipped
       mojo.execute();
@@ -575,10 +576,13 @@ class GraphiteGenerateMojoIntegrationTest {
       // First execution
       mojo.execute();
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
+
+      // Set generated file timestamp to the past to ensure schema appears newer
+      FileTime pastTime = FileTime.from(Instant.now().minusSeconds(60));
+      Files.setLastModifiedTime(userDto, pastTime);
       long firstModTime = Files.getLastModifiedTime(userDto).toMillis();
 
-      // Modify schema
-      Thread.sleep(100);
+      // Modify schema (will have current timestamp, which is newer than generated file)
       Files.writeString(schemaFile, SCHEMA_WITH_MUTATION);
 
       // Second execution should regenerate
