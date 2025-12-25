@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,9 +113,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder endpoint(@NotNull String endpoint) {
-    if (endpoint == null) {
-      throw new NullPointerException("endpoint must not be null");
-    }
+    Objects.requireNonNull(endpoint, "endpoint must not be null");
     this.endpoint = URI.create(endpoint);
     return this;
   }
@@ -130,10 +129,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder endpoint(@NotNull URI endpoint) {
-    if (endpoint == null) {
-      throw new NullPointerException("endpoint must not be null");
-    }
-    this.endpoint = endpoint;
+    this.endpoint = Objects.requireNonNull(endpoint, "endpoint must not be null");
     return this;
   }
 
@@ -149,12 +145,8 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder header(@NotNull String name, @NotNull String value) {
-    if (name == null) {
-      throw new NullPointerException("header name must not be null");
-    }
-    if (value == null) {
-      throw new NullPointerException("header value must not be null");
-    }
+    Objects.requireNonNull(name, "header name must not be null");
+    Objects.requireNonNull(value, "header value must not be null");
     headers.put(name, value);
     return this;
   }
@@ -170,9 +162,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder headers(@NotNull Map<String, String> headers) {
-    if (headers == null) {
-      throw new NullPointerException("headers must not be null");
-    }
+    Objects.requireNonNull(headers, "headers must not be null");
     this.headers.putAll(headers);
     return this;
   }
@@ -247,10 +237,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder retryPolicy(@NotNull RetryPolicy retryPolicy) {
-    if (retryPolicy == null) {
-      throw new NullPointerException("retryPolicy must not be null");
-    }
-    this.retryPolicy = retryPolicy;
+    this.retryPolicy = Objects.requireNonNull(retryPolicy, "retryPolicy must not be null");
     return this;
   }
 
@@ -282,10 +269,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder scalarRegistry(@NotNull ScalarRegistry scalarRegistry) {
-    if (scalarRegistry == null) {
-      throw new NullPointerException("scalarRegistry must not be null");
-    }
-    this.scalarRegistry = scalarRegistry;
+    this.scalarRegistry = Objects.requireNonNull(scalarRegistry, "scalarRegistry must not be null");
     return this;
   }
 
@@ -301,9 +285,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder requestInterceptor(@NotNull RequestInterceptor interceptor) {
-    if (interceptor == null) {
-      throw new NullPointerException("requestInterceptor must not be null");
-    }
+    Objects.requireNonNull(interceptor, "requestInterceptor must not be null");
     requestInterceptors.add(interceptor);
     return this;
   }
@@ -320,9 +302,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder responseInterceptor(@NotNull ResponseInterceptor interceptor) {
-    if (interceptor == null) {
-      throw new NullPointerException("responseInterceptor must not be null");
-    }
+    Objects.requireNonNull(interceptor, "responseInterceptor must not be null");
     responseInterceptors.add(interceptor);
     return this;
   }
@@ -338,10 +318,7 @@ public final class GraphiteClientBuilder {
    */
   @NotNull
   public GraphiteClientBuilder objectMapper(@NotNull ObjectMapper objectMapper) {
-    if (objectMapper == null) {
-      throw new NullPointerException("objectMapper must not be null");
-    }
-    this.objectMapper = objectMapper;
+    this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
     return this;
   }
 
