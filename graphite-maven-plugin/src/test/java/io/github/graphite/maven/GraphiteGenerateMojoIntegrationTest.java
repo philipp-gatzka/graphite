@@ -238,10 +238,11 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
       String content = Files.readString(userDto);
-      assertThat(content).contains("public record UserDTO");
-      assertThat(content).contains("String id");
-      assertThat(content).contains("String name");
-      assertThat(content).contains("String email");
+      assertThat(content)
+          .contains("public record UserDTO")
+          .contains("String id")
+          .contains("String name")
+          .contains("String email");
     }
 
     @Test
@@ -260,8 +261,9 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userQuery = outputDir.resolve("com/example/graphql/query/UserQuery.java");
       assertThat(userQuery).exists();
       String content = Files.readString(userQuery);
-      assertThat(content).contains("public final class UserQuery");
-      assertThat(content).contains("implements GraphQLOperation");
+      assertThat(content)
+          .contains("public final class UserQuery")
+          .contains("implements GraphQLOperation");
     }
 
     @Test
@@ -346,8 +348,9 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
       String content = Files.readString(userDto);
-      assertThat(content).contains("java.time.Instant");
-      assertThat(content).contains("Instant createdAt");
+      assertThat(content)
+          .contains("java.time.Instant")
+          .contains("Instant createdAt");
     }
 
     @Test
@@ -370,8 +373,9 @@ class GraphiteGenerateMojoIntegrationTest {
       Path userDto = outputDir.resolve("com/example/graphql/type/UserDTO.java");
       assertThat(userDto).exists();
       String content = Files.readString(userDto);
-      assertThat(content).contains("java.time.Instant");
-      assertThat(content).contains("java.util.UUID");
+      assertThat(content)
+          .contains("java.time.Instant")
+          .contains("java.util.UUID");
     }
   }
 
@@ -395,8 +399,9 @@ class GraphiteGenerateMojoIntegrationTest {
       Path mutation = outputDir.resolve("com/example/graphql/mutation/CreateUserMutation.java");
       assertThat(mutation).exists();
       String content = Files.readString(mutation);
-      assertThat(content).contains("public final class CreateUserMutation");
-      assertThat(content).contains("implements GraphQLOperation");
+      assertThat(content)
+          .contains("public final class CreateUserMutation")
+          .contains("implements GraphQLOperation");
     }
 
     @Test
@@ -415,9 +420,10 @@ class GraphiteGenerateMojoIntegrationTest {
       Path input = outputDir.resolve("com/example/graphql/input/CreateUserInput.java");
       assertThat(input).exists();
       String content = Files.readString(input);
-      assertThat(content).contains("public final class CreateUserInput");
-      assertThat(content).contains("String name");
-      assertThat(content).contains("String email");
+      assertThat(content)
+          .contains("public final class CreateUserInput")
+          .contains("String name")
+          .contains("String email");
     }
   }
 
@@ -441,10 +447,11 @@ class GraphiteGenerateMojoIntegrationTest {
       Path enumFile = outputDir.resolve("com/example/graphql/enumeration/UserStatus.java");
       assertThat(enumFile).exists();
       String content = Files.readString(enumFile);
-      assertThat(content).contains("public enum UserStatus");
-      assertThat(content).contains("ACTIVE");
-      assertThat(content).contains("INACTIVE");
-      assertThat(content).contains("SUSPENDED");
+      assertThat(content)
+          .contains("public enum UserStatus")
+          .contains("ACTIVE")
+          .contains("INACTIVE")
+          .contains("SUSPENDED");
     }
 
     @Test

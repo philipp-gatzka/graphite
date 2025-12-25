@@ -74,8 +74,9 @@ class ProjectionGeneratorTest {
       assertThat(files).hasSizeGreaterThanOrEqualTo(2);
 
       List<String> typeNames = files.stream().map(f -> f.typeSpec().name()).toList();
-      assertThat(typeNames).contains("UserProjection", "PostProjection");
-      assertThat(typeNames).doesNotContain("QueryProjection", "MutationProjection");
+      assertThat(typeNames)
+          .contains("UserProjection", "PostProjection")
+          .doesNotContain("QueryProjection", "MutationProjection");
     }
 
     @Test
