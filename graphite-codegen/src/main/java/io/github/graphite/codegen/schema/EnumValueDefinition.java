@@ -26,17 +26,18 @@ import org.jetbrains.annotations.Nullable;
  * <pre>{@code
  * enum UserStatus {
  *   ACTIVE
- *   INACTIVE @deprecated(reason: "Use SUSPENDED instead")
+ *   INACTIVE @Deprecated(reason: "Use SUSPENDED instead")
  *   SUSPENDED
  * }
  * }</pre>
  *
  * @param name the enum value name
  * @param description the value description, may be null
- * @param isDeprecated whether the value is deprecated
+ * @param isDeprecated whether the value is marked as deprecated in the GraphQL schema
  * @param deprecationReason the deprecation reason, may be null
  * @see EnumDefinition
  */
+@SuppressWarnings({"java:S1133", "java:S1123"})
 public record EnumValueDefinition(
     @NotNull String name,
     @Nullable String description,
