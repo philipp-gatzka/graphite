@@ -60,6 +60,9 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
   /** Default timeout for health check requests. */
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 
+  /** Key for the reason detail in health responses. */
+  private static final String REASON_KEY = "reason";
+
   private final String url;
   private final HttpClient httpClient;
   private final Duration timeout;
@@ -131,7 +134,7 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
             .withDetail("url", url)
             .withDetail("responseTime", responseTime + "ms")
             .withDetail("statusCode", response.statusCode())
-            .withDetail("reason", "Non-2xx response");
+            .withDetail(REASON_KEY, "Non-2xx response");
       }
 
     } catch (InterruptedException e) {
@@ -141,14 +144,14 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
           .down(e)
           .withDetail("url", url)
           .withDetail("responseTime", responseTime + "ms")
-          .withDetail("reason", "Interrupted");
+          .withDetail(REASON_KEY, "Interrupted");
     } catch (Exception e) {
       long responseTime = System.currentTimeMillis() - startTime;
       builder
           .down(e)
           .withDetail("url", url)
           .withDetail("responseTime", responseTime + "ms")
-          .withDetail("reason", e.getMessage());
+          .withDetail(REASON_KEY, e.getMessage());
     }
   }
 
