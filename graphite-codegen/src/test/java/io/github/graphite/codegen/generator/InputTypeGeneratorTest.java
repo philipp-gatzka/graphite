@@ -154,9 +154,10 @@ class InputTypeGeneratorTest {
 
       String source = createUserFile.toString();
 
-      assertThat(source).contains("public Builder name(String name)");
-      assertThat(source).contains("public Builder email(String email)");
-      assertThat(source).contains("return this;");
+      assertThat(source)
+          .contains("public Builder name(String name)")
+          .contains("public Builder email(String email)")
+          .contains("return this;");
     }
 
     @Test
@@ -189,8 +190,9 @@ class InputTypeGeneratorTest {
       String source = createUserFile.toString();
 
       // name and email are required (non-null) in CreateUserInput
-      assertThat(source).contains("Objects.requireNonNull(builder.name");
-      assertThat(source).contains("Objects.requireNonNull(builder.email");
+      assertThat(source)
+          .contains("Objects.requireNonNull(builder.name")
+          .contains("Objects.requireNonNull(builder.email");
     }
 
     @Test
@@ -205,8 +207,9 @@ class InputTypeGeneratorTest {
 
       // All fields in UpdateUserInput are optional (nullable)
       // The constructor should just assign without requireNonNull
-      assertThat(source).contains("this.name = builder.name;");
-      assertThat(source).contains("this.email = builder.email;");
+      assertThat(source)
+          .contains("this.name = builder.name;")
+          .contains("this.email = builder.email;");
     }
   }
 
@@ -225,8 +228,9 @@ class InputTypeGeneratorTest {
       String source = createUserFile.toString();
 
       // status is UserStatus enum
-      assertThat(source).contains("UserStatus status");
-      assertThat(source).contains("import com.example.graphql.enumeration.UserStatus;");
+      assertThat(source)
+          .contains("UserStatus status")
+          .contains("import com.example.graphql.enumeration.UserStatus;");
     }
   }
 }
