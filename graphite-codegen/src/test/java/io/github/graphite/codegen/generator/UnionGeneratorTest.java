@@ -113,9 +113,7 @@ class UnionGeneratorTest {
       String source = searchResultFile.toString();
 
       // SearchResult union includes User and Post
-      assertThat(source).contains("permits");
-      assertThat(source).contains("UserDTO");
-      assertThat(source).contains("PostDTO");
+      assertThat(source).contains("permits").contains("UserDTO").contains("PostDTO");
     }
 
     @Test
@@ -130,9 +128,7 @@ class UnionGeneratorTest {
 
       // Should have empty body (just {})
       // Check that there are no method signatures
-      assertThat(source).doesNotContain("void ");
-      assertThat(source).doesNotContain("String ");
-      assertThat(source).doesNotContain("()");
+      assertThat(source).doesNotContain("void ").doesNotContain("String ").doesNotContain("()");
     }
 
     @Test
@@ -160,8 +156,9 @@ class UnionGeneratorTest {
       String source = searchResultFile.toString();
 
       // Should import member types from type package
-      assertThat(source).contains("import com.example.graphql.type.UserDTO;");
-      assertThat(source).contains("import com.example.graphql.type.PostDTO;");
+      assertThat(source)
+          .contains("import com.example.graphql.type.UserDTO;")
+          .contains("import com.example.graphql.type.PostDTO;");
     }
   }
 
@@ -228,8 +225,9 @@ class UnionGeneratorTest {
       JavaFile file = files.get(0);
       String source = file.toString();
 
-      assertThat(source).contains("public sealed interface SingleResultUnion");
-      assertThat(source).contains("permits ItemDTO");
+      assertThat(source)
+          .contains("public sealed interface SingleResultUnion")
+          .contains("permits ItemDTO");
     }
 
     @Test
@@ -311,10 +309,11 @@ class UnionGeneratorTest {
       JavaFile file = files.get(0);
       String source = file.toString();
 
-      assertThat(source).contains("ArticleDTO");
-      assertThat(source).contains("VideoDTO");
-      assertThat(source).contains("PodcastDTO");
-      assertThat(source).contains("ImageDTO");
+      assertThat(source)
+          .contains("ArticleDTO")
+          .contains("VideoDTO")
+          .contains("PodcastDTO")
+          .contains("ImageDTO");
     }
 
     @Test

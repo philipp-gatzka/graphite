@@ -164,11 +164,12 @@ class ProjectionGeneratorTest {
       String source = userProjection.toString();
 
       // User has id, name, email fields that are scalars
-      assertThat(source).contains("public Builder id()");
-      assertThat(source).contains("public Builder name()");
-      assertThat(source).contains("public Builder email()");
-      assertThat(source).contains("projection.selectedFields.add(");
-      assertThat(source).contains("return this;");
+      assertThat(source)
+          .contains("public Builder id()")
+          .contains("public Builder name()")
+          .contains("public Builder email()")
+          .contains("projection.selectedFields.add(")
+          .contains("return this;");
     }
 
     @Test
@@ -195,8 +196,7 @@ class ProjectionGeneratorTest {
 
       String source = userProjection.toString();
 
-      assertThat(source).contains("public UserProjection build()");
-      assertThat(source).contains("return projection;");
+      assertThat(source).contains("public UserProjection build()").contains("return projection;");
     }
   }
 
@@ -227,8 +227,9 @@ class ProjectionGeneratorTest {
 
       String source = userProjection.toString();
 
-      assertThat(source).contains("if (postsProjection != null)");
-      assertThat(source).contains("postsProjection.toGraphQL()");
+      assertThat(source)
+          .contains("if (postsProjection != null)")
+          .contains("postsProjection.toGraphQL()");
     }
 
     @Test
@@ -287,9 +288,10 @@ class ProjectionGeneratorTest {
       JavaFile file = files.get(0);
       String source = file.toString();
 
-      assertThat(source).contains("public Builder id()");
-      assertThat(source).contains("public Builder name()");
-      assertThat(source).doesNotContain("Consumer<");
+      assertThat(source)
+          .contains("public Builder id()")
+          .contains("public Builder name()")
+          .doesNotContain("Consumer<");
     }
   }
 
@@ -355,8 +357,9 @@ class ProjectionGeneratorTest {
       String source = userProjection.toString();
 
       // posts is [Post!]! - list of non-null Post
-      assertThat(source).contains("PostProjection postsProjection");
-      assertThat(source).contains("posts(Consumer<PostProjection.Builder>");
+      assertThat(source)
+          .contains("PostProjection postsProjection")
+          .contains("posts(Consumer<PostProjection.Builder>");
     }
   }
 }
