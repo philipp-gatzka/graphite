@@ -100,8 +100,9 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public final class UserQuery");
-      assertThat(source).contains("implements GraphQLOperation<UserDTO>");
+      assertThat(source)
+          .contains("public final class UserQuery")
+          .contains("implements GraphQLOperation<UserDTO>");
     }
 
     @Test
@@ -146,8 +147,7 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public String operationName()");
-      assertThat(source).contains("return \"User\"");
+      assertThat(source).contains("public String operationName()").contains("return \"User\"");
     }
 
     @Test
@@ -160,10 +160,11 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public String toGraphQL()");
-      assertThat(source).contains("query User($id: ID!)");
-      assertThat(source).contains("user(id: $id)");
-      assertThat(source).contains("projection.toGraphQL()");
+      assertThat(source)
+          .contains("public String toGraphQL()")
+          .contains("query User($id: ID!)")
+          .contains("user(id: $id)")
+          .contains("projection.toGraphQL()");
     }
 
     @Test
@@ -177,9 +178,7 @@ class QueryGeneratorTest {
       String source = usersQuery.toString();
 
       // users(limit: Int, offset: Int) query
-      assertThat(source).contains("query Users");
-      assertThat(source).contains("$limit: Int");
-      assertThat(source).contains("$offset: Int");
+      assertThat(source).contains("query Users").contains("$limit: Int").contains("$offset: Int");
     }
 
     @Test
@@ -192,8 +191,9 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public Map<String, Object> variables()");
-      assertThat(source).contains("vars.put(\"id\", id)");
+      assertThat(source)
+          .contains("public Map<String, Object> variables()")
+          .contains("vars.put(\"id\", id)");
     }
 
     @Test
@@ -206,8 +206,9 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public Class<UserDTO> responseType()");
-      assertThat(source).contains("return UserDTO.class");
+      assertThat(source)
+          .contains("public Class<UserDTO> responseType()")
+          .contains("return UserDTO.class");
     }
   }
 
@@ -238,8 +239,9 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public static Builder builder()");
-      assertThat(source).contains("return new Builder()");
+      assertThat(source)
+          .contains("public static Builder builder()")
+          .contains("return new Builder()");
     }
 
     @Test
@@ -252,9 +254,10 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public Builder id(String id)");
-      assertThat(source).contains("this.id = id");
-      assertThat(source).contains("return this;");
+      assertThat(source)
+          .contains("public Builder id(String id)")
+          .contains("this.id = id")
+          .contains("return this;");
     }
 
     @Test
@@ -281,8 +284,9 @@ class QueryGeneratorTest {
 
       String source = userQuery.toString();
 
-      assertThat(source).contains("public UserQuery build()");
-      assertThat(source).contains("return new UserQuery(this)");
+      assertThat(source)
+          .contains("public UserQuery build()")
+          .contains("return new UserQuery(this)");
     }
   }
 
@@ -392,8 +396,9 @@ class QueryGeneratorTest {
       JavaFile file = files.get(0);
       String source = file.toString();
 
-      assertThat(source).contains("query CurrentUser { currentUser");
-      assertThat(source).contains("return Collections.emptyMap()");
+      assertThat(source)
+          .contains("query CurrentUser { currentUser")
+          .contains("return Collections.emptyMap()");
     }
 
     @Test
