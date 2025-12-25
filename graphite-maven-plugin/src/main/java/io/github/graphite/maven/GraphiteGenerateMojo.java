@@ -64,9 +64,6 @@ import org.apache.maven.project.MavenProject;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class GraphiteGenerateMojo extends AbstractMojo {
 
-  /** Default output directory relative to build directory. */
-  private static final String DEFAULT_OUTPUT_PATH = "generated-sources/graphite";
-
   /** The current Maven project. */
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;

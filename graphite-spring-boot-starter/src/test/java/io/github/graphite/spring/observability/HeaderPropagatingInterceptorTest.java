@@ -39,7 +39,6 @@ class HeaderPropagatingInterceptorTest {
 
   private Tracer tracer;
   private Propagator propagator;
-  private Tracer.SpanInScope spanInScope;
   private Span currentSpan;
   private TraceContext traceContext;
   private io.micrometer.tracing.CurrentTraceContext currentTraceContext;
@@ -49,7 +48,6 @@ class HeaderPropagatingInterceptorTest {
   void setUp() {
     tracer = mock(Tracer.class);
     propagator = mock(Propagator.class);
-    spanInScope = mock(Tracer.SpanInScope.class);
     currentSpan = mock(Span.class);
     traceContext = mock(TraceContext.class);
     currentTraceContext = mock(io.micrometer.tracing.CurrentTraceContext.class);
