@@ -90,6 +90,9 @@ sonar {
         // Coverage reporting
         property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml")
 
+        // Checkstyle reporting
+        property("sonar.java.checkstyle.reportPaths", "**/build/reports/checkstyle/*.xml")
+
         // Source encoding
         property("sonar.sourceEncoding", "UTF-8")
 
