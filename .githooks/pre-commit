@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# pre-commit hook: Automatically applies spotless formatting
+#
+# This hook runs before each commit and:
+# 1. Runs spotlessApply to format all staged files
+# 2. Re-stages any files that were modified by spotless
+#
+# This ensures all committed code is properly formatted.
+#
+
+set -e
+
+echo "Running spotless formatting..."
+
+# Run spotlessApply
+if ! ./gradlew spotlessApply --quiet 2>/dev/null; then
+    echo ""
+    echo "ERROR: Spotless formatting failed!"
+    echo "Please check the error above and fix any issues."
+    echo ""
+    exit 1
+fi
+
+# Get list of staged files that might have been modified by spotless
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.java$|\.kt$|\.kts$|\.gradle$' || true)
+
+if [ -n "$STAGED_FILES" ]; then
+    # Re-add any files that were modified by spotless
+    for file in $STAGED_FILES; do
+        if [ -f "$file" ]; then
+            # Check if file was modified after staging
+            if ! git diff --quiet "$file" 2>/dev/null; then
+                echo "Re-staging formatted file: $file"
+                git add "$file"
+            fi
+        fi
+    done
+fi
+
+echo "Spotless formatting complete."
+exit 0
