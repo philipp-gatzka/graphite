@@ -160,10 +160,13 @@ public final class EnumGenerator {
         .returns(com.palantir.javapoet.ClassName.bestGuess(enumName))
         .addStatement("return valueOf(value)")
         .addJavadoc(
-            "Creates an enum instance from a string value.\n\n"
-                + "@param value the string value\n"
-                + "@return the enum instance\n"
-                + "@throws IllegalArgumentException if no enum constant matches the value\n")
+            """
+            Creates an enum instance from a string value.
+
+            @param value the string value
+            @return the enum instance
+            @throws IllegalArgumentException if no enum constant matches the value
+            """)
         .build();
   }
 
@@ -174,8 +177,11 @@ public final class EnumGenerator {
         .returns(String.class)
         .addStatement("return name()")
         .addJavadoc(
-            "Returns the string value of this enum constant.\n\n"
-                + "@return the enum constant name\n")
+            """
+            Returns the string value of this enum constant.
+
+            @return the enum constant name
+            """)
         .build();
   }
 
