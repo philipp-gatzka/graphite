@@ -229,21 +229,20 @@ public class GraphiteAssertions {
     @NotNull
     public GraphiteErrorAssert errorAt(int index) {
       Object errors = response.get(ERRORS_KEY);
-      if (!(errors instanceof List)) {
+      if (!(errors instanceof List<?> errorList)) {
         throw new AssertionError("Expected errors to be a List, but was: " + errors);
       }
-      List<?> errorList = (List<?>) errors;
       if (index < 0 || index >= errorList.size()) {
         throw new AssertionError(
             "Error index " + index + " out of bounds, only " + errorList.size() + " errors");
       }
       Object error = errorList.get(index);
-      if (error instanceof GraphQLError) {
-        return new GraphiteErrorAssert((GraphQLError) error);
+      if (error instanceof GraphQLError graphQLError) {
+        return new GraphiteErrorAssert(graphQLError);
       }
-      if (error instanceof Map) {
+      if (error instanceof Map<?, ?> rawMap) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> errorMap = (Map<String, Object>) error;
+        Map<String, Object> errorMap = (Map<String, Object>) rawMap;
         return new GraphiteErrorAssert(mapToGraphQLError(errorMap));
       }
       throw new AssertionError("Unexpected error type: " + error.getClass());
