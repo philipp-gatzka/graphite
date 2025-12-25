@@ -214,9 +214,7 @@ class GraphiteResponseBuilderTest {
 
       String json = builder.toJson();
 
-      assertThat(json).contains("\"data\"");
-      assertThat(json).contains("\"user\"");
-      assertThat(json).contains("\"id\":\"123\"");
+      assertThat(json).contains("\"data\"").contains("\"user\"").contains("\"id\":\"123\"");
     }
 
     @Test
@@ -236,8 +234,7 @@ class GraphiteResponseBuilderTest {
 
       String json = builder.toJson();
 
-      assertThat(json).contains("\"errors\"");
-      assertThat(json).contains("\"message\":\"Error message\"");
+      assertThat(json).contains("\"errors\"").contains("\"message\":\"Error message\"");
     }
 
     @Test
@@ -248,8 +245,7 @@ class GraphiteResponseBuilderTest {
 
       String json = builder.toJson();
 
-      assertThat(json).contains("\"extensions\"");
-      assertThat(json).contains("\"traceId\":\"abc\"");
+      assertThat(json).contains("\"extensions\"").contains("\"traceId\":\"abc\"");
     }
   }
 
@@ -292,8 +288,7 @@ class GraphiteResponseBuilderTest {
       assertThat(builder.hasErrors()).isTrue();
 
       String json = builder.toJson();
-      assertThat(json).contains("\"data\"");
-      assertThat(json).contains("\"errors\"");
+      assertThat(json).contains("\"data\"").contains("\"errors\"");
     }
   }
 }
