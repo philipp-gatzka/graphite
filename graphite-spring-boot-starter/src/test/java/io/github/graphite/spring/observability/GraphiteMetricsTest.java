@@ -22,10 +22,14 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("GraphiteMetrics")
 class GraphiteMetricsTest {
@@ -43,40 +47,29 @@ class GraphiteMetricsTest {
   @DisplayName("recordSuccess")
   class RecordSuccess {
 
-    @Test
-    @DisplayName("should record success counter")
-    void shouldRecordSuccessCounter() {
-      Timer.Sample sample = metrics.startTimer();
-      metrics.recordSuccess("GetUser", sample);
-
-      Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("operation", "GetUser").counter();
-      assertThat(counter).isNotNull();
-      assertThat(counter.count()).isEqualTo(1.0);
+    static Stream<Arguments> recordSuccessTestCases() {
+      return Stream.of(
+          Arguments.of("success counter", GraphiteMetrics.REQUESTS_METRIC, "operation", "GetUser"),
+          Arguments.of("success status tag", GraphiteMetrics.REQUESTS_METRIC, "status", "success"),
+          Arguments.of("duration timer", GraphiteMetrics.DURATION_METRIC, "operation", "GetUser"));
     }
 
-    @Test
-    @DisplayName("should record success status tag")
-    void shouldRecordSuccessStatusTag() {
+    @ParameterizedTest(name = "should record {0}")
+    @MethodSource("recordSuccessTestCases")
+    void shouldRecordSuccess(
+        String description, String metricName, String tagKey, String tagValue) {
       Timer.Sample sample = metrics.startTimer();
       metrics.recordSuccess("GetUser", sample);
 
-      Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("status", "success").counter();
-      assertThat(counter).isNotNull();
-      assertThat(counter.count()).isEqualTo(1.0);
-    }
-
-    @Test
-    @DisplayName("should record duration timer")
-    void shouldRecordDurationTimer() {
-      Timer.Sample sample = metrics.startTimer();
-      metrics.recordSuccess("GetUser", sample);
-
-      Timer timer =
-          registry.find(GraphiteMetrics.DURATION_METRIC).tag("operation", "GetUser").timer();
-      assertThat(timer).isNotNull();
-      assertThat(timer.count()).isEqualTo(1);
+      if (metricName.equals(GraphiteMetrics.DURATION_METRIC)) {
+        Timer timer = registry.find(metricName).tag(tagKey, tagValue).timer();
+        assertThat(timer).isNotNull();
+        assertThat(timer.count()).isEqualTo(1);
+      } else {
+        Counter counter = registry.find(metricName).tag(tagKey, tagValue).counter();
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(1.0);
+      }
     }
 
     @Test
