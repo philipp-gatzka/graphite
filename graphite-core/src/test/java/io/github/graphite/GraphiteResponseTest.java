@@ -241,8 +241,7 @@ class GraphiteResponseTest {
       var response1 = GraphiteResponse.success("data");
       var response2 = GraphiteResponse.success("data");
 
-      assertThat(response1).isEqualTo(response2);
-      assertThat(response1.hashCode()).isEqualTo(response2.hashCode());
+      assertThat(response1).isEqualTo(response2).hasSameHashCodeAs(response2);
     }
 
     @Test
