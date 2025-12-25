@@ -213,7 +213,6 @@ final class DefaultGraphiteClient implements GraphiteClient {
   }
 
   private HttpResponse executeWithRetry(HttpRequest request) {
-    GraphiteException lastException = null;
     int attempt = 0;
 
     while (true) {
@@ -227,7 +226,6 @@ final class DefaultGraphiteClient implements GraphiteClient {
                   "Server error: HTTP " + response.statusCode(), response.statusCode());
 
           if (retryPolicy.shouldRetry(serverException, attempt + 1)) {
-            lastException = serverException;
             attempt++;
             sleepForRetry(attempt);
             continue;
@@ -239,7 +237,6 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
       } catch (GraphiteException e) {
         if (retryPolicy.shouldRetry(e, attempt + 1)) {
-          lastException = e;
           attempt++;
           sleepForRetry(attempt);
           continue;
