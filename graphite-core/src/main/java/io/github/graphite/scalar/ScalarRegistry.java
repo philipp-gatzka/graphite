@@ -94,11 +94,13 @@ public final class ScalarRegistry {
    * Looks up a coercing by scalar type name.
    *
    * @param scalarName the GraphQL scalar type name
+   * @param <T> the Java type that the scalar coerces to
    * @return the coercing if registered, empty otherwise
    */
   @NotNull
-  public Optional<ScalarCoercing<?>> get(@NotNull String scalarName) {
-    return Optional.ofNullable(coercings.get(scalarName));
+  @SuppressWarnings("unchecked")
+  public <T> Optional<ScalarCoercing<T>> get(@NotNull String scalarName) {
+    return Optional.ofNullable((ScalarCoercing<T>) coercings.get(scalarName));
   }
 
   /**
