@@ -182,8 +182,7 @@ class InterfaceGeneratorTest {
 
       String source = timestampedFile.toString();
 
-      assertThat(source).contains("Instant createdAt();");
-      assertThat(source).contains("import java.time.Instant;");
+      assertThat(source).contains("Instant createdAt();").contains("import java.time.Instant;");
     }
   }
 
@@ -244,8 +243,9 @@ class InterfaceGeneratorTest {
       String source = file.toString();
 
       // Should still be a sealed interface, just with no permits
-      assertThat(source).contains("public sealed interface OrphanInterfaceDTO");
-      assertThat(source).contains("String id();");
+      assertThat(source)
+          .contains("public sealed interface OrphanInterfaceDTO")
+          .contains("String id();");
     }
 
     @Test
