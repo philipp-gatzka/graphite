@@ -498,19 +498,19 @@ class GraphiteClientBuilderTest {
     @Test
     @DisplayName("should have expected default connect timeout")
     void shouldHaveExpectedDefaultConnectTimeout() {
-      assertThat(GraphiteClientBuilder.DEFAULT_CONNECT_TIMEOUT).isEqualTo(Duration.ofSeconds(10));
+      assertThat(Duration.ofSeconds(10)).isEqualTo(GraphiteClientBuilder.DEFAULT_CONNECT_TIMEOUT);
     }
 
     @Test
     @DisplayName("should have expected default read timeout")
     void shouldHaveExpectedDefaultReadTimeout() {
-      assertThat(GraphiteClientBuilder.DEFAULT_READ_TIMEOUT).isEqualTo(Duration.ofSeconds(30));
+      assertThat(Duration.ofSeconds(30)).isEqualTo(GraphiteClientBuilder.DEFAULT_READ_TIMEOUT);
     }
 
     @Test
     @DisplayName("should have expected default request timeout")
     void shouldHaveExpectedDefaultRequestTimeout() {
-      assertThat(GraphiteClientBuilder.DEFAULT_REQUEST_TIMEOUT).isEqualTo(Duration.ofSeconds(60));
+      assertThat(Duration.ofSeconds(60)).isEqualTo(GraphiteClientBuilder.DEFAULT_REQUEST_TIMEOUT);
     }
   }
 }
