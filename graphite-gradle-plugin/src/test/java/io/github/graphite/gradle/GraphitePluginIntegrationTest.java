@@ -562,10 +562,11 @@ class GraphitePluginIntegrationTest {
               "build/generated/sources/graphite/main/java/com/example/graphql/type/UserDTO.java");
       String content = Files.readString(userDto);
 
-      assertThat(content).contains("package com.example.graphql.type;");
-      assertThat(content).contains("public record UserDTO");
-      assertThat(content).contains("String id");
-      assertThat(content).contains("String name");
+      assertThat(content)
+          .contains("package com.example.graphql.type;")
+          .contains("public record UserDTO")
+          .contains("String id")
+          .contains("String name");
     }
 
     @Test
@@ -592,9 +593,10 @@ class GraphitePluginIntegrationTest {
               "build/generated/sources/graphite/main/java/com/example/graphql/query/UserQuery.java");
       String content = Files.readString(queryFile);
 
-      assertThat(content).contains("package com.example.graphql.query;");
-      assertThat(content).contains("public final class UserQuery");
-      assertThat(content).contains("GraphQLOperation");
+      assertThat(content)
+          .contains("package com.example.graphql.query;")
+          .contains("public final class UserQuery")
+          .contains("GraphQLOperation");
     }
   }
 }
