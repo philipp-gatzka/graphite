@@ -112,10 +112,11 @@ class EnumGeneratorTest {
 
       String source = userStatusFile.toString();
 
-      assertThat(source).contains("ACTIVE");
-      assertThat(source).contains("INACTIVE");
-      assertThat(source).contains("SUSPENDED");
-      assertThat(source).contains("DELETED");
+      assertThat(source)
+          .contains("ACTIVE")
+          .contains("INACTIVE")
+          .contains("SUSPENDED")
+          .contains("DELETED");
     }
 
     @Test
@@ -161,9 +162,10 @@ class EnumGeneratorTest {
 
       String source = userStatusFile.toString();
 
-      assertThat(source).contains("@JsonValue");
-      assertThat(source).contains("public String toValue()");
-      assertThat(source).contains("return name();");
+      assertThat(source)
+          .contains("@JsonValue")
+          .contains("public String toValue()")
+          .contains("return name();");
     }
 
     @Test
@@ -176,8 +178,9 @@ class EnumGeneratorTest {
 
       String source = userStatusFile.toString();
 
-      assertThat(source).contains("import com.fasterxml.jackson.annotation.JsonCreator;");
-      assertThat(source).contains("import com.fasterxml.jackson.annotation.JsonValue;");
+      assertThat(source)
+          .contains("import com.fasterxml.jackson.annotation.JsonCreator;")
+          .contains("import com.fasterxml.jackson.annotation.JsonValue;");
     }
   }
 
