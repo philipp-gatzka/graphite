@@ -204,11 +204,9 @@ final class DefaultGraphiteClient implements GraphiteClient {
   }
 
   private void acquireRateLimitPermit() {
-    if (rateLimiter != null) {
-      if (!rateLimiter.tryAcquire()) {
-        throw new GraphiteRateLimitException(
-            "Rate limit exceeded: max " + rateLimiter.getRequestsPerSecond() + " requests/second");
-      }
+    if (rateLimiter != null && !rateLimiter.tryAcquire()) {
+      throw new GraphiteRateLimitException(
+          "Rate limit exceeded: max " + rateLimiter.getRequestsPerSecond() + " requests/second");
     }
   }
 

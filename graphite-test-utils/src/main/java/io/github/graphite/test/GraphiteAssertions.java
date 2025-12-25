@@ -176,10 +176,8 @@ public class GraphiteAssertions {
     @NotNull
     public GraphiteResponseAssert hasNoErrors() {
       Object errors = response.get(ERRORS_KEY);
-      if (errors != null) {
-        if (errors instanceof List && !((List<?>) errors).isEmpty()) {
-          throw new AssertionError("Expected no errors, but found: " + errors);
-        }
+      if (errors instanceof List<?> errorList && !errorList.isEmpty()) {
+        throw new AssertionError("Expected no errors, but found: " + errors);
       }
       return this;
     }
