@@ -497,19 +497,19 @@ class GraphiteConfigurationTest {
     @Test
     @DisplayName("should have correct default connect timeout")
     void shouldHaveCorrectDefaultConnectTimeout() {
-      assertThat(GraphiteConfiguration.DEFAULT_CONNECT_TIMEOUT).isEqualTo(Duration.ofSeconds(10));
+      assertThat(Duration.ofSeconds(10)).isEqualTo(GraphiteConfiguration.DEFAULT_CONNECT_TIMEOUT);
     }
 
     @Test
     @DisplayName("should have correct default read timeout")
     void shouldHaveCorrectDefaultReadTimeout() {
-      assertThat(GraphiteConfiguration.DEFAULT_READ_TIMEOUT).isEqualTo(Duration.ofSeconds(30));
+      assertThat(Duration.ofSeconds(30)).isEqualTo(GraphiteConfiguration.DEFAULT_READ_TIMEOUT);
     }
 
     @Test
     @DisplayName("should have correct default request timeout")
     void shouldHaveCorrectDefaultRequestTimeout() {
-      assertThat(GraphiteConfiguration.DEFAULT_REQUEST_TIMEOUT).isEqualTo(Duration.ofSeconds(60));
+      assertThat(Duration.ofSeconds(60)).isEqualTo(GraphiteConfiguration.DEFAULT_REQUEST_TIMEOUT);
     }
   }
 
