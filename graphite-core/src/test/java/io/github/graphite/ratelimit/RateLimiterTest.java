@@ -81,7 +81,8 @@ class RateLimiterTest {
     @Test
     @DisplayName("should reject zero burst capacity")
     void shouldRejectZeroBurstCapacity() {
-      assertThatThrownBy(() -> RateLimiter.builder().burstCapacity(0))
+      var builder = RateLimiter.builder();
+      assertThatThrownBy(() -> builder.burstCapacity(0))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("burstCapacity must be positive");
     }
@@ -89,7 +90,8 @@ class RateLimiterTest {
     @Test
     @DisplayName("should reject negative burst capacity")
     void shouldRejectNegativeBurstCapacity() {
-      assertThatThrownBy(() -> RateLimiter.builder().burstCapacity(-1))
+      var builder = RateLimiter.builder();
+      assertThatThrownBy(() -> builder.burstCapacity(-1))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("burstCapacity must be positive");
     }
