@@ -28,10 +28,14 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.net.URI;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("GraphiteMetricsInterceptor")
 class GraphiteMetricsInterceptorTest {
@@ -128,60 +132,38 @@ class GraphiteMetricsInterceptorTest {
   @DisplayName("operation name extraction")
   class OperationNameExtraction {
 
-    @Test
-    @DisplayName("should extract operationName from JSON body")
-    void shouldExtractOperationNameFromJsonBody() {
-      HttpRequest request =
-          createRequest("{\"operationName\":\"GetUser\",\"query\":\"query GetUser { user }\"}");
-      HttpResponse response = new HttpResponse(200, Map.of(), "{}");
-
-      interceptor.requestInterceptor().intercept(request);
-      interceptor.responseInterceptor().intercept(response);
-
-      Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("operation", "GetUser").counter();
-      assertThat(counter).isNotNull();
+    static Stream<Arguments> operationNameExtractionTestCases() {
+      return Stream.of(
+          Arguments.of(
+              "operationName from JSON body",
+              "{\"operationName\":\"GetUser\",\"query\":\"query GetUser { user }\"}",
+              "GetUser"),
+          Arguments.of(
+              "operation name from query when operationName not present",
+              "{\"query\":\"query GetUserById { user }\"}",
+              "GetUserById"),
+          Arguments.of(
+              "mutation name from query",
+              "{\"query\":\"mutation CreateUser { createUser }\"}",
+              "CreateUser"),
+          Arguments.of("unknown for anonymous query", "{\"query\":\"{ user }\"}", "unknown"));
     }
 
-    @Test
-    @DisplayName("should extract operation name from query when operationName not present")
-    void shouldExtractFromQuery() {
-      HttpRequest request = createRequest("{\"query\":\"query GetUserById { user }\"}");
+    @ParameterizedTest(name = "should extract {0}")
+    @MethodSource("operationNameExtractionTestCases")
+    void shouldExtractOperationName(
+        String description, String requestBody, String expectedOperation) {
+      HttpRequest request = createRequest(requestBody);
       HttpResponse response = new HttpResponse(200, Map.of(), "{}");
 
       interceptor.requestInterceptor().intercept(request);
       interceptor.responseInterceptor().intercept(response);
 
       Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("operation", "GetUserById").counter();
-      assertThat(counter).isNotNull();
-    }
-
-    @Test
-    @DisplayName("should extract mutation name from query")
-    void shouldExtractMutationName() {
-      HttpRequest request = createRequest("{\"query\":\"mutation CreateUser { createUser }\"}");
-      HttpResponse response = new HttpResponse(200, Map.of(), "{}");
-
-      interceptor.requestInterceptor().intercept(request);
-      interceptor.responseInterceptor().intercept(response);
-
-      Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("operation", "CreateUser").counter();
-      assertThat(counter).isNotNull();
-    }
-
-    @Test
-    @DisplayName("should use unknown for anonymous query")
-    void shouldUseUnknownForAnonymousQuery() {
-      HttpRequest request = createRequest("{\"query\":\"{ user }\"}");
-      HttpResponse response = new HttpResponse(200, Map.of(), "{}");
-
-      interceptor.requestInterceptor().intercept(request);
-      interceptor.responseInterceptor().intercept(response);
-
-      Counter counter =
-          registry.find(GraphiteMetrics.REQUESTS_METRIC).tag("operation", "unknown").counter();
+          registry
+              .find(GraphiteMetrics.REQUESTS_METRIC)
+              .tag("operation", expectedOperation)
+              .counter();
       assertThat(counter).isNotNull();
     }
 
