@@ -18,6 +18,7 @@ package io.github.graphite.scalar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
@@ -155,12 +156,8 @@ public final class ScalarRegistry {
      */
     @NotNull
     public Builder register(@NotNull String scalarName, @NotNull ScalarCoercing<?> coercing) {
-      if (scalarName == null) {
-        throw new NullPointerException("scalarName must not be null");
-      }
-      if (coercing == null) {
-        throw new NullPointerException("coercing must not be null");
-      }
+      Objects.requireNonNull(scalarName, "scalarName must not be null");
+      Objects.requireNonNull(coercing, "coercing must not be null");
       coercings.put(scalarName, coercing);
       return this;
     }
