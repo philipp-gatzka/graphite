@@ -170,8 +170,9 @@ class InputTypeGeneratorTest {
 
       String source = createUserFile.toString();
 
-      assertThat(source).contains("public CreateUserInput build()");
-      assertThat(source).contains("return new CreateUserInput(this);");
+      assertThat(source)
+          .contains("public CreateUserInput build()")
+          .contains("return new CreateUserInput(this);");
     }
   }
 
