@@ -83,6 +83,7 @@ public final class ProjectionGenerator {
 
   private static final String TYPE_PACKAGE_SUFFIX = ".type";
   private static final String PROJECTION_SUFFIX = "Projection";
+  private static final String BUILDER_CLASS_NAME = "Builder";
   private static final Set<String> ROOT_TYPE_NAMES = Set.of("Query", "Mutation", "Subscription");
 
   private final CodegenConfiguration configuration;
@@ -135,7 +136,7 @@ public final class ProjectionGenerator {
     String className = type.name() + PROJECTION_SUFFIX;
 
     ClassName projectionClassName = ClassName.get(packageName, className);
-    ClassName builderClassName = projectionClassName.nestedClass("Builder");
+    ClassName builderClassName = projectionClassName.nestedClass(BUILDER_CLASS_NAME);
 
     TypeSpec.Builder classBuilder =
         TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -232,7 +233,7 @@ public final class ProjectionGenerator {
       ClassName builderClassName,
       List<FieldDefinition> objectFields) {
     TypeSpec.Builder builder =
-        TypeSpec.classBuilder("Builder")
+        TypeSpec.classBuilder(BUILDER_CLASS_NAME)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
 
     builder.addJavadoc("Builder for {@link $T}.\n", projectionClassName);
@@ -293,7 +294,7 @@ public final class ProjectionGenerator {
 
   private MethodSpec generateObjectFieldMethod(
       FieldDefinition field, ClassName builderClassName, ClassName fieldProjectionClass) {
-    ClassName fieldBuilderClass = fieldProjectionClass.nestedClass("Builder");
+    ClassName fieldBuilderClass = fieldProjectionClass.nestedClass(BUILDER_CLASS_NAME);
     ParameterizedTypeName consumerType =
         ParameterizedTypeName.get(ClassName.get(Consumer.class), fieldBuilderClass);
 

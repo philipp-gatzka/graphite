@@ -87,6 +87,9 @@ public final class QueryGenerator {
   private static final String QUERY_SUFFIX = "Query";
   private static final String DTO_SUFFIX = "DTO";
   private static final String PROJECTION_SUFFIX = "Projection";
+  private static final String BUILDER_CLASS_NAME = "Builder";
+  private static final String INHERITDOC = "{@inheritDoc}\n";
+  private static final String QUERY_TYPE_NAME = "Query";
 
   private final CodegenConfiguration configuration;
   private final SchemaModel schema;
@@ -113,7 +116,7 @@ public final class QueryGenerator {
   public List<JavaFile> generate() {
     List<JavaFile> files = new ArrayList<>();
 
-    TypeDefinition queryType = schema.types().get("Query");
+    TypeDefinition queryType = schema.types().get(QUERY_TYPE_NAME);
     if (queryType == null) {
       return files;
     }
@@ -159,7 +162,7 @@ public final class QueryGenerator {
         ParameterizedTypeName.get(ClassName.get(GraphQLOperation.class), actualResponseType);
 
     ClassName queryClassName = ClassName.get(packageName, className);
-    ClassName builderClassName = queryClassName.nestedClass("Builder");
+    ClassName builderClassName = queryClassName.nestedClass(BUILDER_CLASS_NAME);
 
     TypeSpec.Builder classBuilder =
         TypeSpec.classBuilder(className)
@@ -202,7 +205,7 @@ public final class QueryGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(String.class)
             .addStatement("return $S", operationName)
-            .addJavadoc("{@inheritDoc}\n")
+            .addJavadoc(INHERITDOC)
             .build());
 
     // Add toGraphQL() method
@@ -270,7 +273,7 @@ public final class QueryGenerator {
             .addAnnotation(NotNull.class)
             .addModifiers(Modifier.PUBLIC)
             .returns(String.class)
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     // Build variable definitions
     StringBuilder varDefs = new StringBuilder();
@@ -313,7 +316,7 @@ public final class QueryGenerator {
                     ClassName.get(Map.class),
                     ClassName.get(String.class),
                     ClassName.get(Object.class)))
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     if (field.arguments().isEmpty()) {
       method.addStatement("return $T.emptyMap()", Collections.class);
@@ -337,7 +340,7 @@ public final class QueryGenerator {
             .addAnnotation(Override.class)
             .addAnnotation(NotNull.class)
             .addModifiers(Modifier.PUBLIC)
-            .addJavadoc("{@inheritDoc}\n");
+            .addJavadoc(INHERITDOC);
 
     if (isList) {
       // For List types, we need to return a Class<List<T>> which requires casting
@@ -363,7 +366,7 @@ public final class QueryGenerator {
       ClassName projectionClass,
       boolean hasProjection) {
     TypeSpec.Builder builder =
-        TypeSpec.classBuilder("Builder")
+        TypeSpec.classBuilder(BUILDER_CLASS_NAME)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
 
     builder.addJavadoc("Builder for {@link $T}.\n", queryClassName);
@@ -386,7 +389,7 @@ public final class QueryGenerator {
 
     // Add selecting() method for projection
     if (hasProjection) {
-      ClassName projectionBuilderClass = projectionClass.nestedClass("Builder");
+      ClassName projectionBuilderClass = projectionClass.nestedClass(BUILDER_CLASS_NAME);
       ParameterizedTypeName consumerType =
           ParameterizedTypeName.get(ClassName.get(Consumer.class), projectionBuilderClass);
 
