@@ -302,7 +302,7 @@ class GraphiteAssertionsTest {
                 r -> {
                   @SuppressWarnings("unchecked")
                   Map<String, Object> data = (Map<String, Object>) r.get("data");
-                  org.assertj.core.api.Assertions.assertThat(data.get("count")).isEqualTo(5);
+                  org.assertj.core.api.Assertions.assertThat(data).containsEntry("count", 5);
                 });
       }
     }
