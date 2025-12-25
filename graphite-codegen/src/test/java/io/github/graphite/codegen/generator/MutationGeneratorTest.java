@@ -101,8 +101,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public final class CreateUserMutation");
-      assertThat(source).contains("implements GraphQLOperation<UserDTO>");
+      assertThat(source)
+          .contains("public final class CreateUserMutation")
+          .contains("implements GraphQLOperation<UserDTO>");
     }
 
     @Test
@@ -147,8 +148,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public String operationName()");
-      assertThat(source).contains("return \"CreateUser\"");
+      assertThat(source)
+          .contains("public String operationName()")
+          .contains("return \"CreateUser\"");
     }
 
     @Test
@@ -161,11 +163,12 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public String toGraphQL()");
-      assertThat(source).contains("mutation CreateUser");
-      assertThat(source).contains("$input: CreateUserInput!");
-      assertThat(source).contains("createUser(input: $input)");
-      assertThat(source).contains("projection.toGraphQL()");
+      assertThat(source)
+          .contains("public String toGraphQL()")
+          .contains("mutation CreateUser")
+          .contains("$input: CreateUserInput!")
+          .contains("createUser(input: $input)")
+          .contains("projection.toGraphQL()");
     }
 
     @Test
@@ -178,8 +181,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public Map<String, Object> variables()");
-      assertThat(source).contains("vars.put(\"input\", input)");
+      assertThat(source)
+          .contains("public Map<String, Object> variables()")
+          .contains("vars.put(\"input\", input)");
     }
 
     @Test
@@ -192,8 +196,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public Class<UserDTO> responseType()");
-      assertThat(source).contains("return UserDTO.class");
+      assertThat(source)
+          .contains("public Class<UserDTO> responseType()")
+          .contains("return UserDTO.class");
     }
   }
 
@@ -224,8 +229,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public static Builder builder()");
-      assertThat(source).contains("return new Builder()");
+      assertThat(source)
+          .contains("public static Builder builder()")
+          .contains("return new Builder()");
     }
 
     @Test
@@ -238,9 +244,10 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public Builder input(CreateUserInput input)");
-      assertThat(source).contains("this.input = input");
-      assertThat(source).contains("return this;");
+      assertThat(source)
+          .contains("public Builder input(CreateUserInput input)")
+          .contains("this.input = input")
+          .contains("return this;");
     }
 
     @Test
@@ -267,8 +274,9 @@ class MutationGeneratorTest {
 
       String source = createUserMutation.toString();
 
-      assertThat(source).contains("public CreateUserMutation build()");
-      assertThat(source).contains("return new CreateUserMutation(this)");
+      assertThat(source)
+          .contains("public CreateUserMutation build()")
+          .contains("return new CreateUserMutation(this)");
     }
   }
 
@@ -287,9 +295,10 @@ class MutationGeneratorTest {
       String source = deleteUserMutation.toString();
 
       // deleteUser returns Boolean
-      assertThat(source).contains("implements GraphQLOperation<Boolean>");
-      assertThat(source).doesNotContain("projection");
-      assertThat(source).doesNotContain("selecting");
+      assertThat(source)
+          .contains("implements GraphQLOperation<Boolean>")
+          .doesNotContain("projection")
+          .doesNotContain("selecting");
     }
 
     @Test
@@ -378,9 +387,10 @@ class MutationGeneratorTest {
       String source = updateUserMutation.toString();
 
       // updateUser(id: ID!, input: UpdateUserInput!) has two arguments
-      assertThat(source).contains("private final String id;");
-      assertThat(source).contains("private final UpdateUserInput input;");
-      assertThat(source).contains("$id: ID!, $input: UpdateUserInput!");
+      assertThat(source)
+          .contains("private final String id;")
+          .contains("private final UpdateUserInput input;")
+          .contains("$id: ID!, $input: UpdateUserInput!");
     }
 
     @Test
