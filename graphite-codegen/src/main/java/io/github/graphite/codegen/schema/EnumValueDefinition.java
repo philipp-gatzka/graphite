@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * <pre>{@code
  * enum UserStatus {
  *   ACTIVE
- *   INACTIVE @deprecated(reason: "Use SUSPENDED instead")
+ *   INACTIVE &#64;deprecated(reason: "Use SUSPENDED instead")
  *   SUSPENDED
  * }
  * }</pre>
