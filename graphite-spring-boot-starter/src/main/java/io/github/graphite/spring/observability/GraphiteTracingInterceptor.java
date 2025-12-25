@@ -73,6 +73,7 @@ public class GraphiteTracingInterceptor {
   private static final String OP_TYPE_QUERY = "query";
   private static final String OP_TYPE_MUTATION = "mutation";
   private static final String OP_TYPE_SUBSCRIPTION = "subscription";
+  private static final String ANONYMOUS_QUERY_TYPE = "anonymous";
 
   /** Default span name. */
   public static final String SPAN_NAME = "graphite";
@@ -207,55 +208,72 @@ public class GraphiteTracingInterceptor {
 
     try {
       JsonNode json = objectMapper.readTree(body);
+      String name = extractOperationName(json);
+      String type = extractOperationType(json, name == null);
 
-      // Get operation name
-      String name = null;
-      JsonNode operationNameNode = json.get(OPERATION_NAME_FIELD);
-      if (operationNameNode != null && operationNameNode.isTextual()) {
-        name = operationNameNode.asText();
+      // Handle anonymous queries - return the real type but keep any provided name
+      if (ANONYMOUS_QUERY_TYPE.equals(type)) {
+        return new OperationInfo(name, OP_TYPE_QUERY);
       }
 
-      // Get operation type from query
-      String type = null;
-      JsonNode queryNode = json.get(QUERY_FIELD);
-      if (queryNode != null && queryNode.isTextual()) {
-        String query = queryNode.asText().trim();
-
-        // Skip leading comments
-        while (query.startsWith("#")) {
-          int newlineIndex = query.indexOf('\n');
-          if (newlineIndex == -1) {
-            break;
-          }
-          query = query.substring(newlineIndex + 1).trim();
-        }
-
-        if (query.startsWith(OP_TYPE_QUERY)) {
-          type = OP_TYPE_QUERY;
-          if (name == null) {
-            name = extractNameFromQuery(query, OP_TYPE_QUERY);
-          }
-        } else if (query.startsWith(OP_TYPE_MUTATION)) {
-          type = OP_TYPE_MUTATION;
-          if (name == null) {
-            name = extractNameFromQuery(query, OP_TYPE_MUTATION);
-          }
-        } else if (query.startsWith(OP_TYPE_SUBSCRIPTION)) {
-          type = OP_TYPE_SUBSCRIPTION;
-          if (name == null) {
-            name = extractNameFromQuery(query, OP_TYPE_SUBSCRIPTION);
-          }
-        } else if (query.startsWith("{")) {
-          // Anonymous query
-          type = OP_TYPE_QUERY;
+      // If we found a type but no name, try to extract from query
+      if (type != null && name == null) {
+        JsonNode queryNode = json.get(QUERY_FIELD);
+        if (queryNode != null && queryNode.isTextual()) {
+          name = extractNameFromQuery(skipComments(queryNode.asText().trim()), type);
         }
       }
 
       return new OperationInfo(name, type);
-
     } catch (Exception e) {
       return new OperationInfo(null, null);
     }
+  }
+
+  @Nullable
+  private String extractOperationName(JsonNode json) {
+    JsonNode operationNameNode = json.get(OPERATION_NAME_FIELD);
+    if (operationNameNode != null && operationNameNode.isTextual()) {
+      return operationNameNode.asText();
+    }
+    return null;
+  }
+
+  @Nullable
+  private String extractOperationType(JsonNode json, boolean needsName) {
+    JsonNode queryNode = json.get(QUERY_FIELD);
+    if (queryNode == null || !queryNode.isTextual()) {
+      return null;
+    }
+
+    String query = skipComments(queryNode.asText().trim());
+    return detectOperationType(query);
+  }
+
+  private String skipComments(String query) {
+    while (query.startsWith("#")) {
+      int newlineIndex = query.indexOf('\n');
+      if (newlineIndex == -1) {
+        break;
+      }
+      query = query.substring(newlineIndex + 1).trim();
+    }
+    return query;
+  }
+
+  @Nullable
+  private String detectOperationType(String query) {
+    if (query.startsWith(OP_TYPE_QUERY)) {
+      return OP_TYPE_QUERY;
+    } else if (query.startsWith(OP_TYPE_MUTATION)) {
+      return OP_TYPE_MUTATION;
+    } else if (query.startsWith(OP_TYPE_SUBSCRIPTION)) {
+      return OP_TYPE_SUBSCRIPTION;
+    } else if (query.startsWith("{")) {
+      // Anonymous query - return special marker
+      return ANONYMOUS_QUERY_TYPE;
+    }
+    return null;
   }
 
   /**

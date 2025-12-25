@@ -185,28 +185,10 @@ public final class SchemaParser {
   }
 
   private SchemaModel parseSchema(JsonNode schemaNode) {
-    // Parse query type (required)
-    JsonNode queryTypeNode = schemaNode.get(QUERY_TYPE_FIELD);
-    if (queryTypeNode == null || queryTypeNode.isNull()) {
-      throw new SchemaParseException("Missing 'queryType' field in schema");
-    }
-    String queryTypeName = getRequiredString(queryTypeNode, NAME_FIELD, "queryType");
+    String queryTypeName = parseQueryTypeName(schemaNode);
+    String mutationTypeName = parseOptionalTypeName(schemaNode, MUTATION_TYPE_FIELD);
+    String subscriptionTypeName = parseOptionalTypeName(schemaNode, SUBSCRIPTION_TYPE_FIELD);
 
-    // Parse mutation type (optional)
-    JsonNode mutationTypeNode = schemaNode.get(MUTATION_TYPE_FIELD);
-    String mutationTypeName =
-        (mutationTypeNode != null && !mutationTypeNode.isNull())
-            ? getString(mutationTypeNode, NAME_FIELD)
-            : null;
-
-    // Parse subscription type (optional)
-    JsonNode subscriptionTypeNode = schemaNode.get(SUBSCRIPTION_TYPE_FIELD);
-    String subscriptionTypeName =
-        (subscriptionTypeNode != null && !subscriptionTypeNode.isNull())
-            ? getString(subscriptionTypeNode, NAME_FIELD)
-            : null;
-
-    // Parse all types
     JsonNode typesNode = schemaNode.get(TYPES_FIELD);
     if (typesNode == null || !typesNode.isArray()) {
       throw new SchemaParseException("Missing or invalid 'types' array in schema");
@@ -268,6 +250,22 @@ public final class SchemaParser {
     return INTRINSIC_TYPES.contains(name)
         || name.startsWith("__")
         || ScalarDefinition.BUILT_IN_SCALARS.contains(name);
+  }
+
+  private String parseQueryTypeName(JsonNode schemaNode) {
+    JsonNode queryTypeNode = schemaNode.get(QUERY_TYPE_FIELD);
+    if (queryTypeNode == null || queryTypeNode.isNull()) {
+      throw new SchemaParseException("Missing 'queryType' field in schema");
+    }
+    return getRequiredString(queryTypeNode, NAME_FIELD, "queryType");
+  }
+
+  private String parseOptionalTypeName(JsonNode schemaNode, String fieldName) {
+    JsonNode typeNode = schemaNode.get(fieldName);
+    if (typeNode != null && !typeNode.isNull()) {
+      return getString(typeNode, NAME_FIELD);
+    }
+    return null;
   }
 
   private TypeDefinition parseObjectType(JsonNode node) {
