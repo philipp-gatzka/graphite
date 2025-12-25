@@ -346,9 +346,9 @@ public final class ProjectionGenerator {
 
   private String getBaseTypeName(TypeReference typeRef) {
     return switch (typeRef) {
-      case TypeReference.Named named -> named.name();
-      case TypeReference.NonNull nonNull -> getBaseTypeName(nonNull.inner());
-      case TypeReference.ListType listType -> getBaseTypeName(listType.inner());
+      case TypeReference.Named(String name) -> name;
+      case TypeReference.NonNull(TypeReference inner) -> getBaseTypeName(inner);
+      case TypeReference.ListType(TypeReference inner) -> getBaseTypeName(inner);
     };
   }
 
