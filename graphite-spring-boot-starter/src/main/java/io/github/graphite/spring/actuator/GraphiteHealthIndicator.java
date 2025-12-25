@@ -134,6 +134,14 @@ public class GraphiteHealthIndicator extends AbstractHealthIndicator {
             .withDetail("reason", "Non-2xx response");
       }
 
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      long responseTime = System.currentTimeMillis() - startTime;
+      builder
+          .down(e)
+          .withDetail("url", url)
+          .withDetail("responseTime", responseTime + "ms")
+          .withDetail("reason", "Interrupted");
     } catch (Exception e) {
       long responseTime = System.currentTimeMillis() - startTime;
       builder
