@@ -107,11 +107,8 @@ class TypeGeneratorTest {
 
       String source = userFile.toString();
 
-      // Should be a record
-      assertThat(source).contains("public record UserDTO(");
-
-      // Should have expected fields
       assertThat(source)
+          .contains("public record UserDTO(")
           .contains("String id")
           .contains("String name")
           .contains("String email")
