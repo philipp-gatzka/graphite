@@ -238,12 +238,12 @@ public class GraphiteAssertions {
             "Error index " + index + " out of bounds, only " + errorList.size() + " errors");
       }
       Object error = errorList.get(index);
-      if (error instanceof GraphQLError) {
-        return new GraphiteErrorAssert((GraphQLError) error);
+      if (error instanceof GraphQLError graphQLError) {
+        return new GraphiteErrorAssert(graphQLError);
       }
-      if (error instanceof Map) {
+      if (error instanceof Map<?, ?> map) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> errorMap = (Map<String, Object>) error;
+        Map<String, Object> errorMap = (Map<String, Object>) map;
         return new GraphiteErrorAssert(mapToGraphQLError(errorMap));
       }
       throw new AssertionError("Unexpected error type: " + error.getClass());
