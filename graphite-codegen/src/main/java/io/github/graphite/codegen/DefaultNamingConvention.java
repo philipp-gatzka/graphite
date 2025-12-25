@@ -121,20 +121,22 @@ final class DefaultNamingConvention implements NamingConvention {
   @Override
   @NotNull
   public String getEnumName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
-    return capitalize(graphQLName);
+    return getCapitalizedName(graphQLName);
   }
 
   @Override
   @NotNull
   public String getInterfaceName(@NotNull String graphQLName) {
-    Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
-    return capitalize(graphQLName);
+    return getCapitalizedName(graphQLName);
   }
 
   @Override
   @NotNull
   public String getUnionName(@NotNull String graphQLName) {
+    return getCapitalizedName(graphQLName);
+  }
+
+  private String getCapitalizedName(String graphQLName) {
     Objects.requireNonNull(graphQLName, GRAPHQL_NAME_NULL_MSG);
     return capitalize(graphQLName);
   }
