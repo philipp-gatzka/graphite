@@ -222,13 +222,8 @@ public final class SchemaParser {
     for (JsonNode typeNode : typesNode) {
       String name = getRequiredString(typeNode, NAME_FIELD, "type");
 
-      // Skip intrinsic types
-      if (INTRINSIC_TYPES.contains(name) || name.startsWith("__")) {
-        continue;
-      }
-
-      // Skip built-in scalars
-      if (ScalarDefinition.BUILT_IN_SCALARS.contains(name)) {
+      // Skip intrinsic types and built-in scalars
+      if (isSkippableType(name)) {
         continue;
       }
 
@@ -267,6 +262,12 @@ public final class SchemaParser {
         interfaces,
         unions,
         scalars);
+  }
+
+  private boolean isSkippableType(String name) {
+    return INTRINSIC_TYPES.contains(name)
+        || name.startsWith("__")
+        || ScalarDefinition.BUILT_IN_SCALARS.contains(name);
   }
 
   private TypeDefinition parseObjectType(JsonNode node) {
