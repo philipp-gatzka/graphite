@@ -25,9 +25,9 @@ micrometer-tracing = "1.4.1"
 javapoet = "0.6.0"
 
 # Testing
-junit = "5.11.4"
-assertj = "3.27.0"
-mockito = "5.15.2"
+junit = "6.0.1"
+assertj = "3.27.6"
+mockito = "5.21.0"
 wiremock = "3.10.0"
 awaitility = "4.2.2"
 
