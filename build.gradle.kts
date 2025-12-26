@@ -33,6 +33,7 @@ plugins {
     id("jacoco-report-aggregation")
     alias(libs.plugins.owasp.dependency.check)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.release)
 }
 
 description = "Graphite - Type-safe GraphQL client for Spring Boot"
@@ -105,4 +106,16 @@ sonar {
         // Exclude generated code and build directories
         property("sonar.exclusions", "**/build/**,**/generated/**")
     }
+}
+
+// Configure release plugin
+release {
+    git {
+        requireBranch.set("main")
+    }
+}
+
+// Publish all subprojects after release build
+tasks.named("afterReleaseBuild") {
+    dependsOn(subprojects.mapNotNull { it.tasks.findByName("publish") })
 }
