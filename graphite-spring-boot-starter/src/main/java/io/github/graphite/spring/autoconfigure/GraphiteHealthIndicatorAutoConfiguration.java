@@ -17,12 +17,11 @@ package io.github.graphite.spring.autoconfigure;
 
 import io.github.graphite.GraphiteClient;
 import io.github.graphite.spring.actuator.GraphiteHealthIndicator;
-import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
-import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -33,7 +32,6 @@ import org.springframework.context.annotation.Bean;
  * <ul>
  *   <li>Spring Boot Actuator's {@link HealthIndicator} is on the classpath
  *   <li>{@link GraphiteClient} is on the classpath
- *   <li>The graphite health indicator is enabled (default: true)
  *   <li>The {@code graphite.url} property is configured
  * </ul>
  *
@@ -52,18 +50,11 @@ import org.springframework.context.annotation.Bean;
  * }
  * }</pre>
  *
- * <p>To disable the health indicator:
- *
- * <pre>{@code
- * management.health.graphite.enabled=false
- * }</pre>
- *
  * @see GraphiteHealthIndicator
  * @see GraphiteAutoConfiguration
  */
 @AutoConfiguration(after = GraphiteAutoConfiguration.class)
 @ConditionalOnClass({HealthIndicator.class, GraphiteClient.class})
-@ConditionalOnEnabledHealthIndicator("graphite")
 @ConditionalOnProperty(prefix = "graphite", name = "url")
 public class GraphiteHealthIndicatorAutoConfiguration {
 
