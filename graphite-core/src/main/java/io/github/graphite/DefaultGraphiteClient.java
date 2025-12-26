@@ -43,6 +43,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link GraphiteClient}.
@@ -65,6 +67,7 @@ import org.jetbrains.annotations.Nullable;
  */
 final class DefaultGraphiteClient implements GraphiteClient {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultGraphiteClient.class);
   private static final String CONTENT_TYPE_JSON = "application/json";
 
   private final GraphiteConfiguration configuration;
@@ -106,9 +109,16 @@ final class DefaultGraphiteClient implements GraphiteClient {
     Objects.requireNonNull(operation, "operation must not be null");
     ensureNotClosed();
 
+    String operationName = operation.operationName();
+    LOG.debug("Executing GraphQL operation: {}", operationName);
+
     try {
       // Step 1: Serialize operation to JSON
       String requestBody = serializeOperation(operation);
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("Operation query: {}", operation.toGraphQL());
+        LOG.trace("Operation variables: {}", operation.variables());
+      }
 
       // Step 2: Create HTTP request with headers
       HttpRequest request = createRequest(requestBody);
@@ -126,11 +136,19 @@ final class DefaultGraphiteClient implements GraphiteClient {
       response = applyResponseInterceptors(response);
 
       // Step 7: Deserialize response and return
-      return deserializeResponse(response, operation.responseType());
+      GraphiteResponse<T> result = deserializeResponse(response, operation.responseType());
+      if (result.hasErrors()) {
+        LOG.debug("Operation {} completed with {} errors", operationName, result.errors().size());
+      } else {
+        LOG.debug("Operation {} completed successfully", operationName);
+      }
+      return result;
 
     } catch (GraphiteException e) {
+      LOG.debug("Operation {} failed: {}", operationName, e.getMessage());
       throw e;
     } catch (Exception e) {
+      LOG.debug("Operation {} failed with unexpected error: {}", operationName, e.getMessage());
       throw new GraphiteClientException("Failed to execute GraphQL operation", e);
     }
   }
@@ -225,23 +243,29 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   private int retryOrThrow(
       RetryPolicy retryPolicy, RetryListener listener, GraphiteException e, int attempt) {
-    if (!retryPolicy.shouldRetry(e, attempt + 1)) {
-      // Retries exhausted - notify listener if any retries were attempted
+    int nextAttempt = attempt + 1;
+    if (!retryPolicy.shouldRetry(e, nextAttempt)) {
+      LOG.debug("Retry exhausted after {} attempts: {}", attempt, e.getMessage());
+      // Notify listener if any retries were attempted
       if (attempt > 0 && listener != null) {
-        listener.onRetryExhausted(attempt + 1, e);
+        listener.onRetryExhausted(nextAttempt, e);
       }
       throw e;
     }
-    attempt++;
-    Duration delay = retryPolicy.getDelay(attempt);
+    Duration delay = retryPolicy.getDelay(nextAttempt);
+    LOG.debug(
+        "Retry attempt {} after {}ms delay due to: {}",
+        nextAttempt,
+        delay.toMillis(),
+        e.getMessage());
 
     // Notify listener about retry attempt
     if (listener != null) {
-      listener.onRetryAttempt(attempt, e, delay);
+      listener.onRetryAttempt(nextAttempt, e, delay);
     }
 
     sleepForRetry(delay);
-    return attempt;
+    return nextAttempt;
   }
 
   private void sleepForRetry(Duration delay) {
@@ -249,6 +273,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
       Thread.sleep(delay.toMillis());
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+      LOG.debug("Retry sleep interrupted");
       throw new GraphiteClientException("Retry interrupted", e);
     }
   }
