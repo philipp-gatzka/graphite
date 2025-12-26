@@ -309,40 +309,33 @@ public class GraphiteAssertions {
         if (current == null) {
           return null;
         }
-
-        // Handle array access like "users[0]"
-        if (part.contains("[")) {
-          int bracketStart = part.indexOf('[');
-          int bracketEnd = part.indexOf(']');
-          String fieldName = part.substring(0, bracketStart);
-          int index = Integer.parseInt(part.substring(bracketStart + 1, bracketEnd));
-
-          if (current instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) current;
-            current = map.get(fieldName);
-          }
-
-          if (current instanceof List) {
-            List<?> list = (List<?>) current;
-            if (index < list.size()) {
-              current = list.get(index);
-            } else {
-              return null;
-            }
-          }
-        } else {
-          if (current instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) current;
-            current = map.get(part);
-          } else {
-            return null;
-          }
-        }
+        current =
+            part.contains("[") ? navigateArrayAccess(current, part) : navigateField(current, part);
       }
 
       return current;
+    }
+
+    @Nullable
+    private Object navigateArrayAccess(@NotNull Object current, @NotNull String part) {
+      int bracketStart = part.indexOf('[');
+      int bracketEnd = part.indexOf(']');
+      String fieldName = part.substring(0, bracketStart);
+      int index = Integer.parseInt(part.substring(bracketStart + 1, bracketEnd));
+
+      Object fieldValue = navigateField(current, fieldName);
+      if (fieldValue instanceof List<?> list && index < list.size()) {
+        return list.get(index);
+      }
+      return null;
+    }
+
+    @Nullable
+    private Object navigateField(@NotNull Object current, @NotNull String fieldName) {
+      if (current instanceof Map<?, ?> map) {
+        return map.get(fieldName);
+      }
+      return null;
     }
 
     @NotNull
