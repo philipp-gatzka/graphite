@@ -81,7 +81,7 @@ class FixedBackoffTest {
     @Test
     @DisplayName("should have expected default constant")
     void shouldHaveExpectedDefaultConstant() {
-      assertThat(FixedBackoff.DEFAULT_DELAY).isEqualTo(Duration.ofSeconds(1));
+      assertThat(Duration.ofSeconds(1)).isEqualTo(FixedBackoff.DEFAULT_DELAY);
     }
   }
 
@@ -153,8 +153,7 @@ class FixedBackoffTest {
       var backoff1 = FixedBackoff.of(Duration.ofMillis(500));
       var backoff2 = FixedBackoff.of(Duration.ofMillis(500));
 
-      assertThat(backoff1).isEqualTo(backoff2);
-      assertThat(backoff1.hashCode()).isEqualTo(backoff2.hashCode());
+      assertThat(backoff1).isEqualTo(backoff2).hasSameHashCodeAs(backoff2);
     }
 
     @Test

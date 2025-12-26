@@ -242,7 +242,7 @@ public record RetryPolicy(
      * @return this builder
      */
     public Builder retryOnAllErrors() {
-      this.retryPredicate = throwable -> throwable instanceof GraphiteException;
+      this.retryPredicate = GraphiteException.class::isInstance;
       return this;
     }
 

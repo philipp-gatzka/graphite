@@ -50,7 +50,7 @@ class RetryPolicyTest {
     void shouldAllowZeroMaxAttempts() {
       var policy = new RetryPolicy(0, BackoffStrategy.fixed(Duration.ofMillis(100)), t -> true);
 
-      assertThat(policy.maxAttempts()).isEqualTo(0);
+      assertThat(policy.maxAttempts()).isZero();
       assertThat(policy.isEnabled()).isFalse();
     }
 
@@ -90,7 +90,7 @@ class RetryPolicyTest {
     void shouldReturnPolicyWithNoRetries() {
       var policy = RetryPolicy.disabled();
 
-      assertThat(policy.maxAttempts()).isEqualTo(0);
+      assertThat(policy.maxAttempts()).isZero();
       assertThat(policy.isEnabled()).isFalse();
       assertThat(policy.shouldRetry(new RuntimeException(), 1)).isFalse();
     }
@@ -157,7 +157,7 @@ class RetryPolicyTest {
       var policy =
           RetryPolicy.builder()
               .maxAttempts(3)
-              .retryPredicate(t -> t instanceof GraphiteConnectionException)
+              .retryPredicate(GraphiteConnectionException.class::isInstance)
               .build();
 
       assertThat(policy.shouldRetry(new GraphiteConnectionException("Error", null, "host", 80), 1))
@@ -289,7 +289,7 @@ class RetryPolicyTest {
     void shouldConfigureNoRetry() {
       var policy = RetryPolicy.builder().noRetry().build();
 
-      assertThat(policy.maxAttempts()).isEqualTo(0);
+      assertThat(policy.maxAttempts()).isZero();
       assertThat(policy.isEnabled()).isFalse();
       assertThat(policy.shouldRetry(new GraphiteException("Error"), 1)).isFalse();
     }

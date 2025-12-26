@@ -56,6 +56,7 @@ import org.jetbrains.annotations.Nullable;
 public class GraphiteResponseBuilder {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final String ROOT_KEY = "_root";
 
   private final Map<String, Object> data;
   private final List<GraphQLError> errors;
@@ -143,7 +144,7 @@ public class GraphiteResponseBuilder {
     } else if (data != null) {
       // For non-map data, we need to wrap it or handle specially
       this.data.clear();
-      this.data.put("_root", data);
+      this.data.put(ROOT_KEY, data);
     }
     return this;
   }
@@ -229,8 +230,8 @@ public class GraphiteResponseBuilder {
     if (data.isEmpty()) {
       return null;
     }
-    if (data.size() == 1 && data.containsKey("_root")) {
-      return data.get("_root");
+    if (data.size() == 1 && data.containsKey(ROOT_KEY)) {
+      return data.get(ROOT_KEY);
     }
     return new LinkedHashMap<>(data);
   }
@@ -294,8 +295,8 @@ public class GraphiteResponseBuilder {
       Map<String, Object> response = new LinkedHashMap<>();
 
       if (!data.isEmpty()) {
-        if (data.size() == 1 && data.containsKey("_root")) {
-          response.put("data", data.get("_root"));
+        if (data.size() == 1 && data.containsKey(ROOT_KEY)) {
+          response.put("data", data.get(ROOT_KEY));
         } else {
           response.put("data", data);
         }
@@ -327,8 +328,8 @@ public class GraphiteResponseBuilder {
     Map<String, Object> response = new LinkedHashMap<>();
 
     if (!data.isEmpty()) {
-      if (data.size() == 1 && data.containsKey("_root")) {
-        response.put("data", data.get("_root"));
+      if (data.size() == 1 && data.containsKey(ROOT_KEY)) {
+        response.put("data", data.get(ROOT_KEY));
       } else {
         response.put("data", data);
       }

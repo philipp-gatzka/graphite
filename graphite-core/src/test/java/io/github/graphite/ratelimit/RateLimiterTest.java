@@ -257,7 +257,7 @@ class RateLimiterTest {
       for (int i = 0; i < 10; i++) {
         limiter.tryAcquire();
       }
-      assertThat(limiter.availablePermits()).isEqualTo(0);
+      assertThat(limiter.availablePermits()).isZero();
 
       // Wait for refill using Awaitility
       await()
