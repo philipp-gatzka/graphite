@@ -73,8 +73,9 @@ class RetryPolicyTest {
     @Test
     @DisplayName("should reject negative max attempts")
     void shouldRejectNegativeMaxAttempts() {
-      assertThatThrownBy(
-              () -> new RetryPolicy(-1, BackoffStrategy.fixed(Duration.ofMillis(100)), t -> true))
+      var backoff = BackoffStrategy.fixed(Duration.ofMillis(100));
+
+      assertThatThrownBy(() -> new RetryPolicy(-1, backoff, t -> true))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("maxAttempts must not be negative");
     }
@@ -198,7 +199,9 @@ class RetryPolicyTest {
     @Test
     @DisplayName("should reject negative max attempts in builder")
     void shouldRejectNegativeMaxAttemptsInBuilder() {
-      assertThatThrownBy(() -> RetryPolicy.builder().maxAttempts(-1))
+      var builder = RetryPolicy.builder();
+
+      assertThatThrownBy(() -> builder.maxAttempts(-1))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("maxAttempts must not be negative");
     }
