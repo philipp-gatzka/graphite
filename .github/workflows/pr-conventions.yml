@@ -23,13 +23,15 @@ jobs:
         id: branch
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
-          if [[ ! "$BRANCH_NAME" =~ ^[0-9] ]]; then
-            echo "❌ Branch name must start with a number: '$BRANCH_NAME'"
+          if [[ ! "$BRANCH_NAME" =~ ^[0-9]+-[a-zA-Z0-9-]+$ ]]; then
+            echo "❌ Invalid branch name: '$BRANCH_NAME'"
             echo ""
-            echo "Examples of valid branch names:"
-            echo "  123-feature-name"
-            echo "  456/fix-bug"
-            echo "  789_add-tests"
+            echo "Branch name must:"
+            echo "  - Start with an issue number"
+            echo "  - Followed by a hyphen"
+            echo "  - Contain only letters, numbers, and hyphens"
+            echo ""
+            echo "Example: 123-feature-name"
             exit 1
           fi
           echo "✅ Branch name is valid: '$BRANCH_NAME'"
