@@ -26,6 +26,7 @@ import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.TypeDefinition;
 import io.github.graphite.codegen.schema.TypeReference;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -150,7 +151,7 @@ public final class ProjectionGenerator {
           <p>$L
           """,
           type.name(),
-          escapeJavadoc(type.description()));
+          GeneratorUtils.escapeJavadoc(type.description()));
     } else {
       classBuilder.addJavadoc("Projection for selecting fields from {@code $L}.\n", type.name());
     }
@@ -295,7 +296,8 @@ public final class ProjectionGenerator {
             .addStatement("return this");
 
     if (field.description() != null && !field.description().isBlank()) {
-      method.addJavadoc(escapeJavadoc(field.description()) + "\n\n@return this builder\n");
+      method.addJavadoc(
+          GeneratorUtils.escapeJavadoc(field.description()) + "\n\n@return this builder\n");
     } else {
       method.addJavadoc("Selects the $N field.\n\n@return this builder\n", field.name());
     }
@@ -327,7 +329,7 @@ public final class ProjectionGenerator {
           @param config the nested projection configuration
           @return this builder
           """
-              .formatted(escapeJavadoc(field.description())));
+              .formatted(GeneratorUtils.escapeJavadoc(field.description())));
     } else {
       method.addJavadoc(
           """
@@ -371,12 +373,5 @@ public final class ProjectionGenerator {
       case TypeReference.NonNull(TypeReference inner) -> getBaseTypeName(inner);
       case TypeReference.ListType(TypeReference inner) -> getBaseTypeName(inner);
     };
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }
