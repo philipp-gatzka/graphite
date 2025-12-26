@@ -2,6 +2,7 @@
 .gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
+buildSrc/.kotlin/
 
 # IDE
 .idea/
