@@ -11,8 +11,12 @@ permissions:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build and Test (Spring Boot ${{ matrix.spring-boot }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        spring-boot: ['3.2.12', '3.3.7', '3.4.1']
 
     steps:
       - name: Checkout
@@ -32,7 +36,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Build and test
-        run: ./gradlew build
+        run: ./gradlew build -PspringBootVersion=${{ matrix.spring-boot }}
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
