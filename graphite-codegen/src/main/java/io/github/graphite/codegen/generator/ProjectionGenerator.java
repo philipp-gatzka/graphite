@@ -170,7 +170,8 @@ public final class ProjectionGenerator {
       if (fieldProjectionType != null) {
         ClassName fieldProjectionClass = ClassName.get(packageName, fieldProjectionType);
         classBuilder.addField(
-            FieldSpec.builder(fieldProjectionClass, field.name() + "Projection", Modifier.PRIVATE)
+            FieldSpec.builder(
+                    fieldProjectionClass, field.name() + PROJECTION_SUFFIX, Modifier.PRIVATE)
                 .build());
       }
     }
@@ -220,11 +221,11 @@ public final class ProjectionGenerator {
 
     // Add nested projections
     for (FieldDefinition field : objectFields) {
-      method.beginControlFlow("if ($N != null)", field.name() + "Projection");
+      method.beginControlFlow("if ($N != null)", field.name() + PROJECTION_SUFFIX);
       method.addStatement(
           "sb.append($S).append($N.toGraphQL()).append(\" \")",
           field.name() + " ",
-          field.name() + "Projection");
+          field.name() + PROJECTION_SUFFIX);
       method.endControlFlow();
     }
 
@@ -315,7 +316,7 @@ public final class ProjectionGenerator {
             .returns(builderClassName)
             .addStatement("$T builder = $T.builder()", fieldBuilderClass, fieldProjectionClass)
             .addStatement("config.accept(builder)")
-            .addStatement("projection.$N = builder.build()", field.name() + "Projection")
+            .addStatement("projection.$N = builder.build()", field.name() + PROJECTION_SUFFIX)
             .addStatement("return this");
 
     if (field.description() != null && !field.description().isBlank()) {

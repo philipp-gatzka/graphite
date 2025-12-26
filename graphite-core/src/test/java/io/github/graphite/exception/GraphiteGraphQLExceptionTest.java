@@ -76,7 +76,9 @@ class GraphiteGraphQLExceptionTest {
     @Test
     @DisplayName("should throw when errors is empty")
     void shouldThrowWhenErrorsIsEmpty() {
-      assertThatThrownBy(() -> new GraphiteGraphQLException(List.of()))
+      List<GraphQLError> emptyErrors = List.of();
+
+      assertThatThrownBy(() -> new GraphiteGraphQLException(emptyErrors))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("errors must not be null or empty");
     }
@@ -230,9 +232,9 @@ class GraphiteGraphQLExceptionTest {
     void errorsListShouldBeUnmodifiable() {
       var error = new GraphQLError("Error", null, null, null);
       var exception = new GraphiteGraphQLException(List.of(error));
+      var errors = exception.getErrors();
 
-      assertThatThrownBy(() -> exception.getErrors().add(error))
-          .isInstanceOf(UnsupportedOperationException.class);
+      assertThatThrownBy(() -> errors.add(error)).isInstanceOf(UnsupportedOperationException.class);
     }
   }
 }
