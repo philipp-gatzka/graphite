@@ -1,0 +1,124 @@
+name: PR Conventions
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: PR Conventions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: read
+
+    steps:
+      - name: Validate branch name
+        id: branch
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          if [[ ! "$BRANCH_NAME" =~ ^[0-9] ]]; then
+            echo "❌ Branch name must start with a number: '$BRANCH_NAME'"
+            echo ""
+            echo "Examples of valid branch names:"
+            echo "  123-feature-name"
+            echo "  456/fix-bug"
+            echo "  789_add-tests"
+            exit 1
+          fi
+          echo "✅ Branch name is valid: '$BRANCH_NAME'"
+          
+          ISSUE_NUMBER=$(echo "$BRANCH_NAME" | grep -oE '^[0-9]+')
+          echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Verify issue exists and is open
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.branch.outputs.issue_number }}
+        run: |
+          echo "Checking if issue #$ISSUE_NUMBER exists and is open..."
+          
+          ISSUE_JSON=$(gh issue view "$ISSUE_NUMBER" --repo "${{ github.repository }}" --json state,title 2>/dev/null) || {
+            echo "❌ Issue #$ISSUE_NUMBER does not exist"
+            echo ""
+            echo "Please create issue #$ISSUE_NUMBER before opening this PR."
+            exit 1
+          }
+          
+          ISSUE_STATE=$(echo "$ISSUE_JSON" | jq -r '.state')
+          ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.title')
+          
+          if [[ "$ISSUE_STATE" != "OPEN" ]]; then
+            echo "❌ Issue #$ISSUE_NUMBER is closed"
+            echo ""
+            echo "Please create a new issue and a new branch with the new issue number."
+            exit 1
+          fi
+          
+          echo "✅ Issue #$ISSUE_NUMBER exists and is open"
+          echo "issue_title=$ISSUE_TITLE" >> "$GITHUB_OUTPUT"
+
+      - name: Validate PR title
+        env:
+          ISSUE_NUMBER: ${{ steps.branch.outputs.issue_number }}
+          ISSUE_TITLE: ${{ steps.issue.outputs.issue_title }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          EXPECTED_TITLE="#$ISSUE_NUMBER $ISSUE_TITLE"
+          
+          echo "Checking PR title..."
+          
+          if [[ "$PR_TITLE" != "$EXPECTED_TITLE" ]]; then
+            echo "❌ PR title does not match expected format"
+            echo ""
+            echo "Expected: $EXPECTED_TITLE"
+            echo "Actual:   $PR_TITLE"
+            exit 1
+          fi
+          
+          echo "✅ PR title is valid"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        env:
+          ISSUE_NUMBER: ${{ steps.branch.outputs.issue_number }}
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          
+          echo "Checking commit messages start with #$ISSUE_NUMBER..."
+          
+          INVALID_COMMITS=()
+          
+          while IFS= read -r line; do
+            COMMIT_SHA=$(echo "$line" | cut -d' ' -f1)
+            COMMIT_MSG=$(echo "$line" | cut -d' ' -f2-)
+            
+            if [[ ! "$COMMIT_MSG" =~ ^#$ISSUE_NUMBER[[:space:]] ]]; then
+              INVALID_COMMITS+=("$COMMIT_SHA: $COMMIT_MSG")
+            fi
+          done < <(git log --format="%h %s" "$BASE_SHA".."$HEAD_SHA")
+          
+          if [[ ${#INVALID_COMMITS[@]} -gt 0 ]]; then
+            echo "❌ The following commits do not start with #$ISSUE_NUMBER:"
+            echo ""
+            for commit in "${INVALID_COMMITS[@]}"; do
+              echo "  $commit"
+            done
+            echo ""
+            echo "Expected format: #$ISSUE_NUMBER <message>"
+            echo "Example: #$ISSUE_NUMBER Did some work"
+            exit 1
+          fi
+          
+          echo "✅ All commit messages are valid"
