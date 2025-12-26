@@ -108,10 +108,12 @@ class HttpTransportConfigTest {
     @Test
     @DisplayName("should reject negative connectTimeout")
     void shouldRejectNegativeConnectTimeout() {
+      var negativeConnect = Duration.ofSeconds(-1);
+      var readTimeout = Duration.ofSeconds(30);
+      var requestTimeout = Duration.ofSeconds(60);
+
       assertThatThrownBy(
-              () ->
-                  new HttpTransportConfig(
-                      Duration.ofSeconds(-1), Duration.ofSeconds(30), Duration.ofSeconds(60)))
+              () -> new HttpTransportConfig(negativeConnect, readTimeout, requestTimeout))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("connectTimeout must not be negative");
     }
@@ -119,10 +121,12 @@ class HttpTransportConfigTest {
     @Test
     @DisplayName("should reject negative readTimeout")
     void shouldRejectNegativeReadTimeout() {
+      var connectTimeout = Duration.ofSeconds(10);
+      var negativeRead = Duration.ofSeconds(-1);
+      var requestTimeout = Duration.ofSeconds(60);
+
       assertThatThrownBy(
-              () ->
-                  new HttpTransportConfig(
-                      Duration.ofSeconds(10), Duration.ofSeconds(-1), Duration.ofSeconds(60)))
+              () -> new HttpTransportConfig(connectTimeout, negativeRead, requestTimeout))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("readTimeout must not be negative");
     }
@@ -130,10 +134,12 @@ class HttpTransportConfigTest {
     @Test
     @DisplayName("should reject negative requestTimeout")
     void shouldRejectNegativeRequestTimeout() {
+      var connectTimeout = Duration.ofSeconds(10);
+      var readTimeout = Duration.ofSeconds(30);
+      var negativeRequest = Duration.ofSeconds(-1);
+
       assertThatThrownBy(
-              () ->
-                  new HttpTransportConfig(
-                      Duration.ofSeconds(10), Duration.ofSeconds(30), Duration.ofSeconds(-1)))
+              () -> new HttpTransportConfig(connectTimeout, readTimeout, negativeRequest))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("requestTimeout must not be negative");
     }
