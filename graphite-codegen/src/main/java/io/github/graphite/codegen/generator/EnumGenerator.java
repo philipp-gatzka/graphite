@@ -25,6 +25,7 @@ import io.github.graphite.codegen.CodegenConfiguration;
 import io.github.graphite.codegen.schema.EnumDefinition;
 import io.github.graphite.codegen.schema.EnumValueDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -113,7 +114,7 @@ public final class EnumGenerator {
 
     // Add JavaDoc
     if (enumDef.description() != null && !enumDef.description().isBlank()) {
-      enumBuilder.addJavadoc(escapeJavadoc(enumDef.description()) + "\n");
+      enumBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(enumDef.description()) + "\n");
     }
 
     // Add enum constants
@@ -137,7 +138,7 @@ public final class EnumGenerator {
 
     // Add JavaDoc if present
     if (value.description() != null && !value.description().isBlank()) {
-      constantBuilder.addJavadoc(escapeJavadoc(value.description()) + "\n");
+      constantBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(value.description()) + "\n");
     }
 
     // Add deprecation annotation if deprecated
@@ -183,12 +184,5 @@ public final class EnumGenerator {
             @return the enum constant name
             """)
         .build();
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }

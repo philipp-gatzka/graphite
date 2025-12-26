@@ -27,6 +27,7 @@ import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.TypeDefinition;
 import io.github.graphite.codegen.schema.UnionDefinition;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -124,7 +125,7 @@ public final class TypeGenerator {
 
     // Add JavaDoc
     if (type.description() != null && !type.description().isBlank()) {
-      recordBuilder.addJavadoc(escapeJavadoc(type.description()) + "\n");
+      recordBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(type.description()) + "\n");
     }
 
     // Generate record components via record constructor
@@ -201,18 +202,5 @@ public final class TypeGenerator {
       }
     }
     return unions;
-  }
-
-  /**
-   * Escapes special characters in JavaDoc content.
-   *
-   * @param text the text to escape
-   * @return the escaped text
-   */
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }
