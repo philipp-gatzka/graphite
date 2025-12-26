@@ -29,6 +29,7 @@ import io.github.graphite.http.HttpTransport;
 import io.github.graphite.http.HttpTransportConfig;
 import io.github.graphite.interceptor.RequestInterceptor;
 import io.github.graphite.interceptor.ResponseInterceptor;
+import io.github.graphite.logging.GraphiteMdc;
 import io.github.graphite.ratelimit.RateLimiter;
 import io.github.graphite.retry.RetryListener;
 import io.github.graphite.retry.RetryPolicy;
@@ -105,14 +106,16 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   @Override
   @NotNull
+  @SuppressWarnings("try")
   public <T> GraphiteResponse<T> execute(@NotNull GraphQLOperation<T> operation) {
     Objects.requireNonNull(operation, "operation must not be null");
     ensureNotClosed();
 
     String operationName = operation.operationName();
-    LOG.debug("Executing GraphQL operation: {}", operationName);
 
-    try {
+    try (GraphiteMdc.Context ignored = GraphiteMdc.start(operationName)) {
+      LOG.debug("Executing GraphQL operation: {}", operationName);
+
       // Step 1: Serialize operation to JSON
       String requestBody = serializeOperation(operation);
       if (LOG.isTraceEnabled()) {
