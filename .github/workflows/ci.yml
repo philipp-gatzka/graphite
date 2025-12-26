@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-matrix:
     name: Build and Test (Spring Boot ${{ matrix.spring-boot }})
     runs-on: ubuntu-latest
     strategy:
@@ -46,6 +46,14 @@ jobs:
           path: '**/build/reports/tests/'
           retention-days: 7
 
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: [build-matrix]
+    steps:
+      - name: All builds passed
+        run: echo "All Spring Boot version builds passed successfully"
+
   verify:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -74,7 +82,7 @@ jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
-    needs: [build, verify]
+    needs: [build-matrix, verify]
 
     steps:
       - name: Checkout
