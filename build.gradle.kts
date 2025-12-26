@@ -47,7 +47,7 @@ dependencies {
 reporting {
     reports {
         register<JacocoCoverageReport>("jacocoAggregatedReport") {
-            testType.set(TestSuiteType.UNIT_TEST)
+            testSuiteName = "test"
         }
     }
 }
@@ -58,7 +58,7 @@ tasks.check {
 
 // Configure wrapper task
 tasks.wrapper {
-    gradleVersion = "8.12"
+    gradleVersion = "9.2.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 
