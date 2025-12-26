@@ -61,7 +61,9 @@ import org.jetbrains.annotations.Nullable;
 public class GraphiteMockServer implements AutoCloseable {
 
   private static final String GRAPHQL_PATH = "/graphql";
+  private static final String CONTENT_TYPE_HEADER = "Content-Type";
   private static final String CONTENT_TYPE_JSON = "application/json";
+  private static final String OPERATION_NAME_JSON_PATH = "OPERATION_NAME_JSON_PATH";
 
   private final WireMockServer wireMockServer;
   private final ObjectMapper objectMapper;
@@ -162,11 +164,12 @@ public class GraphiteMockServer implements AutoCloseable {
 
       wireMockServer.stubFor(
           post(urlEqualTo(GRAPHQL_PATH))
-              .withRequestBody(matchingJsonPath("$.operationName", WireMock.equalTo(operationName)))
+              .withRequestBody(
+                  matchingJsonPath(OPERATION_NAME_JSON_PATH, WireMock.equalTo(operationName)))
               .willReturn(
                   aResponse()
                       .withStatus(200)
-                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
       throw new GraphiteTestException("Failed to serialize response", e);
@@ -187,7 +190,7 @@ public class GraphiteMockServer implements AutoCloseable {
               .willReturn(
                   aResponse()
                       .withStatus(200)
-                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
       throw new GraphiteTestException("Failed to serialize response", e);
@@ -203,7 +206,8 @@ public class GraphiteMockServer implements AutoCloseable {
   public void stubHttpError(@NotNull String operationName, int statusCode) {
     wireMockServer.stubFor(
         post(urlEqualTo(GRAPHQL_PATH))
-            .withRequestBody(matchingJsonPath("$.operationName", WireMock.equalTo(operationName)))
+            .withRequestBody(
+                matchingJsonPath(OPERATION_NAME_JSON_PATH, WireMock.equalTo(operationName)))
             .willReturn(aResponse().withStatus(statusCode)));
   }
 
@@ -220,11 +224,12 @@ public class GraphiteMockServer implements AutoCloseable {
 
       wireMockServer.stubFor(
           post(urlEqualTo(GRAPHQL_PATH))
-              .withRequestBody(matchingJsonPath("$.operationName", WireMock.equalTo(operationName)))
+              .withRequestBody(
+                  matchingJsonPath(OPERATION_NAME_JSON_PATH, WireMock.equalTo(operationName)))
               .willReturn(
                   aResponse()
                       .withStatus(200)
-                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON)
                       .withBody(responseBody)
                       .withFixedDelay(delayMillis)));
     } catch (JsonProcessingException e) {
@@ -276,7 +281,7 @@ public class GraphiteMockServer implements AutoCloseable {
               .willReturn(
                   aResponse()
                       .withStatus(200)
-                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON)
                       .withBody(responseBody)));
     } catch (JsonProcessingException e) {
       throw new GraphiteTestException("Failed to serialize response", e);
@@ -311,7 +316,7 @@ public class GraphiteMockServer implements AutoCloseable {
               .willReturn(
                   aResponse()
                       .withStatus(200)
-                      .withHeader("Content-Type", CONTENT_TYPE_JSON)
+                      .withHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON)
                       .withBody(responseBody)
                       .withFixedDelay(delayMillis)));
     } catch (JsonProcessingException e) {
@@ -339,7 +344,8 @@ public class GraphiteMockServer implements AutoCloseable {
   public void verify(@NotNull String operationName, int times) {
     RequestPatternBuilder pattern =
         postRequestedFor(urlEqualTo(GRAPHQL_PATH))
-            .withRequestBody(matchingJsonPath("$.operationName", WireMock.equalTo(operationName)));
+            .withRequestBody(
+                matchingJsonPath(OPERATION_NAME_JSON_PATH, WireMock.equalTo(operationName)));
 
     WireMock.verify(times, pattern);
   }
@@ -352,7 +358,8 @@ public class GraphiteMockServer implements AutoCloseable {
   public void verifyCalled(@NotNull String operationName) {
     RequestPatternBuilder pattern =
         postRequestedFor(urlEqualTo(GRAPHQL_PATH))
-            .withRequestBody(matchingJsonPath("$.operationName", WireMock.equalTo(operationName)));
+            .withRequestBody(
+                matchingJsonPath(OPERATION_NAME_JSON_PATH, WireMock.equalTo(operationName)));
 
     WireMock.verify(pattern);
   }
