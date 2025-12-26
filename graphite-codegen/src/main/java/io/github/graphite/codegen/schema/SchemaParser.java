@@ -255,9 +255,9 @@ public final class SchemaParser {
   private String parseQueryTypeName(JsonNode schemaNode) {
     JsonNode queryTypeNode = schemaNode.get(QUERY_TYPE_FIELD);
     if (queryTypeNode == null || queryTypeNode.isNull()) {
-      throw new SchemaParseException("Missing 'queryType' field in schema");
+      throw new SchemaParseException("Missing '" + QUERY_TYPE_FIELD + "' field in schema");
     }
-    return getRequiredString(queryTypeNode, NAME_FIELD, "queryType");
+    return getRequiredString(queryTypeNode, NAME_FIELD, QUERY_TYPE_FIELD);
   }
 
   private String parseOptionalTypeName(JsonNode schemaNode, String fieldName) {
