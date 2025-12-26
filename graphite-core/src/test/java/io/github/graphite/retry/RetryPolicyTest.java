@@ -156,7 +156,7 @@ class RetryPolicyTest {
       var policy =
           RetryPolicy.builder()
               .maxAttempts(3)
-              .retryPredicate(t -> t instanceof GraphiteConnectionException)
+              .retryPredicate(GraphiteConnectionException.class::isInstance)
               .build();
 
       assertThat(policy.shouldRetry(new GraphiteConnectionException("Error", null, "host", 80), 1))
