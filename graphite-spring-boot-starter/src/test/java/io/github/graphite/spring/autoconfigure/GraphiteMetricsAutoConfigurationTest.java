@@ -32,7 +32,8 @@ class GraphiteMetricsAutoConfigurationTest {
 
   private final ApplicationContextRunner contextRunner =
       new ApplicationContextRunner()
-          .withConfiguration(AutoConfigurations.of(GraphiteMetricsAutoConfiguration.class));
+          .withConfiguration(AutoConfigurations.of(GraphiteMetricsAutoConfiguration.class))
+          .withBean(GraphiteProperties.class, GraphiteProperties::new);
 
   @Nested
   @DisplayName("when MeterRegistry is present")
