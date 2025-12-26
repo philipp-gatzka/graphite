@@ -92,8 +92,8 @@ sonar {
         // Coverage reporting
         property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml")
 
-        // SpotBugs reporting
-        property("sonar.java.spotbugs.reportPaths", "**/build/reports/spotbugs/*.xml")
+	// SpotBugs reporting
+        // property("sonar.java.spotbugs.reportPaths", "**/build/reports/spotbugs/*.xml")
 
         // Source encoding
         property("sonar.sourceEncoding", "UTF-8")
