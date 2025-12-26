@@ -39,9 +39,12 @@ plugins {
 
 group = "io.github.graphite"
 
+// Support for Java version override via Gradle property for compatibility testing
+val javaVersion = providers.gradleProperty("javaVersion").getOrElse("21").toInt()
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
     }
     withJavadocJar()
     withSourcesJar()
@@ -62,7 +65,7 @@ tasks.withType<Javadoc>().configureEach {
     options.encoding = "UTF-8"
     (options as StandardJavadocDocletOptions).apply {
         addStringOption("Xdoclint:all,-missing", "-quiet")
-        links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+        links("https://docs.oracle.com/en/java/javase/$javaVersion/docs/api/")
     }
 }
 
