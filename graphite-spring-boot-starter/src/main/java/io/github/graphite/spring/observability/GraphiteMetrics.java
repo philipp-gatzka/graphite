@@ -84,6 +84,9 @@ public class GraphiteMetrics {
   /** Default operation name when unknown. */
   public static final String UNKNOWN_OPERATION = "unknown";
 
+  private static final String REQUESTS_DESCRIPTION = "Total number of GraphQL requests";
+  private static final String DURATION_DESCRIPTION = "GraphQL request duration";
+
   private final MeterRegistry registry;
 
   /**
@@ -117,7 +120,7 @@ public class GraphiteMetrics {
     // Record request counter
     Counter.builder(REQUESTS_METRIC)
         .tags(List.of(Tag.of(TAG_OPERATION, op), Tag.of(TAG_STATUS, STATUS_SUCCESS)))
-        .description("Total number of GraphQL requests")
+        .description(REQUESTS_DESCRIPTION)
         .register(registry)
         .increment();
 
@@ -125,7 +128,7 @@ public class GraphiteMetrics {
     sample.stop(
         Timer.builder(DURATION_METRIC)
             .tags(List.of(Tag.of(TAG_OPERATION, op)))
-            .description("GraphQL request duration")
+            .description(DURATION_DESCRIPTION)
             .register(registry));
   }
 
@@ -144,7 +147,7 @@ public class GraphiteMetrics {
     // Record request counter as error
     Counter.builder(REQUESTS_METRIC)
         .tags(List.of(Tag.of(TAG_OPERATION, op), Tag.of(TAG_STATUS, STATUS_ERROR)))
-        .description("Total number of GraphQL requests")
+        .description(REQUESTS_DESCRIPTION)
         .register(registry)
         .increment();
 
@@ -159,7 +162,7 @@ public class GraphiteMetrics {
     sample.stop(
         Timer.builder(DURATION_METRIC)
             .tags(List.of(Tag.of(TAG_OPERATION, op)))
-            .description("GraphQL request duration")
+            .description(DURATION_DESCRIPTION)
             .register(registry));
   }
 
@@ -178,14 +181,14 @@ public class GraphiteMetrics {
     // Record request counter
     Counter.builder(REQUESTS_METRIC)
         .tags(List.of(Tag.of(TAG_OPERATION, op), Tag.of(TAG_STATUS, status)))
-        .description("Total number of GraphQL requests")
+        .description(REQUESTS_DESCRIPTION)
         .register(registry)
         .increment();
 
     // Record duration
     Timer.builder(DURATION_METRIC)
         .tags(List.of(Tag.of(TAG_OPERATION, op)))
-        .description("GraphQL request duration")
+        .description(DURATION_DESCRIPTION)
         .register(registry)
         .record(duration);
   }
