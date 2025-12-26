@@ -41,5 +41,5 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
     testImplementation(libs.wiremock)
-    testRuntimeOnly(libs.slf4j.simple)
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.15")
 }
