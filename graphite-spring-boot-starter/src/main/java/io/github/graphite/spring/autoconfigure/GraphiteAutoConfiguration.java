@@ -75,61 +75,62 @@ public class GraphiteAutoConfiguration {
   @ConditionalOnMissingBean
   public GraphiteClient graphiteClient(GraphiteProperties properties) {
     GraphiteClientBuilder builder = GraphiteClient.builder();
+    configureEndpoint(builder, properties);
+    configureHeaders(builder, properties.getHeaders());
+    configureTimeouts(builder, properties.getTimeout());
+    configureRetryPolicy(builder, properties.getRetry());
+    configureRateLimit(builder, properties.getRateLimit());
+    return builder.build();
+  }
 
-    // Configure endpoint
+  private void configureEndpoint(GraphiteClientBuilder builder, GraphiteProperties properties) {
     if (properties.getUrl() != null && !properties.getUrl().isBlank()) {
       builder.endpoint(URI.create(properties.getUrl()));
     }
+  }
 
-    // Configure headers
-    Map<String, String> headers = properties.getHeaders();
+  private void configureHeaders(GraphiteClientBuilder builder, Map<String, String> headers) {
     if (headers != null && !headers.isEmpty()) {
-      for (Map.Entry<String, String> entry : headers.entrySet()) {
-        builder.header(entry.getKey(), entry.getValue());
-      }
+      headers.forEach(builder::header);
     }
+  }
 
-    // Configure timeouts
-    GraphiteProperties.Timeout timeout = properties.getTimeout();
-    if (timeout != null) {
-      if (timeout.getConnect() != null) {
-        builder.connectTimeout(timeout.getConnect());
-      }
-      if (timeout.getRead() != null) {
-        builder.readTimeout(timeout.getRead());
-      }
-      if (timeout.getRequest() != null) {
-        builder.requestTimeout(timeout.getRequest());
-      }
+  private void configureTimeouts(
+      GraphiteClientBuilder builder, GraphiteProperties.Timeout timeout) {
+    if (timeout == null) {
+      return;
     }
+    if (timeout.getConnect() != null) {
+      builder.connectTimeout(timeout.getConnect());
+    }
+    if (timeout.getRead() != null) {
+      builder.readTimeout(timeout.getRead());
+    }
+    if (timeout.getRequest() != null) {
+      builder.requestTimeout(timeout.getRequest());
+    }
+  }
 
-    // Configure retry policy
-    GraphiteProperties.Retry retry = properties.getRetry();
-    if (retry != null && retry.isEnabled()) {
-      ExponentialBackoff backoff =
-          ExponentialBackoff.builder()
-              .initialDelay(retry.getInitialDelay())
-              .maxDelay(retry.getMaxDelay())
-              .multiplier(retry.getMultiplier())
-              .build();
-
-      RetryPolicy retryPolicy =
-          RetryPolicy.builder()
-              .maxAttempts(retry.getMaxAttempts())
-              .backoffStrategy(backoff)
-              .build();
-      builder.retryPolicy(retryPolicy);
-    } else {
+  private void configureRetryPolicy(GraphiteClientBuilder builder, GraphiteProperties.Retry retry) {
+    if (retry == null || !retry.isEnabled()) {
       builder.retryPolicy(RetryPolicy.disabled());
+      return;
     }
+    ExponentialBackoff backoff =
+        ExponentialBackoff.builder()
+            .initialDelay(retry.getInitialDelay())
+            .maxDelay(retry.getMaxDelay())
+            .multiplier(retry.getMultiplier())
+            .build();
+    RetryPolicy retryPolicy =
+        RetryPolicy.builder().maxAttempts(retry.getMaxAttempts()).backoffStrategy(backoff).build();
+    builder.retryPolicy(retryPolicy);
+  }
 
-    // Configure rate limiting
-    GraphiteProperties.RateLimit rateLimit = properties.getRateLimit();
+  private void configureRateLimit(
+      GraphiteClientBuilder builder, GraphiteProperties.RateLimit rateLimit) {
     if (rateLimit != null && rateLimit.isEnabled()) {
-      RateLimiter rateLimiter = RateLimiter.create(rateLimit.getRequestsPerSecond());
-      builder.rateLimiter(rateLimiter);
+      builder.rateLimiter(RateLimiter.create(rateLimit.getRequestsPerSecond()));
     }
-
-    return builder.build();
   }
 }

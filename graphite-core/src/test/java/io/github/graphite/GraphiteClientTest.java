@@ -34,8 +34,7 @@ class GraphiteClientTest {
     void shouldReturnBuilderInstance() {
       var builder = GraphiteClient.builder();
 
-      assertThat(builder).isNotNull();
-      assertThat(builder).isInstanceOf(GraphiteClientBuilder.class);
+      assertThat(builder).isNotNull().isInstanceOf(GraphiteClientBuilder.class);
     }
 
     @Test
@@ -53,8 +52,7 @@ class GraphiteClientTest {
     void buildShouldSucceedWithEndpoint() {
       var client = GraphiteClient.builder().endpoint("https://api.example.com/graphql").build();
 
-      assertThat(client).isNotNull();
-      assertThat(client).isInstanceOf(GraphiteClient.class);
+      assertThat(client).isNotNull().isInstanceOf(GraphiteClient.class);
     }
   }
 

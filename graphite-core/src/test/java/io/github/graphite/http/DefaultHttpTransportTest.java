@@ -81,7 +81,9 @@ class DefaultHttpTransportTest {
     @Test
     @DisplayName("should reject null httpClient")
     void shouldRejectNullHttpClient() {
-      assertThatThrownBy(() -> new DefaultHttpTransport(null, HttpTransportConfig.defaults()))
+      var config = HttpTransportConfig.defaults();
+
+      assertThatThrownBy(() -> new DefaultHttpTransport(null, config))
           .isInstanceOf(NullPointerException.class)
           .hasMessage("httpClient must not be null");
     }
