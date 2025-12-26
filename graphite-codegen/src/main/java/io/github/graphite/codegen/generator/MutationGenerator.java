@@ -29,6 +29,7 @@ import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.TypeDefinition;
 import io.github.graphite.codegen.schema.TypeReference;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ public final class MutationGenerator {
   public JavaFile generateMutation(@NotNull FieldDefinition field) {
     String packageName = configuration.packageName() + MUTATION_PACKAGE_SUFFIX;
     String typePackage = configuration.packageName() + TYPE_PACKAGE_SUFFIX;
-    String className = capitalize(field.name()) + MUTATION_SUFFIX;
+    String className = GeneratorUtils.capitalize(field.name()) + MUTATION_SUFFIX;
 
     String returnTypeName = getBaseTypeName(field.type());
     boolean isScalarReturn = isScalarType(returnTypeName);
@@ -166,7 +167,9 @@ public final class MutationGenerator {
     // Add JavaDoc
     if (field.description() != null && !field.description().isBlank()) {
       classBuilder.addJavadoc(
-          "Mutation for $N.\n\n<p>$L\n", field.name(), escapeJavadoc(field.description()));
+          "Mutation for $N.\n\n<p>$L\n",
+          field.name(),
+          GeneratorUtils.escapeJavadoc(field.description()));
     } else {
       classBuilder.addJavadoc("Mutation for $N.\n", field.name());
     }
@@ -191,7 +194,7 @@ public final class MutationGenerator {
     classBuilder.addMethod(generateConstructor(field, builderClassName, !isScalarReturn));
 
     // Add operationName() method
-    String operationName = capitalize(field.name());
+    String operationName = GeneratorUtils.capitalize(field.name());
     classBuilder.addMethod(
         MethodSpec.methodBuilder("operationName")
             .addAnnotation(Override.class)
@@ -439,7 +442,7 @@ public final class MutationGenerator {
 
     if (arg.description() != null && !arg.description().isBlank()) {
       setter.addJavadoc(
-          escapeJavadoc(arg.description())
+          GeneratorUtils.escapeJavadoc(arg.description())
               + "\n\n@param $N the value to set\n@return this builder\n",
           arg.name());
     } else {
@@ -485,16 +488,5 @@ public final class MutationGenerator {
 
   private String formatGraphQLType(TypeReference type) {
     return type.toGraphQL();
-  }
-
-  private String capitalize(String s) {
-    return s == null || s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }

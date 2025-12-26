@@ -34,8 +34,12 @@ dependencies {
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.datatype.jsr310)
 
+    // Logging
+    api(libs.slf4j.api)
+
     // Testing
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
     testImplementation(libs.wiremock)
+    testRuntimeOnly(libs.slf4j.simple)
 }

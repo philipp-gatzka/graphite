@@ -30,6 +30,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link HttpTransport} using Java's built-in HttpClient.
@@ -65,6 +67,8 @@ import org.jetbrains.annotations.Nullable;
  * @see HttpTransportConfig
  */
 public final class DefaultHttpTransport implements HttpTransport {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultHttpTransport.class);
 
   private final HttpClient httpClient;
   private final HttpTransportConfig config;
@@ -131,19 +135,42 @@ public final class DefaultHttpTransport implements HttpTransport {
     ensureNotClosed();
     Objects.requireNonNull(request, "request must not be null");
 
+    LOG.debug("Executing {} request to {}", request.method(), request.uri());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Request headers: {}", request.headers());
+      LOG.trace("Request body: {}", request.body());
+    }
+
     acquireConcurrencyPermit();
     try {
       java.net.http.HttpRequest javaRequest = buildJavaRequest(request);
+      long startTime = System.nanoTime();
 
       try {
         java.net.http.HttpResponse<String> javaResponse =
             httpClient.send(javaRequest, java.net.http.HttpResponse.BodyHandlers.ofString());
-        return convertResponse(javaResponse);
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        HttpResponse response = convertResponse(javaResponse);
+
+        LOG.debug(
+            "Received response: status={}, duration={}ms", javaResponse.statusCode(), durationMs);
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("Response headers: {}", javaResponse.headers().map());
+          LOG.trace("Response body: {}", response.body());
+        }
+
+        return response;
       } catch (HttpTimeoutException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Request timed out after {}ms: {}", durationMs, e.getMessage());
         throw createTimeoutException(request, e);
       } catch (ConnectException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Connection failed after {}ms: {}", durationMs, e.getMessage());
         throw createConnectionException(request, e);
       } catch (IOException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Request failed after {}ms: {}", durationMs, e.getMessage());
         throw new GraphiteConnectionException(
             "Failed to execute request: " + e.getMessage(),
             e,
@@ -151,6 +178,7 @@ public final class DefaultHttpTransport implements HttpTransport {
             request.uri().getPort() != -1 ? request.uri().getPort() : getDefaultPort(request));
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
+        LOG.debug("Request interrupted");
         throw new GraphiteException("Request interrupted", e);
       }
     } finally {
