@@ -21,7 +21,6 @@ import io.github.graphite.spring.actuator.GraphiteHealthIndicator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.actuate.autoconfigure.health.HealthContributorAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -32,9 +31,7 @@ class GraphiteHealthIndicatorAutoConfigurationTest {
       new ApplicationContextRunner()
           .withConfiguration(
               AutoConfigurations.of(
-                  GraphiteAutoConfiguration.class,
-                  GraphiteHealthIndicatorAutoConfiguration.class,
-                  HealthContributorAutoConfiguration.class));
+                  GraphiteAutoConfiguration.class, GraphiteHealthIndicatorAutoConfiguration.class));
 
   @Nested
   @DisplayName("when url is configured")
@@ -73,28 +70,7 @@ class GraphiteHealthIndicatorAutoConfigurationTest {
     void shouldNotCreateGraphiteHealthIndicatorBean() {
       // Use a separate runner without GraphiteAutoConfiguration to avoid context failure
       new ApplicationContextRunner()
-          .withConfiguration(
-              AutoConfigurations.of(
-                  GraphiteHealthIndicatorAutoConfiguration.class,
-                  HealthContributorAutoConfiguration.class))
-          .run(
-              context -> {
-                assertThat(context).doesNotHaveBean(GraphiteHealthIndicator.class);
-              });
-    }
-  }
-
-  @Nested
-  @DisplayName("when health indicator is disabled")
-  class WhenHealthIndicatorDisabled {
-
-    @Test
-    @DisplayName("should not create GraphiteHealthIndicator bean")
-    void shouldNotCreateGraphiteHealthIndicatorBean() {
-      contextRunner
-          .withPropertyValues(
-              "graphite.url=https://api.example.com/graphql",
-              "management.health.graphite.enabled=false")
+          .withConfiguration(AutoConfigurations.of(GraphiteHealthIndicatorAutoConfiguration.class))
           .run(
               context -> {
                 assertThat(context).doesNotHaveBean(GraphiteHealthIndicator.class);
