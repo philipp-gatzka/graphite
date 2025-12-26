@@ -50,10 +50,10 @@ class DefaultHttpTransportTest {
     @Test
     @DisplayName("should create transport with default config")
     void shouldCreateTransportWithDefaultConfig() {
-      var transport = new DefaultHttpTransport();
+      var newTransport = new DefaultHttpTransport();
 
-      assertThat(transport.getConfig()).isEqualTo(HttpTransportConfig.defaults());
-      assertThat(transport.isClosed()).isFalse();
+      assertThat(newTransport.getConfig()).isEqualTo(HttpTransportConfig.defaults());
+      assertThat(newTransport.isClosed()).isFalse();
     }
 
     @Test
@@ -65,9 +65,9 @@ class DefaultHttpTransportTest {
               .requestTimeout(Duration.ofSeconds(15))
               .build();
 
-      var transport = new DefaultHttpTransport(config);
+      var customTransport = new DefaultHttpTransport(config);
 
-      assertThat(transport.getConfig()).isEqualTo(config);
+      assertThat(customTransport.getConfig()).isEqualTo(config);
     }
 
     @Test
@@ -81,7 +81,9 @@ class DefaultHttpTransportTest {
     @Test
     @DisplayName("should reject null httpClient")
     void shouldRejectNullHttpClient() {
-      assertThatThrownBy(() -> new DefaultHttpTransport(null, HttpTransportConfig.defaults()))
+      var config = HttpTransportConfig.defaults();
+
+      assertThatThrownBy(() -> new DefaultHttpTransport(null, config))
           .isInstanceOf(NullPointerException.class)
           .hasMessage("httpClient must not be null");
     }

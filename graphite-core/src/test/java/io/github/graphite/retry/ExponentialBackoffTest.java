@@ -44,9 +44,9 @@ class ExponentialBackoffTest {
     @Test
     @DisplayName("should have expected default constants")
     void shouldHaveExpectedDefaultConstants() {
-      assertThat(ExponentialBackoff.DEFAULT_INITIAL_DELAY).isEqualTo(Duration.ofMillis(100));
-      assertThat(ExponentialBackoff.DEFAULT_MAX_DELAY).isEqualTo(Duration.ofSeconds(30));
-      assertThat(ExponentialBackoff.DEFAULT_MULTIPLIER).isEqualTo(2.0);
+      assertThat(Duration.ofMillis(100)).isEqualTo(ExponentialBackoff.DEFAULT_INITIAL_DELAY);
+      assertThat(Duration.ofSeconds(30)).isEqualTo(ExponentialBackoff.DEFAULT_MAX_DELAY);
+      assertThat(2.0).isEqualTo(ExponentialBackoff.DEFAULT_MULTIPLIER);
     }
   }
 

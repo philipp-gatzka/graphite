@@ -206,8 +206,7 @@ class RateLimitConfigTest {
       var config1 = RateLimitConfig.of(100.0, 150);
       var config2 = RateLimitConfig.of(100.0, 150);
 
-      assertThat(config1).isEqualTo(config2);
-      assertThat(config1.hashCode()).isEqualTo(config2.hashCode());
+      assertThat(config1).isEqualTo(config2).hasSameHashCodeAs(config2);
     }
 
     @Test

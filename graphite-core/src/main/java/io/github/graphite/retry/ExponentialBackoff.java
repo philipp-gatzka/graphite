@@ -107,7 +107,7 @@ public final class ExponentialBackoff implements BackoffStrategy {
     }
 
     // Calculate exponential delay: initialDelay * multiplier^(attempt-1)
-    double delayMillis = initialDelay.toMillis() * Math.pow(multiplier, attempt - 1);
+    double delayMillis = initialDelay.toMillis() * Math.pow(multiplier, (double) attempt - 1);
 
     // Cap at max delay
     long cappedMillis = Math.min((long) delayMillis, maxDelay.toMillis());
