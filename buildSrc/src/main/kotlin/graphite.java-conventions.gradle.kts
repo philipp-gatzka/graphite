@@ -37,7 +37,7 @@ plugins {
     id("com.github.spotbugs")
 }
 
-group = "io.github.graphite"
+group = "io.github.philipp-gatzka"
 
 // Support for Java version override via Gradle property for compatibility testing
 val javaVersion = providers.gradleProperty("javaVersion").getOrElse("21").toInt()
