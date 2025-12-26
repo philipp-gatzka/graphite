@@ -12,7 +12,7 @@ jackson = "2.20.1"
 jetbrains-annotations = "26.0.1"
 
 # Spring Boot
-spring-boot = "3.4.1"
+spring-boot = "4.0.1"
 
 # Logging
 slf4j = "2.0.16"
@@ -56,6 +56,7 @@ spring-boot-configuration-processor = { module = "org.springframework.boot:sprin
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-actuator" }
 spring-boot-actuator-autoconfigure = { module = "org.springframework.boot:spring-boot-actuator-autoconfigure" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-health = { module = "org.springframework.boot:spring-boot-health" }
 
 # Logging
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
