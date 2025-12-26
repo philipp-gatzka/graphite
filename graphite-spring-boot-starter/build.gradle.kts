@@ -21,9 +21,18 @@ plugins {
 
 description = "Graphite Spring Boot Starter - Auto-configuration for Spring Boot applications"
 
+// Support for Spring Boot version override via Gradle property
+val springBootVersion: String by project
+
+val springBootBom = if (project.hasProperty("springBootVersion")) {
+    "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+} else {
+    libs.spring.boot.bom.get().toString()
+}
+
 dependencies {
     // API dependencies
-    api(platform(libs.spring.boot.bom))
+    api(platform(springBootBom))
     api(project(":graphite-core"))
 
     // Implementation dependencies
@@ -36,7 +45,7 @@ dependencies {
     compileOnly(libs.micrometer.tracing)
 
     // Annotation processors
-    annotationProcessor(platform(libs.spring.boot.bom))
+    annotationProcessor(platform(springBootBom))
     annotationProcessor(libs.spring.boot.configuration.processor)
 
     // Test dependencies
