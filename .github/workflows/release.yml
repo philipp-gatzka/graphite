@@ -79,12 +79,31 @@ jobs:
           fi
           echo "All signing secrets are configured"
 
+      - name: Prepare signing key
+        id: signing
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          # Check if key is base64 encoded (doesn't start with -----)
+          if [[ "$SIGNING_KEY" != -----* ]]; then
+            echo "Decoding base64 signing key..."
+            DECODED_KEY=$(echo "$SIGNING_KEY" | base64 -d 2>/dev/null || echo "$SIGNING_KEY")
+            echo "SIGNING_KEY<<EOF" >> $GITHUB_OUTPUT
+            echo "$DECODED_KEY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "Using signing key as-is..."
+            echo "SIGNING_KEY<<EOF" >> $GITHUB_OUTPUT
+            echo "$SIGNING_KEY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish to Maven Central
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY: ${{ steps.signing.outputs.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: ./gradlew publishMavenPublicationToMavenCentralRepository -Pversion=${{ steps.version.outputs.VERSION }} --info
 
