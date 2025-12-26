@@ -75,6 +75,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
@@ -83,7 +84,7 @@ awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" 
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-annotations", "jackson-datatype-jsr310"]
-testing = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter", "awaitility"]
+testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core", "mockito-core", "mockito-junit-jupiter", "awaitility"]
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
