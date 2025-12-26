@@ -41,6 +41,7 @@ dependencies {
     // Compile-only dependencies
     compileOnly(libs.spring.boot.actuator)
     compileOnly(libs.spring.boot.actuator.autoconfigure)
+    compileOnly(libs.spring.boot.health)
     compileOnly(libs.micrometer.core)
     compileOnly(libs.micrometer.tracing)
 
@@ -56,4 +57,5 @@ dependencies {
     testImplementation(libs.micrometer.tracing)
     testImplementation(libs.spring.boot.actuator)
     testImplementation(libs.spring.boot.actuator.autoconfigure)
+    testImplementation(libs.spring.boot.health)
 }
