@@ -23,6 +23,7 @@
  *   <li>Compiler options with strict warnings</li>
  *   <li>Google Java Format via Spotless</li>
  *   <li>Checkstyle for code style enforcement</li>
+ *   <li>SpotBugs for static analysis</li>
  *   <li>JaCoCo for code coverage</li>
  *   <li>JUnit 5 for testing</li>
  * </ul>
@@ -33,6 +34,7 @@ plugins {
     checkstyle
     jacoco
     id("com.diffplug.spotless")
+    id("com.github.spotbugs")
 }
 
 group = "io.github.graphite"
@@ -80,6 +82,32 @@ checkstyle {
     configDirectory.set(rootProject.file("gradle"))
     isIgnoreFailures = false
     maxWarnings = 0
+}
+
+spotbugs {
+    toolVersion.set("4.8.6")
+    // Set to true to allow build to pass while SonarCloud reports issues
+    ignoreFailures.set(true)
+    showStackTraces.set(true)
+    showProgress.set(false)
+    effort.set(com.github.spotbugs.snom.Effort.MAX)
+    reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
+    excludeFilter.set(rootProject.file("gradle/spotbugs-exclude.xml"))
+}
+
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+    reports.create("xml") {
+        required.set(true)
+    }
+    reports.create("html") {
+        required.set(true)
+        setStylesheet("fancy-hist.xsl")
+    }
+}
+
+// Only run SpotBugs on main source set, not test code
+tasks.matching { it.name == "spotbugsTest" }.configureEach {
+    enabled = false
 }
 
 jacoco {
