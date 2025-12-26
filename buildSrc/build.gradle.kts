@@ -20,4 +20,5 @@ plugins {
 
 dependencies {
     implementation(libs.plugins.spotless.get().let { "${it.pluginId}:${it.pluginId}.gradle.plugin:${it.version}" })
+    implementation(libs.plugins.spotbugs.get().let { "${it.pluginId}:${it.pluginId}.gradle.plugin:${it.version}" })
 }

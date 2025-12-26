@@ -87,9 +87,13 @@ sonar {
         property("sonar.organization", "philipp-gatzka-1")
         property("sonar.host.url", "https://sonarcloud.io")
 
-	property("sonar.java.binaries", layout.buildDirectory.dir("classes").get().asFile.path)	
+        property("sonar.java.binaries", layout.buildDirectory.dir("classes").get().asFile.path)
+
         // Coverage reporting
         property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml")
+
+        // SpotBugs reporting
+        property("sonar.java.spotbugs.reportPaths", "**/build/reports/spotbugs/*.xml")
 
         // Source encoding
         property("sonar.sourceEncoding", "UTF-8")

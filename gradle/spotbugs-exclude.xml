@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SpotBugs exclusion filter for Graphite project.
+  See: https://spotbugs.readthedocs.io/en/stable/filter.html
+-->
+<FindBugsFilter>
+    <!-- Exclude generated code -->
+    <Match>
+        <Source name="~.*Generated.*\.java"/>
+    </Match>
+
+    <!-- Exclude test classes from certain checks -->
+    <Match>
+        <Class name="~.*Test"/>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    </Match>
+
+    <!-- Exclude builder patterns from unwritten field warnings -->
+    <Match>
+        <Class name="~.*Builder"/>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+    </Match>
+</FindBugsFilter>
