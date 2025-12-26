@@ -28,7 +28,7 @@ javapoet = "0.6.0"
 junit = "5.11.4"
 assertj = "3.27.0"
 mockito = "5.15.2"
-wiremock = "3.10.0"
+wiremock = "3.13.2"
 awaitility = "4.2.2"
 
 # Build plugins
