@@ -42,11 +42,23 @@ class HttpTransportConfigTest {
     }
 
     @Test
+    @DisplayName("should return default connection pool settings")
+    void shouldReturnDefaultConnectionPoolSettings() {
+      var config = HttpTransportConfig.defaults();
+
+      assertThat(config.executor()).isNull();
+      assertThat(config.maxConcurrentRequests()).isEqualTo(0);
+      assertThat(config.keepAliveTimeout()).isEqualTo(Duration.ofMinutes(5));
+    }
+
+    @Test
     @DisplayName("should have expected default constants")
     void shouldHaveExpectedDefaultConstants() {
       assertThat(Duration.ofSeconds(10)).isEqualTo(HttpTransportConfig.DEFAULT_CONNECT_TIMEOUT);
       assertThat(Duration.ofSeconds(30)).isEqualTo(HttpTransportConfig.DEFAULT_READ_TIMEOUT);
       assertThat(Duration.ofSeconds(60)).isEqualTo(HttpTransportConfig.DEFAULT_REQUEST_TIMEOUT);
+      assertThat(0).isEqualTo(HttpTransportConfig.DEFAULT_MAX_CONCURRENT_REQUESTS);
+      assertThat(Duration.ofMinutes(5)).isEqualTo(HttpTransportConfig.DEFAULT_KEEP_ALIVE_TIMEOUT);
     }
   }
 
@@ -61,7 +73,8 @@ class HttpTransportConfigTest {
       var readTimeout = Duration.ofSeconds(15);
       var requestTimeout = Duration.ofSeconds(30);
 
-      var config = new HttpTransportConfig(connectTimeout, readTimeout, requestTimeout);
+      var config =
+          new HttpTransportConfig(connectTimeout, readTimeout, requestTimeout, null, 0, null);
 
       assertThat(config.connectTimeout()).isEqualTo(connectTimeout);
       assertThat(config.readTimeout()).isEqualTo(readTimeout);
@@ -71,7 +84,8 @@ class HttpTransportConfigTest {
     @Test
     @DisplayName("should allow zero duration timeouts")
     void shouldAllowZeroDurationTimeouts() {
-      var config = new HttpTransportConfig(Duration.ZERO, Duration.ZERO, Duration.ZERO);
+      var config =
+          new HttpTransportConfig(Duration.ZERO, Duration.ZERO, Duration.ZERO, null, 0, null);
 
       assertThat(config.connectTimeout()).isEqualTo(Duration.ZERO);
       assertThat(config.readTimeout()).isEqualTo(Duration.ZERO);
@@ -83,7 +97,9 @@ class HttpTransportConfigTest {
     void shouldRejectNullConnectTimeout() {
       assertThatNullPointerException()
           .isThrownBy(
-              () -> new HttpTransportConfig(null, Duration.ofSeconds(30), Duration.ofSeconds(60)))
+              () ->
+                  new HttpTransportConfig(
+                      null, Duration.ofSeconds(30), Duration.ofSeconds(60), null, 0, null))
           .withMessage("connectTimeout must not be null");
     }
 
@@ -92,7 +108,9 @@ class HttpTransportConfigTest {
     void shouldRejectNullReadTimeout() {
       assertThatNullPointerException()
           .isThrownBy(
-              () -> new HttpTransportConfig(Duration.ofSeconds(10), null, Duration.ofSeconds(60)))
+              () ->
+                  new HttpTransportConfig(
+                      Duration.ofSeconds(10), null, Duration.ofSeconds(60), null, 0, null))
           .withMessage("readTimeout must not be null");
     }
 
@@ -101,7 +119,9 @@ class HttpTransportConfigTest {
     void shouldRejectNullRequestTimeout() {
       assertThatNullPointerException()
           .isThrownBy(
-              () -> new HttpTransportConfig(Duration.ofSeconds(10), Duration.ofSeconds(30), null))
+              () ->
+                  new HttpTransportConfig(
+                      Duration.ofSeconds(10), Duration.ofSeconds(30), null, null, 0, null))
           .withMessage("requestTimeout must not be null");
     }
 
@@ -113,7 +133,9 @@ class HttpTransportConfigTest {
       var requestTimeout = Duration.ofSeconds(60);
 
       assertThatThrownBy(
-              () -> new HttpTransportConfig(negativeConnect, readTimeout, requestTimeout))
+              () ->
+                  new HttpTransportConfig(
+                      negativeConnect, readTimeout, requestTimeout, null, 0, null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("connectTimeout must not be negative");
     }
@@ -126,7 +148,9 @@ class HttpTransportConfigTest {
       var requestTimeout = Duration.ofSeconds(60);
 
       assertThatThrownBy(
-              () -> new HttpTransportConfig(connectTimeout, negativeRead, requestTimeout))
+              () ->
+                  new HttpTransportConfig(
+                      connectTimeout, negativeRead, requestTimeout, null, 0, null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("readTimeout must not be negative");
     }
@@ -139,9 +163,43 @@ class HttpTransportConfigTest {
       var negativeRequest = Duration.ofSeconds(-1);
 
       assertThatThrownBy(
-              () -> new HttpTransportConfig(connectTimeout, readTimeout, negativeRequest))
+              () ->
+                  new HttpTransportConfig(
+                      connectTimeout, readTimeout, negativeRequest, null, 0, null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("requestTimeout must not be negative");
+    }
+
+    @Test
+    @DisplayName("should reject negative maxConcurrentRequests")
+    void shouldRejectNegativeMaxConcurrentRequests() {
+      assertThatThrownBy(
+              () ->
+                  new HttpTransportConfig(
+                      Duration.ofSeconds(10),
+                      Duration.ofSeconds(30),
+                      Duration.ofSeconds(60),
+                      null,
+                      -1,
+                      null))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("maxConcurrentRequests must not be negative");
+    }
+
+    @Test
+    @DisplayName("should reject negative keepAliveTimeout")
+    void shouldRejectNegativeKeepAliveTimeout() {
+      assertThatThrownBy(
+              () ->
+                  new HttpTransportConfig(
+                      Duration.ofSeconds(10),
+                      Duration.ofSeconds(30),
+                      Duration.ofSeconds(60),
+                      null,
+                      0,
+                      Duration.ofSeconds(-1)))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("keepAliveTimeout must not be negative");
     }
   }
 
@@ -236,13 +294,76 @@ class HttpTransportConfigTest {
     }
 
     @Test
+    @DisplayName("should set executor")
+    void shouldSetExecutor() {
+      var executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+      var config = HttpTransportConfig.builder().executor(executor).build();
+
+      assertThat(config.executor()).isSameAs(executor);
+    }
+
+    @Test
+    @DisplayName("should allow null executor")
+    void shouldAllowNullExecutor() {
+      var config = HttpTransportConfig.builder().executor(null).build();
+
+      assertThat(config.executor()).isNull();
+    }
+
+    @Test
+    @DisplayName("should set maxConcurrentRequests")
+    void shouldSetMaxConcurrentRequests() {
+      var config = HttpTransportConfig.builder().maxConcurrentRequests(100).build();
+
+      assertThat(config.maxConcurrentRequests()).isEqualTo(100);
+    }
+
+    @Test
+    @DisplayName("should reject negative maxConcurrentRequests in builder")
+    void shouldRejectNegativeMaxConcurrentRequestsInBuilder() {
+      assertThatThrownBy(() -> HttpTransportConfig.builder().maxConcurrentRequests(-1))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("maxConcurrentRequests must not be negative");
+    }
+
+    @Test
+    @DisplayName("should set keepAliveTimeout")
+    void shouldSetKeepAliveTimeout() {
+      var timeout = Duration.ofMinutes(10);
+      var config = HttpTransportConfig.builder().keepAliveTimeout(timeout).build();
+
+      assertThat(config.keepAliveTimeout()).isEqualTo(timeout);
+    }
+
+    @Test
+    @DisplayName("should allow null keepAliveTimeout")
+    void shouldAllowNullKeepAliveTimeout() {
+      var config = HttpTransportConfig.builder().keepAliveTimeout(null).build();
+
+      assertThat(config.keepAliveTimeout()).isNull();
+    }
+
+    @Test
+    @DisplayName("should reject negative keepAliveTimeout in builder")
+    void shouldRejectNegativeKeepAliveTimeoutInBuilder() {
+      assertThatThrownBy(
+              () -> HttpTransportConfig.builder().keepAliveTimeout(Duration.ofSeconds(-1)))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("keepAliveTimeout must not be negative");
+    }
+
+    @Test
     @DisplayName("should allow method chaining")
     void shouldAllowMethodChaining() {
       var builder = HttpTransportConfig.builder();
+      var executor = java.util.concurrent.Executors.newSingleThreadExecutor();
 
       assertThat(builder.connectTimeout(Duration.ofSeconds(1))).isSameAs(builder);
       assertThat(builder.readTimeout(Duration.ofSeconds(1))).isSameAs(builder);
       assertThat(builder.requestTimeout(Duration.ofSeconds(1))).isSameAs(builder);
+      assertThat(builder.executor(executor)).isSameAs(builder);
+      assertThat(builder.maxConcurrentRequests(10)).isSameAs(builder);
+      assertThat(builder.keepAliveTimeout(Duration.ofMinutes(1))).isSameAs(builder);
     }
   }
 }

@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,8 @@ public final class DefaultHttpTransport implements HttpTransport {
   private final HttpTransportConfig config;
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
+  @Nullable private final Semaphore concurrencyLimiter;
+
   /** Creates a new transport with default configuration. */
   public DefaultHttpTransport() {
     this(HttpTransportConfig.defaults());
@@ -86,6 +90,7 @@ public final class DefaultHttpTransport implements HttpTransport {
   public DefaultHttpTransport(HttpTransportConfig config) {
     this.config = Objects.requireNonNull(config, "config must not be null");
     this.httpClient = createHttpClient(config);
+    this.concurrencyLimiter = createConcurrencyLimiter(config);
   }
 
   /**
@@ -101,14 +106,28 @@ public final class DefaultHttpTransport implements HttpTransport {
   public DefaultHttpTransport(HttpClient httpClient, HttpTransportConfig config) {
     this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
     this.config = Objects.requireNonNull(config, "config must not be null");
+    this.concurrencyLimiter = createConcurrencyLimiter(config);
+  }
+
+  @Nullable
+  private static Semaphore createConcurrencyLimiter(HttpTransportConfig config) {
+    int maxConcurrent = config.maxConcurrentRequests();
+    return maxConcurrent > 0 ? new Semaphore(maxConcurrent, true) : null;
   }
 
   private static HttpClient createHttpClient(HttpTransportConfig config) {
-    return HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_2)
-        .connectTimeout(config.connectTimeout())
-        .followRedirects(HttpClient.Redirect.NORMAL)
-        .build();
+    HttpClient.Builder builder =
+        HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(config.connectTimeout())
+            .followRedirects(HttpClient.Redirect.NORMAL);
+
+    // Use custom executor if provided
+    if (config.executor() != null) {
+      builder.executor(config.executor());
+    }
+
+    return builder.build();
   }
 
   @Override
@@ -122,43 +141,48 @@ public final class DefaultHttpTransport implements HttpTransport {
       LOG.trace("Request body: {}", request.body());
     }
 
-    java.net.http.HttpRequest javaRequest = buildJavaRequest(request);
-    long startTime = System.nanoTime();
-
+    acquireConcurrencyPermit();
     try {
-      java.net.http.HttpResponse<String> javaResponse =
-          httpClient.send(javaRequest, java.net.http.HttpResponse.BodyHandlers.ofString());
-      long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-      HttpResponse response = convertResponse(javaResponse);
+      java.net.http.HttpRequest javaRequest = buildJavaRequest(request);
+      long startTime = System.nanoTime();
 
-      LOG.debug(
-          "Received response: status={}, duration={}ms", javaResponse.statusCode(), durationMs);
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("Response headers: {}", javaResponse.headers().map());
-        LOG.trace("Response body: {}", response.body());
+      try {
+        java.net.http.HttpResponse<String> javaResponse =
+            httpClient.send(javaRequest, java.net.http.HttpResponse.BodyHandlers.ofString());
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        HttpResponse response = convertResponse(javaResponse);
+
+        LOG.debug(
+            "Received response: status={}, duration={}ms", javaResponse.statusCode(), durationMs);
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("Response headers: {}", javaResponse.headers().map());
+          LOG.trace("Response body: {}", response.body());
+        }
+
+        return response;
+      } catch (HttpTimeoutException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Request timed out after {}ms: {}", durationMs, e.getMessage());
+        throw createTimeoutException(request, e);
+      } catch (ConnectException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Connection failed after {}ms: {}", durationMs, e.getMessage());
+        throw createConnectionException(request, e);
+      } catch (IOException e) {
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        LOG.debug("Request failed after {}ms: {}", durationMs, e.getMessage());
+        throw new GraphiteConnectionException(
+            "Failed to execute request: " + e.getMessage(),
+            e,
+            request.uri().getHost(),
+            request.uri().getPort() != -1 ? request.uri().getPort() : getDefaultPort(request));
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        LOG.debug("Request interrupted");
+        throw new GraphiteException("Request interrupted", e);
       }
-
-      return response;
-    } catch (HttpTimeoutException e) {
-      long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-      LOG.debug("Request timed out after {}ms: {}", durationMs, e.getMessage());
-      throw createTimeoutException(request, e);
-    } catch (ConnectException e) {
-      long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-      LOG.debug("Connection failed after {}ms: {}", durationMs, e.getMessage());
-      throw createConnectionException(request, e);
-    } catch (IOException e) {
-      long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-      LOG.debug("Request failed after {}ms: {}", durationMs, e.getMessage());
-      throw new GraphiteConnectionException(
-          "Failed to execute request: " + e.getMessage(),
-          e,
-          request.uri().getHost(),
-          request.uri().getPort() != -1 ? request.uri().getPort() : getDefaultPort(request));
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOG.debug("Request interrupted");
-      throw new GraphiteException("Request interrupted", e);
+    } finally {
+      releaseConcurrencyPermit();
     }
   }
 
@@ -167,6 +191,7 @@ public final class DefaultHttpTransport implements HttpTransport {
     ensureNotClosed();
     Objects.requireNonNull(request, "request must not be null");
 
+    acquireConcurrencyPermit();
     java.net.http.HttpRequest javaRequest = buildJavaRequest(request);
 
     return httpClient
@@ -189,7 +214,8 @@ public final class DefaultHttpTransport implements HttpTransport {
                         : getDefaultPort(request));
               }
               throw new GraphiteException("Request failed: " + cause.getMessage(), cause);
-            });
+            })
+        .whenComplete((result, error) -> releaseConcurrencyPermit());
   }
 
   @Override
@@ -220,6 +246,23 @@ public final class DefaultHttpTransport implements HttpTransport {
   private void ensureNotClosed() {
     if (closed.get()) {
       throw new IllegalStateException("Transport has been closed");
+    }
+  }
+
+  private void acquireConcurrencyPermit() {
+    if (concurrencyLimiter != null) {
+      try {
+        concurrencyLimiter.acquire();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new GraphiteException("Interrupted while waiting for concurrency permit", e);
+      }
+    }
+  }
+
+  private void releaseConcurrencyPermit() {
+    if (concurrencyLimiter != null) {
+      concurrencyLimiter.release();
     }
   }
 
