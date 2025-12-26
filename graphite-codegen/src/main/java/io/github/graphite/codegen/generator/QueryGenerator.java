@@ -29,6 +29,7 @@ import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.TypeDefinition;
 import io.github.graphite.codegen.schema.TypeReference;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -138,7 +139,7 @@ public final class QueryGenerator {
   public JavaFile generateQuery(@NotNull FieldDefinition field) {
     String packageName = configuration.packageName() + QUERY_PACKAGE_SUFFIX;
     String typePackage = configuration.packageName() + TYPE_PACKAGE_SUFFIX;
-    String className = capitalize(field.name()) + QUERY_SUFFIX;
+    String className = GeneratorUtils.capitalize(field.name()) + QUERY_SUFFIX;
 
     String returnTypeName = getBaseTypeName(field.type());
     boolean isScalarReturn = isScalarType(returnTypeName);
@@ -172,7 +173,9 @@ public final class QueryGenerator {
     // Add JavaDoc
     if (field.description() != null && !field.description().isBlank()) {
       classBuilder.addJavadoc(
-          "Query for $N.\n\n<p>$L\n", field.name(), escapeJavadoc(field.description()));
+          "Query for $N.\n\n<p>$L\n",
+          field.name(),
+          GeneratorUtils.escapeJavadoc(field.description()));
     } else {
       classBuilder.addJavadoc("Query for $N.\n", field.name());
     }
@@ -197,7 +200,7 @@ public final class QueryGenerator {
     classBuilder.addMethod(generateConstructor(field, builderClassName, !isScalarReturn));
 
     // Add operationName() method
-    String operationName = capitalize(field.name());
+    String operationName = GeneratorUtils.capitalize(field.name());
     classBuilder.addMethod(
         MethodSpec.methodBuilder("operationName")
             .addAnnotation(Override.class)
@@ -444,7 +447,7 @@ public final class QueryGenerator {
 
     if (arg.description() != null && !arg.description().isBlank()) {
       setter.addJavadoc(
-          escapeJavadoc(arg.description())
+          GeneratorUtils.escapeJavadoc(arg.description())
               + "\n\n@param $N the value to set\n@return this builder\n",
           arg.name());
     } else {
@@ -490,16 +493,5 @@ public final class QueryGenerator {
 
   private String formatGraphQLType(TypeReference type) {
     return type.toGraphQL();
-  }
-
-  private String capitalize(String s) {
-    return s == null || s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }

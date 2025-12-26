@@ -31,6 +31,7 @@ import io.github.graphite.interceptor.RequestInterceptor;
 import io.github.graphite.interceptor.ResponseInterceptor;
 import io.github.graphite.logging.GraphiteMdc;
 import io.github.graphite.ratelimit.RateLimiter;
+import io.github.graphite.retry.RetryListener;
 import io.github.graphite.retry.RetryPolicy;
 import io.github.graphite.scalar.ScalarRegistry;
 import java.net.URI;
@@ -216,6 +217,7 @@ final class DefaultGraphiteClient implements GraphiteClient {
 
   private HttpResponse executeWithRetry(HttpRequest request) {
     RetryPolicy retryPolicy = configuration.retryPolicy();
+    RetryListener listener = configuration.retryListener();
     int attempt = 0;
 
     while (true) {
@@ -227,21 +229,30 @@ final class DefaultGraphiteClient implements GraphiteClient {
           GraphiteServerException serverException =
               new GraphiteServerException(
                   "Server error: HTTP " + response.statusCode(), response.statusCode());
-          attempt = retryOrThrow(retryPolicy, serverException, attempt);
+          attempt = retryOrThrow(retryPolicy, listener, serverException, attempt);
         } else {
+          // Success - notify listener if retries were needed
+          if (attempt > 0 && listener != null) {
+            listener.onRetrySuccess(attempt + 1);
+          }
           return response;
         }
 
       } catch (GraphiteException e) {
-        attempt = retryOrThrow(retryPolicy, e, attempt);
+        attempt = retryOrThrow(retryPolicy, listener, e, attempt);
       }
     }
   }
 
-  private int retryOrThrow(RetryPolicy retryPolicy, GraphiteException e, int attempt) {
+  private int retryOrThrow(
+      RetryPolicy retryPolicy, RetryListener listener, GraphiteException e, int attempt) {
     int nextAttempt = attempt + 1;
     if (!retryPolicy.shouldRetry(e, nextAttempt)) {
       LOG.debug("Retry exhausted after {} attempts: {}", attempt, e.getMessage());
+      // Notify listener if any retries were attempted
+      if (attempt > 0 && listener != null) {
+        listener.onRetryExhausted(nextAttempt, e);
+      }
       throw e;
     }
     Duration delay = retryPolicy.getDelay(nextAttempt);
@@ -250,6 +261,12 @@ final class DefaultGraphiteClient implements GraphiteClient {
         nextAttempt,
         delay.toMillis(),
         e.getMessage());
+
+    // Notify listener about retry attempt
+    if (listener != null) {
+      listener.onRetryAttempt(nextAttempt, e, delay);
+    }
+
     sleepForRetry(delay);
     return nextAttempt;
   }
@@ -450,6 +467,16 @@ final class DefaultGraphiteClient implements GraphiteClient {
   @Nullable
   RateLimiter getRateLimiter() {
     return configuration.rateLimiter();
+  }
+
+  /**
+   * Returns the retry listener, if configured.
+   *
+   * @return the retry listener, or null
+   */
+  @Nullable
+  RetryListener getRetryListener() {
+    return configuration.retryListener();
   }
 
   /**
