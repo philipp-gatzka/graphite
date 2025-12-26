@@ -214,44 +214,51 @@ public class GraphiteMetricsInterceptor {
    */
   @Nullable
   private String extractOperationNameFromQuery(@NotNull String query) {
-    // Simple extraction: look for "query Name" or "mutation Name" pattern
-    String trimmed = query.trim();
+    String trimmed = skipLeadingComments(query.trim());
+    if (trimmed == null) {
+      return null;
+    }
+    return extractNameFromOperation(trimmed);
+  }
 
-    // Skip leading comments
-    while (trimmed.startsWith("#")) {
-      int newlineIndex = trimmed.indexOf('\n');
+  @Nullable
+  private String skipLeadingComments(@NotNull String query) {
+    String result = query;
+    while (result.startsWith("#")) {
+      int newlineIndex = result.indexOf('\n');
       if (newlineIndex == -1) {
         return null;
       }
-      trimmed = trimmed.substring(newlineIndex + 1).trim();
+      result = result.substring(newlineIndex + 1).trim();
     }
+    return result;
+  }
 
-    // Match query/mutation/subscription followed by optional name
+  @Nullable
+  private String extractNameFromOperation(@NotNull String trimmed) {
     String[] prefixes = {"query", "mutation", "subscription"};
     for (String prefix : prefixes) {
       if (trimmed.startsWith(prefix)) {
-        String remainder = trimmed.substring(prefix.length()).trim();
-
-        // Skip if starts with { (anonymous query)
-        if (remainder.startsWith("{") || remainder.startsWith("(")) {
-          return null;
-        }
-
-        // Extract name (word characters until space, (, or {)
-        StringBuilder name = new StringBuilder();
-        for (char c : remainder.toCharArray()) {
-          if (Character.isLetterOrDigit(c) || c == '_') {
-            name.append(c);
-          } else {
-            break;
-          }
-        }
-
-        return !name.isEmpty() ? name.toString() : null;
+        return extractOperationName(trimmed.substring(prefix.length()).trim());
       }
     }
-
     return null;
+  }
+
+  @Nullable
+  private String extractOperationName(@NotNull String remainder) {
+    if (remainder.startsWith("{") || remainder.startsWith("(")) {
+      return null;
+    }
+    StringBuilder name = new StringBuilder();
+    for (char c : remainder.toCharArray()) {
+      if (Character.isLetterOrDigit(c) || c == '_') {
+        name.append(c);
+      } else {
+        break;
+      }
+    }
+    return !name.isEmpty() ? name.toString() : null;
   }
 
   /**
