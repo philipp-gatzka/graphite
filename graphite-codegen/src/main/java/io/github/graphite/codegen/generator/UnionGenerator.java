@@ -21,6 +21,7 @@ import com.palantir.javapoet.TypeSpec;
 import io.github.graphite.codegen.CodegenConfiguration;
 import io.github.graphite.codegen.schema.SchemaModel;
 import io.github.graphite.codegen.schema.UnionDefinition;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -107,7 +108,7 @@ public final class UnionGenerator {
 
     // Add JavaDoc
     if (unionDef.description() != null && !unionDef.description().isBlank()) {
-      unionBuilder.addJavadoc(escapeJavadoc(unionDef.description()) + "\n");
+      unionBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(unionDef.description()) + "\n");
     }
 
     // Add permits clause for all member types
@@ -123,12 +124,5 @@ public final class UnionGenerator {
         .skipJavaLangImports(true)
         .indent("    ")
         .build();
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }

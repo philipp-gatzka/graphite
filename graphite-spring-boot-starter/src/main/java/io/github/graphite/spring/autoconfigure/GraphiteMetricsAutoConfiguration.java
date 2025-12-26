@@ -19,6 +19,7 @@ import io.github.graphite.GraphiteClient;
 import io.github.graphite.spring.observability.GraphiteHttpMetrics;
 import io.github.graphite.spring.observability.GraphiteMetrics;
 import io.github.graphite.spring.observability.GraphiteMetricsInterceptor;
+import io.github.graphite.spring.observability.GraphiteRetryMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -43,6 +44,7 @@ import org.springframework.context.annotation.Bean;
  * <ul>
  *   <li>{@link GraphiteMetrics} - Facade for recording Graphite metrics
  *   <li>{@link GraphiteMetricsInterceptor} - Interceptor for automatic metrics collection
+ *   <li>{@link GraphiteRetryMetrics} - Listener for recording retry metrics
  * </ul>
  *
  * <p>To use the metrics interceptor with a client:
@@ -67,10 +69,14 @@ import org.springframework.context.annotation.Bean;
  *   <li>{@code graphite.client.requests} - Counter with tags: operation, status
  *   <li>{@code graphite.client.request.duration} - Timer with tags: operation
  *   <li>{@code graphite.client.errors} - Counter with tags: operation, error_type
+ *   <li>{@code graphite.client.retry.attempts} - Counter with tags: exception_type
+ *   <li>{@code graphite.client.retry.exhausted} - Counter with tags: exception_type
+ *   <li>{@code graphite.client.retry.success} - Counter for successful retries
  * </ul>
  *
  * @see GraphiteMetrics
  * @see GraphiteMetricsInterceptor
+ * @see GraphiteRetryMetrics
  * @see GraphiteAutoConfiguration
  */
 @AutoConfiguration(after = GraphiteAutoConfiguration.class)
@@ -103,6 +109,21 @@ public class GraphiteMetricsAutoConfiguration {
   @ConditionalOnMissingBean
   public GraphiteMetricsInterceptor graphiteMetricsInterceptor(MeterRegistry registry) {
     return new GraphiteMetricsInterceptor(registry);
+  }
+
+  /**
+   * Creates a {@link GraphiteRetryMetrics} bean for recording retry metrics.
+   *
+   * <p>The retry metrics can be used as a retry listener with a GraphiteClient to automatically
+   * record metrics for retry attempts.
+   *
+   * @param registry the meter registry
+   * @return the retry metrics listener
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  public GraphiteRetryMetrics graphiteRetryMetrics(MeterRegistry registry) {
+    return new GraphiteRetryMetrics(registry);
   }
 
   /**

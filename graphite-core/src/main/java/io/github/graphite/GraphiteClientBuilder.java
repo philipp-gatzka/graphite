@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.graphite.interceptor.RequestInterceptor;
 import io.github.graphite.interceptor.ResponseInterceptor;
 import io.github.graphite.ratelimit.RateLimiter;
+import io.github.graphite.retry.RetryListener;
 import io.github.graphite.retry.RetryPolicy;
 import io.github.graphite.scalar.ScalarRegistry;
 import java.net.URI;
@@ -77,6 +78,7 @@ public final class GraphiteClientBuilder {
   private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
   private RetryPolicy retryPolicy = RetryPolicy.defaults();
   private RateLimiter rateLimiter;
+  private RetryListener retryListener;
   private ScalarRegistry scalarRegistry = ScalarRegistry.defaults();
   private final List<RequestInterceptor> requestInterceptors = new ArrayList<>();
   private final List<ResponseInterceptor> responseInterceptors = new ArrayList<>();
@@ -258,6 +260,22 @@ public final class GraphiteClientBuilder {
   }
 
   /**
+   * Sets the retry listener for receiving retry events.
+   *
+   * <p>When set, the listener will be notified of retry attempts, exhausted retries, and successful
+   * retries. This is useful for metrics collection, logging, and monitoring.
+   *
+   * @param retryListener the retry listener, or null to disable retry notifications
+   * @return this builder
+   * @see RetryListener
+   */
+  @NotNull
+  public GraphiteClientBuilder retryListener(@Nullable RetryListener retryListener) {
+    this.retryListener = retryListener;
+    return this;
+  }
+
+  /**
    * Sets the scalar registry for custom scalar type handling.
    *
    * <p>The default registry includes coercings for common scalar types.
@@ -344,7 +362,8 @@ public final class GraphiteClientBuilder {
             readTimeout,
             requestTimeout,
             retryPolicy,
-            rateLimiter);
+            rateLimiter,
+            retryListener);
 
     return new DefaultGraphiteClient(
         configuration,

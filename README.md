@@ -175,6 +175,224 @@ class UserServiceTest {
 }
 ```
 
+## Advanced Usage
+
+### Custom Scalars
+
+Configure custom scalar type mappings in your build tool:
+
+**Gradle**
+```kotlin
+graphite {
+    schemaFile = file("src/main/resources/graphql/schema.json")
+    packageName = "com.example.graphql"
+    scalars = mapOf(
+        "DateTime" to "java.time.OffsetDateTime",
+        "Date" to "java.time.LocalDate",
+        "Time" to "java.time.LocalTime",
+        "JSON" to "com.fasterxml.jackson.databind.JsonNode",
+        "Long" to "java.lang.Long",
+        "UUID" to "java.util.UUID"
+    )
+}
+```
+
+**Maven**
+```xml
+<configuration>
+    <schemaFile>${project.basedir}/src/main/resources/graphql/schema.json</schemaFile>
+    <packageName>com.example.graphql</packageName>
+    <scalars>
+        <DateTime>java.time.OffsetDateTime</DateTime>
+        <Date>java.time.LocalDate</Date>
+        <JSON>com.fasterxml.jackson.databind.JsonNode</JSON>
+    </scalars>
+</configuration>
+```
+
+### Error Handling
+
+Graphite provides a rich exception hierarchy for precise error handling:
+
+```java
+import io.github.graphite.exception.*;
+
+try {
+    var response = client.execute(query);
+    return response.getDataOrThrow();
+
+} catch (GraphiteConnectionException e) {
+    // Network connectivity issues
+    log.error("Connection failed: {}", e.getMessage());
+    throw new ServiceUnavailableException("GraphQL server unreachable");
+
+} catch (GraphiteTimeoutException e) {
+    // Request timed out
+    if (e.isSafeToRetry()) {
+        // Connect timeout - no request was sent, safe to retry
+        return retryRequest(query);
+    }
+    throw new TimeoutException("Request timed out: " + e.getTimeoutType());
+
+} catch (GraphiteRateLimitException e) {
+    // Rate limit exceeded
+    log.warn("Rate limited: {}", e.getMessage());
+    throw new TooManyRequestsException();
+
+} catch (GraphiteServerException e) {
+    // Server returned 5xx error
+    log.error("Server error (HTTP {}): {}", e.getStatusCode(), e.getMessage());
+    throw new InternalServerException();
+
+} catch (GraphiteGraphQLException e) {
+    // GraphQL-level errors in response
+    log.warn("GraphQL errors: {}", e.getErrors());
+    throw new BadRequestException(e.getMessage());
+
+} catch (GraphiteException e) {
+    // Catch-all for any Graphite error
+    log.error("Unexpected error: {}", e.getMessage(), e);
+    throw new InternalServerException();
+}
+```
+
+For partial responses (data with errors), check the response directly:
+
+```java
+var response = client.execute(query);
+
+if (response.hasErrors()) {
+    response.getErrors().forEach(error ->
+        log.warn("GraphQL warning: {} at {}", error.message(), error.path())
+    );
+}
+
+if (response.hasData()) {
+    return response.getData();
+}
+
+throw new NoDataException("No data in response");
+```
+
+### Retry Configuration
+
+Configure retry behavior programmatically:
+
+```java
+import io.github.graphite.retry.*;
+
+// Exponential backoff with custom settings
+var backoff = ExponentialBackoff.builder()
+    .initialDelay(Duration.ofMillis(100))
+    .maxDelay(Duration.ofSeconds(10))
+    .multiplier(2.0)
+    .build();
+
+// Add jitter to prevent thundering herd
+var jitteredBackoff = backoff.withJitter(0.25);
+
+// Create retry policy
+var retryPolicy = RetryPolicy.builder()
+    .maxAttempts(5)
+    .backoffStrategy(jitteredBackoff)
+    .retryOn(GraphiteConnectionException.class)
+    .retryOn(GraphiteTimeoutException.class)
+    .retryOn(GraphiteServerException.class)
+    .build();
+
+// Use with client
+var client = GraphiteClient.builder()
+    .endpoint("https://api.example.com/graphql")
+    .retryPolicy(retryPolicy)
+    .build();
+```
+
+Or via Spring Boot configuration:
+
+```yaml
+graphite:
+  url: https://api.example.com/graphql
+  retry:
+    enabled: true
+    max-attempts: 5
+    initial-delay: 100ms
+    multiplier: 2.0
+    max-delay: 10s
+```
+
+### Observability
+
+#### Metrics
+
+Graphite automatically exposes Micrometer metrics when the starter is used:
+
+| Metric | Type | Tags | Description |
+|--------|------|------|-------------|
+| `graphite.client.requests` | Counter | operation, status | Total requests |
+| `graphite.client.request.duration` | Timer | operation | Request duration |
+| `graphite.client.errors` | Counter | operation, error_type | Error count |
+| `graphite.client.retry.attempts` | Counter | exception_type | Retry attempts |
+| `graphite.client.retry.exhausted` | Counter | exception_type | Exhausted retries |
+| `graphite.client.retry.success` | Counter | - | Successful retries |
+
+Access metrics programmatically:
+
+```java
+import io.github.graphite.spring.observability.GraphiteMetrics;
+
+@Service
+public class GraphQLMonitoringService {
+
+    private final GraphiteMetrics metrics;
+
+    public GraphQLMonitoringService(GraphiteMetrics metrics) {
+        this.metrics = metrics;
+    }
+
+    public void executeWithCustomMetrics(GraphQLOperation<?> operation) {
+        var sample = metrics.startTimer();
+        try {
+            client.execute(operation);
+            metrics.recordSuccess(operation.operationName(), sample);
+        } catch (Exception e) {
+            metrics.recordError(operation.operationName(), e, sample);
+            throw e;
+        }
+    }
+}
+```
+
+#### Tracing
+
+Enable distributed tracing with Micrometer Tracing:
+
+```yaml
+# application.yml
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0  # Sample all requests (adjust for production)
+```
+
+Graphite propagates trace context automatically in requests.
+
+#### Health Checks
+
+Enable the health indicator:
+
+```yaml
+management:
+  health:
+    graphite:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+```
+
+The health check performs a lightweight introspection query to verify endpoint availability.
+
 ## Modules
 
 | Module | Description |

@@ -16,6 +16,7 @@
 package io.github.graphite;
 
 import io.github.graphite.ratelimit.RateLimiter;
+import io.github.graphite.retry.RetryListener;
 import io.github.graphite.retry.RetryPolicy;
 import java.net.URI;
 import java.time.Duration;
@@ -54,6 +55,7 @@ import org.jetbrains.annotations.Nullable;
  * @param requestTimeout the total request timeout
  * @param retryPolicy the retry policy for failed requests
  * @param rateLimiter the rate limiter, or null if no rate limiting
+ * @param retryListener the retry listener, or null if no retry events should be reported
  * @see GraphiteClient
  * @see GraphiteClientBuilder
  */
@@ -64,7 +66,8 @@ public record GraphiteConfiguration(
     @NotNull Duration readTimeout,
     @NotNull Duration requestTimeout,
     @NotNull RetryPolicy retryPolicy,
-    @Nullable RateLimiter rateLimiter) {
+    @Nullable RateLimiter rateLimiter,
+    @Nullable RetryListener retryListener) {
 
   /** Default connect timeout of 10 seconds. */
   public static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
@@ -148,6 +151,7 @@ public record GraphiteConfiguration(
         DEFAULT_READ_TIMEOUT,
         DEFAULT_REQUEST_TIMEOUT,
         RetryPolicy.defaults(),
+        null,
         null);
   }
 
@@ -187,7 +191,8 @@ public record GraphiteConfiguration(
         readTimeout,
         requestTimeout,
         retryPolicy,
-        rateLimiter);
+        rateLimiter,
+        retryListener);
   }
 
   /**
@@ -199,7 +204,14 @@ public record GraphiteConfiguration(
   @NotNull
   public GraphiteConfiguration withConnectTimeout(@NotNull Duration timeout) {
     return new GraphiteConfiguration(
-        endpoint, headers, timeout, readTimeout, requestTimeout, retryPolicy, rateLimiter);
+        endpoint,
+        headers,
+        timeout,
+        readTimeout,
+        requestTimeout,
+        retryPolicy,
+        rateLimiter,
+        retryListener);
   }
 
   /**
@@ -211,7 +223,14 @@ public record GraphiteConfiguration(
   @NotNull
   public GraphiteConfiguration withReadTimeout(@NotNull Duration timeout) {
     return new GraphiteConfiguration(
-        endpoint, headers, connectTimeout, timeout, requestTimeout, retryPolicy, rateLimiter);
+        endpoint,
+        headers,
+        connectTimeout,
+        timeout,
+        requestTimeout,
+        retryPolicy,
+        rateLimiter,
+        retryListener);
   }
 
   /**
@@ -223,7 +242,14 @@ public record GraphiteConfiguration(
   @NotNull
   public GraphiteConfiguration withRequestTimeout(@NotNull Duration timeout) {
     return new GraphiteConfiguration(
-        endpoint, headers, connectTimeout, readTimeout, timeout, retryPolicy, rateLimiter);
+        endpoint,
+        headers,
+        connectTimeout,
+        readTimeout,
+        timeout,
+        retryPolicy,
+        rateLimiter,
+        retryListener);
   }
 
   /**
@@ -235,7 +261,14 @@ public record GraphiteConfiguration(
   @NotNull
   public GraphiteConfiguration withRetryPolicy(@NotNull RetryPolicy policy) {
     return new GraphiteConfiguration(
-        endpoint, headers, connectTimeout, readTimeout, requestTimeout, policy, rateLimiter);
+        endpoint,
+        headers,
+        connectTimeout,
+        readTimeout,
+        requestTimeout,
+        policy,
+        rateLimiter,
+        retryListener);
   }
 
   /**
@@ -247,6 +280,41 @@ public record GraphiteConfiguration(
   @NotNull
   public GraphiteConfiguration withRateLimiter(@Nullable RateLimiter limiter) {
     return new GraphiteConfiguration(
-        endpoint, headers, connectTimeout, readTimeout, requestTimeout, retryPolicy, limiter);
+        endpoint,
+        headers,
+        connectTimeout,
+        readTimeout,
+        requestTimeout,
+        retryPolicy,
+        limiter,
+        retryListener);
+  }
+
+  /**
+   * Returns a new configuration with the specified retry listener.
+   *
+   * @param listener the new retry listener (may be null to disable)
+   * @return a new configuration with the listener
+   */
+  @NotNull
+  public GraphiteConfiguration withRetryListener(@Nullable RetryListener listener) {
+    return new GraphiteConfiguration(
+        endpoint,
+        headers,
+        connectTimeout,
+        readTimeout,
+        requestTimeout,
+        retryPolicy,
+        rateLimiter,
+        listener);
+  }
+
+  /**
+   * Returns whether a retry listener is configured.
+   *
+   * @return {@code true} if a retry listener is configured
+   */
+  public boolean hasRetryListener() {
+    return retryListener != null;
   }
 }
