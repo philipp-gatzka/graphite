@@ -1,0 +1,128 @@
+name: Weekly Release
+
+on:
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force release even if no changes'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  check-changes:
+    name: Check for Changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check.outputs.has_changes }}
+      next_version: ${{ steps.version.outputs.next_version }}
+      last_tag: ${{ steps.version.outputs.last_tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Get latest tag
+        id: version
+        run: |
+          # Get the latest version tag
+          LAST_TAG=$(git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "v0.0.0")
+          echo "last_tag=$LAST_TAG" >> $GITHUB_OUTPUT
+
+          # Parse version and calculate next version
+          VERSION=${LAST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+          # Increment patch version
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_VERSION="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
+          echo "Last tag: $LAST_TAG"
+          echo "Next version: $NEXT_VERSION"
+
+      - name: Check for changes since last release
+        id: check
+        run: |
+          LAST_TAG=${{ steps.version.outputs.last_tag }}
+
+          # Count commits since last tag (excluding workflow files)
+          CHANGES=$(git log ${LAST_TAG}..HEAD --oneline -- \
+            ':!.github/workflows/weekly-release.yml' \
+            ':!*.md' \
+            | wc -l)
+
+          echo "Changes since $LAST_TAG: $CHANGES commits"
+
+          if [ "$CHANGES" -gt 0 ] || [ "${{ github.event.inputs.force_release }}" == "true" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.has_changes == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ needs.check-changes.outputs.next_version }}
+          TAG="v${VERSION}"
+
+          echo "Creating tag: $TAG"
+
+          # Create annotated tag
+          git tag -a "$TAG" -m "Release $VERSION"
+
+          # Push tag to trigger release workflow
+          git push origin "$TAG"
+
+          echo "Tag $TAG created and pushed"
+
+      - name: Summary
+        run: |
+          echo "## Weekly Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Previous version: ${{ needs.check-changes.outputs.last_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- New version: v${{ needs.check-changes.outputs.next_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The release workflow has been triggered." >> $GITHUB_STEP_SUMMARY
+
+  no-release:
+    name: No Release Needed
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.has_changes == 'false'
+
+    steps:
+      - name: Summary
+        run: |
+          echo "## No Release Needed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No code changes detected since ${{ needs.check-changes.outputs.last_tag }}." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Use workflow_dispatch with force_release=true to force a release." >> $GITHUB_STEP_SUMMARY
