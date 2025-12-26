@@ -44,9 +44,9 @@ class HttpTransportConfigTest {
     @Test
     @DisplayName("should have expected default constants")
     void shouldHaveExpectedDefaultConstants() {
-      assertThat(HttpTransportConfig.DEFAULT_CONNECT_TIMEOUT).isEqualTo(Duration.ofSeconds(10));
-      assertThat(HttpTransportConfig.DEFAULT_READ_TIMEOUT).isEqualTo(Duration.ofSeconds(30));
-      assertThat(HttpTransportConfig.DEFAULT_REQUEST_TIMEOUT).isEqualTo(Duration.ofSeconds(60));
+      assertThat(Duration.ofSeconds(10)).isEqualTo(HttpTransportConfig.DEFAULT_CONNECT_TIMEOUT);
+      assertThat(Duration.ofSeconds(30)).isEqualTo(HttpTransportConfig.DEFAULT_READ_TIMEOUT);
+      assertThat(Duration.ofSeconds(60)).isEqualTo(HttpTransportConfig.DEFAULT_REQUEST_TIMEOUT);
     }
   }
 
