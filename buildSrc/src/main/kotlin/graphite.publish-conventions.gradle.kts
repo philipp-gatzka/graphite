@@ -84,18 +84,23 @@ publishing {
             val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
-                username = System.getenv("OSSRH_USERNAME") ?: ""
-                password = System.getenv("OSSRH_PASSWORD") ?: ""
+                username = System.getenv("MAVEN_CENTRAL_USERNAME") ?: System.getenv("OSSRH_USERNAME") ?: ""
+                password = System.getenv("MAVEN_CENTRAL_PASSWORD") ?: System.getenv("OSSRH_PASSWORD") ?: ""
             }
         }
     }
 }
 
 signing {
-    val signingKey = System.getenv("GPG_SIGNING_KEY")
-    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD")
+    val signingKeyId = System.getenv("SIGNING_KEY_ID")
+    val signingKey = System.getenv("SIGNING_KEY") ?: System.getenv("GPG_SIGNING_KEY")
+    val signingPassword = System.getenv("SIGNING_PASSWORD") ?: System.getenv("GPG_SIGNING_PASSWORD")
     if (signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+        if (signingKeyId != null) {
+            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+        } else {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+        }
         sign(publishing.publications["maven"])
     }
 }
