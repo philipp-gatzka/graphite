@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.graphite.spring.observability.GraphiteMetrics;
 import io.github.graphite.spring.observability.GraphiteMetricsInterceptor;
+import io.github.graphite.spring.observability.GraphiteRetryMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +60,17 @@ class GraphiteMetricsAutoConfigurationTest {
                 assertThat(context).hasSingleBean(GraphiteMetricsInterceptor.class);
               });
     }
+
+    @Test
+    @DisplayName("should create GraphiteRetryMetrics bean")
+    void shouldCreateGraphiteRetryMetricsBean() {
+      contextRunner
+          .withBean(MeterRegistry.class, SimpleMeterRegistry::new)
+          .run(
+              context -> {
+                assertThat(context).hasSingleBean(GraphiteRetryMetrics.class);
+              });
+    }
   }
 
   @Nested
@@ -80,6 +92,15 @@ class GraphiteMetricsAutoConfigurationTest {
       contextRunner.run(
           context -> {
             assertThat(context).doesNotHaveBean(GraphiteMetricsInterceptor.class);
+          });
+    }
+
+    @Test
+    @DisplayName("should not create GraphiteRetryMetrics bean")
+    void shouldNotCreateGraphiteRetryMetricsBean() {
+      contextRunner.run(
+          context -> {
+            assertThat(context).doesNotHaveBean(GraphiteRetryMetrics.class);
           });
     }
   }
@@ -118,6 +139,23 @@ class GraphiteMetricsAutoConfigurationTest {
                 assertThat(context).hasSingleBean(GraphiteMetricsInterceptor.class);
                 assertThat(context.getBean(GraphiteMetricsInterceptor.class))
                     .isSameAs(customInterceptor);
+              });
+    }
+
+    @Test
+    @DisplayName("should not override existing GraphiteRetryMetrics bean")
+    void shouldNotOverrideExistingGraphiteRetryMetrics() {
+      MeterRegistry registry = new SimpleMeterRegistry();
+      GraphiteRetryMetrics customRetryMetrics = new GraphiteRetryMetrics(registry);
+
+      contextRunner
+          .withBean(MeterRegistry.class, () -> registry)
+          .withBean(GraphiteRetryMetrics.class, () -> customRetryMetrics)
+          .run(
+              context -> {
+                assertThat(context).hasSingleBean(GraphiteRetryMetrics.class);
+                assertThat(context.getBean(GraphiteRetryMetrics.class))
+                    .isSameAs(customRetryMetrics);
               });
     }
   }
