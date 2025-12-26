@@ -95,11 +95,18 @@ signing {
     val signingKeyId = System.getenv("SIGNING_KEY_ID")
     val signingKey = System.getenv("SIGNING_KEY") ?: System.getenv("GPG_SIGNING_KEY")
     val signingPassword = System.getenv("SIGNING_PASSWORD") ?: System.getenv("GPG_SIGNING_PASSWORD")
+
+    // Only require signing for release builds when credentials are available
+    isRequired = signingKey != null && signingPassword != null &&
+        !version.toString().endsWith("SNAPSHOT")
+
     if (signingKey != null && signingPassword != null) {
+        // Convert literal \n to actual newlines (GitHub Actions stores secrets this way)
+        val normalizedKey = signingKey.replace("\\n", "\n")
         if (signingKeyId != null) {
-            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+            useInMemoryPgpKeys(signingKeyId, normalizedKey, signingPassword)
         } else {
-            useInMemoryPgpKeys(signingKey, signingPassword)
+            useInMemoryPgpKeys(normalizedKey, signingPassword)
         }
         sign(publishing.publications["maven"])
     }
