@@ -16,6 +16,7 @@
 package io.github.graphite.spring.autoconfigure;
 
 import io.github.graphite.GraphiteClient;
+import io.github.graphite.spring.observability.GraphiteHttpMetrics;
 import io.github.graphite.spring.observability.GraphiteMetrics;
 import io.github.graphite.spring.observability.GraphiteMetricsInterceptor;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -23,6 +24,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -101,5 +103,35 @@ public class GraphiteMetricsAutoConfiguration {
   @ConditionalOnMissingBean
   public GraphiteMetricsInterceptor graphiteMetricsInterceptor(MeterRegistry registry) {
     return new GraphiteMetricsInterceptor(registry);
+  }
+
+  /**
+   * Creates a {@link GraphiteHttpMetrics} bean for HTTP connection pool metrics.
+   *
+   * <p>This bean provides metrics for monitoring HTTP connection behavior:
+   *
+   * <ul>
+   *   <li>{@code graphite.http.connections.active} - Currently active connections
+   *   <li>{@code graphite.http.connections.pending} - Pending connection requests
+   *   <li>{@code graphite.http.connections.max} - Maximum allowed connections
+   *   <li>{@code graphite.http.connections.total} - Total connection attempts
+   *   <li>{@code graphite.http.connections.acquired} - Connection acquisition timing
+   * </ul>
+   *
+   * @param registry the meter registry
+   * @param properties the graphite properties for configuration
+   * @return the HTTP metrics
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "graphite.metrics.http",
+      name = "enabled",
+      havingValue = "true",
+      matchIfMissing = true)
+  public GraphiteHttpMetrics graphiteHttpMetrics(
+      MeterRegistry registry, GraphiteProperties properties) {
+    String clientName = properties.getClientName() != null ? properties.getClientName() : "default";
+    return new GraphiteHttpMetrics(registry, clientName);
   }
 }
