@@ -63,7 +63,7 @@ public class GraphiteMockServer implements AutoCloseable {
   private static final String GRAPHQL_PATH = "/graphql";
   private static final String CONTENT_TYPE_HEADER = "Content-Type";
   private static final String CONTENT_TYPE_JSON = "application/json";
-  private static final String OPERATION_NAME_JSON_PATH = "OPERATION_NAME_JSON_PATH";
+  private static final String OPERATION_NAME_JSON_PATH = "$.operationName";
 
   private final WireMockServer wireMockServer;
   private final ObjectMapper objectMapper;
