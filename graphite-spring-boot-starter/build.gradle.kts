@@ -22,24 +22,24 @@ plugins {
 description = "Graphite Spring Boot Starter - Auto-configuration for Spring Boot applications"
 
 dependencies {
-    // BOM imports
+    // API dependencies
     api(platform(libs.spring.boot.bom))
-    annotationProcessor(platform(libs.spring.boot.bom))
-
-    // Core module
     api(project(":graphite-core"))
 
-    // Spring Boot
+    // Implementation dependencies
     implementation(libs.spring.boot.autoconfigure)
-    annotationProcessor(libs.spring.boot.configuration.processor)
 
-    // Optional observability dependencies
+    // Compile-only dependencies
     compileOnly(libs.spring.boot.actuator)
     compileOnly(libs.spring.boot.actuator.autoconfigure)
     compileOnly(libs.micrometer.core)
     compileOnly(libs.micrometer.tracing)
 
-    // Testing
+    // Annotation processors
+    annotationProcessor(platform(libs.spring.boot.bom))
+    annotationProcessor(libs.spring.boot.configuration.processor)
+
+    // Test dependencies
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.testing)
     testImplementation(libs.spring.boot.starter.test)
