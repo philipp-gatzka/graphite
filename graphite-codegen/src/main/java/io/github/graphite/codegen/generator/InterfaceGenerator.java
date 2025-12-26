@@ -24,6 +24,7 @@ import io.github.graphite.codegen.CodegenConfiguration;
 import io.github.graphite.codegen.schema.FieldDefinition;
 import io.github.graphite.codegen.schema.InterfaceDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -116,7 +117,7 @@ public final class InterfaceGenerator {
 
     // Add JavaDoc
     if (interfaceDef.description() != null && !interfaceDef.description().isBlank()) {
-      interfaceBuilder.addJavadoc(escapeJavadoc(interfaceDef.description()) + "\n");
+      interfaceBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(interfaceDef.description()) + "\n");
     }
 
     // Add permits clause for all implementing types
@@ -149,19 +150,13 @@ public final class InterfaceGenerator {
     // Add JavaDoc
     if (field.description() != null && !field.description().isBlank()) {
       methodBuilder.addJavadoc(
-          escapeJavadoc(field.description()) + "\n\n@return the $N value\n", field.name());
+          GeneratorUtils.escapeJavadoc(field.description()) + "\n\n@return the $N value\n",
+          field.name());
     } else {
       methodBuilder.addJavadoc(
           "Returns the $N value.\n\n@return the $N value\n", field.name(), field.name());
     }
 
     return methodBuilder.build();
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }
