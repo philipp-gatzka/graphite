@@ -2,44 +2,30 @@ name: Snapshot
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  packages: write
+    branches:
+      - main
 
 jobs:
   publish:
-    name: Publish Snapshot
     runs-on: ubuntu-latest
-
+    # Skip if commit message contains [skip ci]
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: gradle
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Generate snapshot version
-        id: version
-        run: |
-          # Use commit SHA for unique snapshot versions
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          DATE=$(date +%Y%m%d)
-          echo "VERSION=0.1.0-${DATE}-${SHORT_SHA}-SNAPSHOT" >> $GITHUB_OUTPUT
-
-      - name: Build
-        run: ./gradlew build -Pversion=${{ steps.version.outputs.VERSION }}
-
-      - name: Publish to GitHub Packages
+      - name: Build and publish snapshot
+        run: ./gradlew clean build publish
         env:
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository -Pversion=${{ steps.version.outputs.VERSION }}
-        continue-on-error: true
