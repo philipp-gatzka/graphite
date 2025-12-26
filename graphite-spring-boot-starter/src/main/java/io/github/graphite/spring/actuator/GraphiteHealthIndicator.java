@@ -21,8 +21,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
 
 /**
  * Health indicator for the Graphite GraphQL client.
