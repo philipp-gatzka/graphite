@@ -136,9 +136,7 @@ public class GraphiteGraphQLException extends GraphiteServerException {
    * @return a list of errors with the specified code, may be empty
    */
   public List<GraphQLError> getErrorsWithCode(String code) {
-    return errors.stream()
-        .filter(error -> code.equals(error.getCode()))
-        .collect(Collectors.toList());
+    return errors.stream().filter(error -> code.equals(error.getCode())).toList();
   }
 
   /**
