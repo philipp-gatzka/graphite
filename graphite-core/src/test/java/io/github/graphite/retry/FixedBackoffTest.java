@@ -81,7 +81,7 @@ class FixedBackoffTest {
     @Test
     @DisplayName("should have expected default constant")
     void shouldHaveExpectedDefaultConstant() {
-      assertThat(FixedBackoff.DEFAULT_DELAY).isEqualTo(Duration.ofSeconds(1));
+      assertThat(Duration.ofSeconds(1)).isEqualTo(FixedBackoff.DEFAULT_DELAY);
     }
   }
 
