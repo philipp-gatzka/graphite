@@ -63,6 +63,22 @@ jobs:
             echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Verify signing configuration
+        run: |
+          if [ -z "${{ secrets.SIGNING_KEY }}" ]; then
+            echo "::error::SIGNING_KEY secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SIGNING_KEY_ID }}" ]; then
+            echo "::error::SIGNING_KEY_ID secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SIGNING_PASSWORD }}" ]; then
+            echo "::error::SIGNING_PASSWORD secret is not set"
+            exit 1
+          fi
+          echo "All signing secrets are configured"
+
       - name: Publish to Maven Central
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -70,7 +86,7 @@ jobs:
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishMavenPublicationToMavenCentralRepository -Pversion=${{ steps.version.outputs.VERSION }}
+        run: ./gradlew publishMavenPublicationToMavenCentralRepository -Pversion=${{ steps.version.outputs.VERSION }} --info
 
   release:
     name: Create GitHub Release
