@@ -25,6 +25,7 @@ import io.github.graphite.codegen.CodegenConfiguration;
 import io.github.graphite.codegen.schema.InputFieldDefinition;
 import io.github.graphite.codegen.schema.InputTypeDefinition;
 import io.github.graphite.codegen.schema.SchemaModel;
+import io.github.graphite.codegen.util.GeneratorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -138,7 +139,7 @@ public final class InputTypeGenerator {
 
     // Add JavaDoc
     if (inputType.description() != null && !inputType.description().isBlank()) {
-      classBuilder.addJavadoc(escapeJavadoc(inputType.description()) + "\n");
+      classBuilder.addJavadoc(GeneratorUtils.escapeJavadoc(inputType.description()) + "\n");
     }
 
     // Add fields
@@ -205,7 +206,7 @@ public final class InputTypeGenerator {
 
   private MethodSpec generateGetter(InputFieldDefinition field) {
     TypeName javaType = typeMapper.mapType(field.type());
-    String methodName = "get" + capitalize(field.name());
+    String methodName = "get" + GeneratorUtils.capitalize(field.name());
 
     MethodSpec.Builder getter =
         MethodSpec.methodBuilder(methodName)
@@ -215,7 +216,8 @@ public final class InputTypeGenerator {
 
     if (field.description() != null && !field.description().isBlank()) {
       getter.addJavadoc(
-          escapeJavadoc(field.description()) + "\n\n@return the $N value\n", field.name());
+          GeneratorUtils.escapeJavadoc(field.description()) + "\n\n@return the $N value\n",
+          field.name());
     } else {
       getter.addJavadoc(
           "Returns the $N value.\n\n@return the $N value\n", field.name(), field.name());
@@ -274,7 +276,7 @@ public final class InputTypeGenerator {
 
     if (field.description() != null && !field.description().isBlank()) {
       setter.addJavadoc(
-          escapeJavadoc(field.description())
+          GeneratorUtils.escapeJavadoc(field.description())
               + "\n\n@param $N the value to set\n@return this builder\n",
           field.name());
     } else {
@@ -285,19 +287,5 @@ public final class InputTypeGenerator {
     }
 
     return setter.build();
-  }
-
-  private String capitalize(String str) {
-    if (str == null || str.isEmpty()) {
-      return str;
-    }
-    return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-  }
-
-  private String escapeJavadoc(String text) {
-    return text.replace("$", "$$")
-        .replace("@", "{@literal @}")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
   }
 }

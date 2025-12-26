@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import io.github.graphite.ratelimit.RateLimiter;
+import io.github.graphite.retry.RetryListener;
 import io.github.graphite.retry.RetryPolicy;
 import java.net.URI;
 import java.time.Duration;
@@ -50,7 +51,8 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               retryPolicy,
-              rateLimiter);
+              rateLimiter,
+              null);
 
       assertThat(config.endpoint()).isEqualTo(TEST_ENDPOINT);
       assertThat(config.headers()).containsEntry("Authorization", "Bearer token");
@@ -74,6 +76,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("endpoint must not be null");
     }
@@ -91,6 +94,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("headers must not be null");
     }
@@ -108,6 +112,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("connectTimeout must not be null");
     }
@@ -125,6 +130,7 @@ class GraphiteConfigurationTest {
                       null,
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("readTimeout must not be null");
     }
@@ -142,6 +148,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       null,
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("requestTimeout must not be null");
     }
@@ -159,6 +166,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       null,
+                      null,
                       null))
           .withMessageContaining("retryPolicy must not be null");
     }
@@ -174,6 +182,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               RetryPolicy.defaults(),
+              null,
               null);
 
       assertThat(config.rateLimiter()).isNull();
@@ -192,6 +201,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("connectTimeout must be positive");
     }
@@ -209,6 +219,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("connectTimeout must be positive");
     }
@@ -226,6 +237,7 @@ class GraphiteConfigurationTest {
                       Duration.ZERO,
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("readTimeout must be positive");
     }
@@ -243,6 +255,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(-1),
                       Duration.ofSeconds(60),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("readTimeout must be positive");
     }
@@ -260,6 +273,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ZERO,
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("requestTimeout must be positive");
     }
@@ -277,6 +291,7 @@ class GraphiteConfigurationTest {
                       Duration.ofSeconds(30),
                       Duration.ofSeconds(-1),
                       RetryPolicy.defaults(),
+                      null,
                       null))
           .withMessageContaining("requestTimeout must be positive");
     }
@@ -295,6 +310,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               RetryPolicy.defaults(),
+              null,
               null);
 
       assertThat(config.headers()).isUnmodifiable();
@@ -491,6 +507,84 @@ class GraphiteConfigurationTest {
   }
 
   @Nested
+  @DisplayName("withRetryListener")
+  class WithRetryListener {
+
+    @Test
+    @DisplayName("should create new configuration with retry listener")
+    void shouldCreateNewConfigurationWithRetryListener() {
+      RetryListener listener =
+          new RetryListener() {
+            @Override
+            public void onRetryAttempt(int attempt, Exception exception, Duration delay) {}
+
+            @Override
+            public void onRetryExhausted(int totalAttempts, Exception lastException) {}
+
+            @Override
+            public void onRetrySuccess(int attemptsTaken) {}
+          };
+      var original = GraphiteConfiguration.withEndpoint(TEST_ENDPOINT);
+      var modified = original.withRetryListener(listener);
+
+      assertThat(modified.retryListener()).isSameAs(listener);
+      assertThat(original.retryListener()).isNull();
+    }
+
+    @Test
+    @DisplayName("should allow setting retry listener to null")
+    void shouldAllowSettingRetryListenerToNull() {
+      RetryListener listener =
+          new RetryListener() {
+            @Override
+            public void onRetryAttempt(int attempt, Exception exception, Duration delay) {}
+
+            @Override
+            public void onRetryExhausted(int totalAttempts, Exception lastException) {}
+
+            @Override
+            public void onRetrySuccess(int attemptsTaken) {}
+          };
+      var original = GraphiteConfiguration.withEndpoint(TEST_ENDPOINT).withRetryListener(listener);
+      var modified = original.withRetryListener(null);
+
+      assertThat(modified.retryListener()).isNull();
+    }
+  }
+
+  @Nested
+  @DisplayName("hasRetryListener")
+  class HasRetryListener {
+
+    @Test
+    @DisplayName("should return true when retry listener is set")
+    void shouldReturnTrueWhenRetryListenerSet() {
+      RetryListener listener =
+          new RetryListener() {
+            @Override
+            public void onRetryAttempt(int attempt, Exception exception, Duration delay) {}
+
+            @Override
+            public void onRetryExhausted(int totalAttempts, Exception lastException) {}
+
+            @Override
+            public void onRetrySuccess(int attemptsTaken) {}
+          };
+      var config = GraphiteConfiguration.withEndpoint(TEST_ENDPOINT).withRetryListener(listener);
+
+      assertThat(config.hasRetryListener()).isTrue();
+    }
+
+    @Test
+    @DisplayName("should return false when retry listener is null")
+    void shouldReturnFalseWhenRetryListenerNull() {
+      var config = GraphiteConfiguration.withEndpoint(TEST_ENDPOINT);
+
+      assertThat(config.hasRetryListener()).isFalse();
+    }
+  }
+
+  @Nested
   @DisplayName("default timeouts")
   class DefaultTimeouts {
 
@@ -529,6 +623,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               retryPolicy,
+              null,
               null);
       var config2 =
           new GraphiteConfiguration(
@@ -538,6 +633,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               retryPolicy,
+              null,
               null);
 
       assertThat(config1).isEqualTo(config2).hasSameHashCodeAs(config2);
@@ -555,6 +651,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               retryPolicy,
+              null,
               null);
       var config2 =
           new GraphiteConfiguration(
@@ -564,6 +661,7 @@ class GraphiteConfigurationTest {
               Duration.ofSeconds(30),
               Duration.ofSeconds(60),
               retryPolicy,
+              null,
               null);
 
       assertThat(config1).isNotEqualTo(config2);
