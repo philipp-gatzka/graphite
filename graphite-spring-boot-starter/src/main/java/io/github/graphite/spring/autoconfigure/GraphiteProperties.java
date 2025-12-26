@@ -75,6 +75,9 @@ public class GraphiteProperties {
   /** Whether the Graphite client is enabled. */
   private boolean enabled = true;
 
+  /** Client name for metrics tagging. */
+  private String clientName = "default";
+
   public String getUrl() {
     return url;
   }
@@ -129,6 +132,14 @@ public class GraphiteProperties {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  public String getClientName() {
+    return clientName;
+  }
+
+  public void setClientName(String clientName) {
+    this.clientName = clientName;
   }
 
   /** Timeout configuration properties. */
